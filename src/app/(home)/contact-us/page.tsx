@@ -2,7 +2,16 @@ import ContactForm from "./ContactForm";
 import { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Mail, Clock, AlertTriangle, Users, Building, Calendar } from "lucide-react";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  AlertTriangle,
+  Users,
+  Building,
+  Calendar,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -225,7 +234,8 @@ export default function ContactUs() {
               24/7 Emergency Support Available
             </h2>
             <p className="text-muted-foreground">
-              For urgent situations or emergencies, contact these services immediately.
+              For urgent situations or emergencies, contact these services
+              immediately.
             </p>
           </div>
 
@@ -237,8 +247,12 @@ export default function ContactUs() {
                     <Phone className="h-6 w-6 text-red-600 dark:text-red-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">Emergency Hotline</h3>
-                    <p className="text-2xl font-bold text-red-600 dark:text-red-400 mb-1">000</p>
+                    <h3 className="font-semibold text-foreground mb-2">
+                      Emergency Hotline
+                    </h3>
+                    <p className="text-2xl font-bold text-red-600 dark:text-red-400 mb-1">
+                      000
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       For life-threatening emergencies
                     </p>
@@ -254,8 +268,12 @@ export default function ContactUs() {
                     <Phone className="h-6 w-6 text-red-600 dark:text-red-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">Crisis Support</h3>
-                    <p className="text-2xl font-bold text-red-600 dark:text-red-400 mb-1">13 11 14</p>
+                    <h3 className="font-semibold text-foreground mb-2">
+                      Crisis Support
+                    </h3>
+                    <p className="text-2xl font-bold text-red-600 dark:text-red-400 mb-1">
+                      13 11 14
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       Lifeline 24/7 crisis support
                     </p>
@@ -275,7 +293,8 @@ export default function ContactUs() {
               Service Areas
             </h2>
             <p className="text-muted-foreground">
-              We provide comprehensive community support services across Victoria.
+              We provide comprehensive community support services across
+              Victoria.
             </p>
           </div>
 
@@ -285,7 +304,9 @@ export default function ContactUs() {
                 <div className="p-3 bg-primary/10 rounded-lg w-fit mx-auto mb-4">
                   <Building className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Melbourne Metro</h3>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Melbourne Metro
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   City of Melbourne, surrounding suburbs, and metropolitan area
                 </p>
@@ -297,7 +318,9 @@ export default function ContactUs() {
                 <div className="p-3 bg-primary/10 rounded-lg w-fit mx-auto mb-4">
                   <Users className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Regional Victoria</h3>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Regional Victoria
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Geelong, Ballarat, Bendigo, and regional centers
                 </p>
@@ -309,7 +332,9 @@ export default function ContactUs() {
                 <div className="p-3 bg-primary/10 rounded-lg w-fit mx-auto mb-4">
                   <Calendar className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Extended Services</h3>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Extended Services
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Available for assessments and consultations statewide
                 </p>
@@ -341,8 +366,8 @@ export default function ContactUs() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">
-                  Book a free initial consultation to discuss your needs and explore
-                  our available services.
+                  Book a free initial consultation to discuss your needs and
+                  explore our available services.
                 </p>
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">
@@ -367,12 +392,13 @@ export default function ContactUs() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">
-                  Come visit us at our Melbourne office for in-person consultations
-                  and support services.
+                  Come visit us at our Melbourne office for in-person
+                  consultations and support services.
                 </p>
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">
-                    <strong>Address:</strong> 123 Community Street, Melbourne VIC 3000
+                    <strong>Address:</strong> 123 Community Street, Melbourne
+                    VIC 3000
                   </p>
                   <p className="text-sm text-muted-foreground">
                     <strong>Parking:</strong> Available on-site
