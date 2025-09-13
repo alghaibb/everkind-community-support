@@ -4,69 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    role: "Client",
-    location: "Melbourne",
-    content:
-      "EverKind has been a lifesaver for our family. Their personal activities support has given my mother the independence she needed while ensuring her safety. The staff are incredibly compassionate and professional.",
-    rating: 5,
-    service: "Personal Activities",
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    role: "Family Member",
-    location: "Sydney",
-    content:
-      "The travel and transport service has been amazing. They've helped my brother attend all his medical appointments and social activities. The drivers are always punctual and friendly.",
-    rating: 5,
-    service: "Travel & Transport",
-  },
-  {
-    id: 3,
-    name: "Emma Williams",
-    role: "Client",
-    location: "Brisbane",
-    content:
-      "The nursing care provided by EverKind is exceptional. The nurses are highly skilled and genuinely care about my wellbeing. I feel safe and supported in my own home.",
-    rating: 5,
-    service: "Nursing Care",
-  },
-  {
-    id: 4,
-    name: "David Thompson",
-    role: "Family Member",
-    location: "Perth",
-    content:
-      "EverKind's daily tasks support has made such a difference in our lives. They help with everything from meal preparation to household management. Highly recommended!",
-    rating: 5,
-    service: "Daily Tasks",
-  },
-  {
-    id: 5,
-    name: "Lisa Rodriguez",
-    role: "Client",
-    location: "Adelaide",
-    content:
-      "The life skills development program has been transformative. I've gained so much confidence and independence. The support workers are patient and encouraging.",
-    rating: 5,
-    service: "Life Skills",
-  },
-  {
-    id: 6,
-    name: "James Wilson",
-    role: "Family Member",
-    location: "Hobart",
-    content:
-      "EverKind's household tasks service has been invaluable. They keep everything clean and organized, allowing us to focus on spending quality time together.",
-    rating: 5,
-    service: "Household Tasks",
-  },
-];
+import { testimonials } from "../constants";
 
 export default function Testimonials() {
   return (

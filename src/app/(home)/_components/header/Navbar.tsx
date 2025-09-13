@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { navLinks } from "../../constants";
-import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -15,7 +14,7 @@ import {
 
 export default function Navbar() {
   return (
-    <NavigationMenu>
+    <NavigationMenu viewport={false}>
       <NavigationMenuList>
         {navLinks.map((link) => {
           if (link.subLinks) {
@@ -23,7 +22,7 @@ export default function Navbar() {
               <NavigationMenuItem key={link.href}>
                 <NavigationMenuTrigger>{link.label}</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                  <ul className="grid gap-3 p-4 w-[500px] grid-cols-2">
                     {link.subLinks.map((subLink) => (
                       <ListItem
                         key={subLink.href}
@@ -45,9 +44,7 @@ export default function Navbar() {
                   asChild
                   className={navigationMenuTriggerStyle()}
                 >
-                  <Button variant="ghost" asChild>
-                    <Link href={link.href}>{link.label}</Link>
-                  </Button>
+                  <Link href={link.href}>{link.label}</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             );
@@ -68,16 +65,15 @@ function ListItem({ title, children, href }: ListItemProps) {
   return (
     <li>
       <NavigationMenuLink asChild>
-        <Button variant="ghost" className="h-auto p-3 justify-start" asChild>
-          <Link href={href}>
-            <div className="space-y-1">
-              <div className="text-sm font-medium leading-none">{title}</div>
-              <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                {children}
-              </p>
-            </div>
-          </Link>
-        </Button>
+        <Link
+          href={href}
+          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </Link>
       </NavigationMenuLink>
     </li>
   );
