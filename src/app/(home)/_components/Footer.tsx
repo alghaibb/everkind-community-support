@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import {
   footerDescription,
   footerLinks,
@@ -9,7 +10,7 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="bg-muted/50 border-t">
+    <footer className="bg-muted/50 border-t mt-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-2">
@@ -31,12 +32,14 @@ export default function Footer() {
             <ul className="space-y-2">
               {footerLinks.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="px-0 text-muted-foreground"
+                    asChild
                   >
-                    {link.label}
-                  </Link>
+                    <Link href={link.href}>{link.label}</Link>
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -47,12 +50,14 @@ export default function Footer() {
             <ul className="space-y-2">
               {footerServicesSection.map((service) => (
                 <li key={service.href}>
-                  <Link
-                    href={service.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="px-0 text-muted-foreground"
+                    asChild
                   >
-                    {service.label}
-                  </Link>
+                    <Link href={service.href}>{service.label}</Link>
+                  </Button>
                 </li>
               ))}
             </ul>
