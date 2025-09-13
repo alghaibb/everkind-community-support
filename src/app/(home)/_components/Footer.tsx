@@ -15,13 +15,12 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center space-x-2 mb-4">
               <Image
-                src="/logo.png"
+                src="/ekcs-logo.png"
                 alt="EverKind Community Support"
-                width={40}
-                height={40}
-                className="h-10 w-10"
+                width={150}
+                height={150}
+                className="dark:invert"
               />
-              <span className="font-bold text-xl">EverKind</span>
             </Link>
             <p className="text-muted-foreground mb-4">{footerDescription}</p>
             <p className="text-sm text-muted-foreground">{copyrightText}</p>
@@ -34,7 +33,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -50,7 +49,7 @@ export default function Footer() {
                 <li key={service.href}>
                   <Link
                     href={service.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     {service.label}
                   </Link>
