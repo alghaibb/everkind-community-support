@@ -24,112 +24,62 @@ export default function ContactInfo() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            viewport={{ once: true }}
-          >
-            <Card className="border-0 shadow-md h-full">
-              <CardHeader className="text-center pb-2">
-                <div className="p-3 bg-primary/10 rounded-lg w-fit mx-auto mb-2">
-                  <Phone className="h-6 w-6 text-primary" />
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          viewport={{ once: true }}
+          className="max-w-4xl mx-auto"
+        >
+          <Card className="border-0 shadow-lg">
+            <CardContent className="p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="p-3 bg-primary/10 rounded-lg mb-3">
+                    <Phone className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">Phone</h3>
+                  <p className="font-medium text-foreground mb-1">(03) 1234 5678</p>
+                  <p className="text-sm text-muted-foreground mb-2">Mon-Fri: 9AM-5PM</p>
+                  <Badge variant="secondary">Preferred Contact</Badge>
                 </div>
-                <CardTitle className="text-lg">Phone</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="font-semibold text-foreground mb-1">
-                  (03) 1234 5678
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Mon-Fri: 9AM-5PM
-                </p>
-                <Badge variant="secondary" className="mt-2">
-                  Preferred Contact
-                </Badge>
-              </CardContent>
-            </Card>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <Card className="border-0 shadow-md h-full">
-              <CardHeader className="text-center pb-2">
-                <div className="p-3 bg-primary/10 rounded-lg w-fit mx-auto mb-2">
-                  <Mail className="h-6 w-6 text-primary" />
+                <div className="flex flex-col items-center text-center">
+                  <div className="p-3 bg-primary/10 rounded-lg mb-3">
+                    <Mail className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">Email</h3>
+                  <p className="font-medium text-foreground mb-1">info@everkind.org.au</p>
+                  <p className="text-sm text-muted-foreground mb-2">Response within 24 hours</p>
+                  <Badge variant="outline">Business Hours</Badge>
                 </div>
-                <CardTitle className="text-lg">Email</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="font-semibold text-foreground mb-1">
-                  info@everkind.org.au
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Response within 24 hours
-                </p>
-                <Badge variant="outline" className="mt-2">
-                  Business Hours
-                </Badge>
-              </CardContent>
-            </Card>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            viewport={{ once: true }}
-          >
-            <Card className="border-0 shadow-md h-full">
-              <CardHeader className="text-center pb-2">
-                <div className="p-3 bg-primary/10 rounded-lg w-fit mx-auto mb-2">
-                  <MapPin className="h-6 w-6 text-primary" />
+                <div className="flex flex-col items-center text-center">
+                  <div className="p-3 bg-primary/10 rounded-lg mb-3">
+                    <MapPin className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">Office</h3>
+                  <p className="font-medium text-foreground mb-1">123 Community Street</p>
+                  <p className="text-sm text-muted-foreground mb-1">Melbourne VIC 3000</p>
+                  <p className="text-sm text-muted-foreground">Wheelchair accessible</p>
                 </div>
-                <CardTitle className="text-lg">Office</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="font-semibold text-foreground mb-1">
-                  123 Community Street
-                </p>
-                <p className="text-sm text-muted-foreground mb-1">
-                  Melbourne VIC 3000
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Wheelchair accessible
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-          >
-            <Card className="border-0 shadow-md h-full">
-              <CardHeader className="text-center pb-2">
-                <div className="p-3 bg-primary/10 rounded-lg w-fit mx-auto mb-2">
-                  <Clock className="h-6 w-6 text-primary" />
+                <div className="flex flex-col items-center text-center">
+                  <div className="p-3 bg-primary/10 rounded-lg mb-3">
+                    <Clock className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">Hours</h3>
+                  <div className="space-y-1">
+                    <p className="font-medium text-foreground">Mon-Fri</p>
+                    <p className="text-sm text-muted-foreground">9:00 AM - 5:00 PM</p>
+                    <p className="font-medium text-foreground">Sat-Sun</p>
+                    <p className="text-sm text-muted-foreground">Emergency Only</p>
+                  </div>
                 </div>
-                <CardTitle className="text-lg">Hours</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <div className="space-y-1">
-                  <p className="font-semibold text-foreground">Mon-Fri</p>
-                  <p className="text-sm text-muted-foreground">9:00 AM - 5:00 PM</p>
-                  <p className="font-semibold text-foreground">Sat-Sun</p>
-                  <p className="text-sm text-muted-foreground">Emergency Only</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </section>
   );
