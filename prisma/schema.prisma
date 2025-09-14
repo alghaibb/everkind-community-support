@@ -81,3 +81,25 @@ model ContactMessage {
 
   @@map("contact_message")
 }
+
+model CareerSubmission {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String   @unique
+  message   String
+  createdAt DateTime @default(now())
+
+  @@map("career_submission")
+}
+
+// Cert 3 in individual support
+// 3 covid vaccinations
+// influenza vaccination 
+// working with children check
+// ndis screening check
+// ndis modules (infection control, hand hygiene) 
+// first aid, cpr 
+// working rights 
+// police check
