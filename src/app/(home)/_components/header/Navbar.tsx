@@ -11,8 +11,12 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function Navbar() {
+  const pathname = usePathname();
+
   return (
     <NavigationMenu viewport={false}>
       <NavigationMenuList>
@@ -28,6 +32,7 @@ export default function Navbar() {
                         key={subLink.href}
                         title={subLink.label}
                         href={subLink.href}
+                        isActive={pathname === subLink.href}
                       >
                         Professional support services for{" "}
                         {subLink.label.toLowerCase()}
@@ -59,15 +64,19 @@ interface ListItemProps {
   title: string;
   children: React.ReactNode;
   href: string;
+  isActive: boolean;
 }
 
-function ListItem({ title, children, href }: ListItemProps) {
+function ListItem({ title, children, href, isActive }: ListItemProps) {
   return (
     <li>
       <NavigationMenuLink asChild>
         <Link
           href={href}
-          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-all hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative",
+            isActive && "text-accent-foreground after:absolute after:bottom-0 after:left-3 after:right-3 after:h-1 after:bg-primary after:rounded-full"
+          )}
         >
           <div className="text-sm font-medium leading-none">{title}</div>
           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
