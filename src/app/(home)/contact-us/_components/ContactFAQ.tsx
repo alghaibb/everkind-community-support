@@ -68,8 +68,8 @@ export default function ContactFAQ() {
               <AccordionContent className="text-muted-foreground">
                 You can contact us directly for an initial assessment, or you
                 may be referred by healthcare professionals, family members, or
-                other support services. We'll guide you through the assessment
-                process.
+                other support services. We&apos;ll guide you through the
+                assessment process.
               </AccordionContent>
             </AccordionItem>
 

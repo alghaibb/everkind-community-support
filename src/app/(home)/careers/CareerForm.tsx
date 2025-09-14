@@ -140,7 +140,7 @@ export default function CareerForm() {
           Career Application
         </CardTitle>
         <p className="text-muted-foreground">
-          Please fill out all required information. We'll review your
+          Please fill out all required information. We&apos;ll review your
           application and qualifications thoroughly.
         </p>
       </CardHeader>

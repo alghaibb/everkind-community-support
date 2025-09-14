@@ -18,8 +18,8 @@ export default function CareersPage() {
               Join Our Team
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              We're looking for compassionate and dedicated professionals to
-              join our mission of providing exceptional community support
+              We&apos;re looking for compassionate and dedicated professionals
+              to join our mission of providing exceptional community support
               services.
             </p>
           </div>
@@ -34,8 +34,8 @@ export default function CareersPage() {
               Apply for a Position
             </h2>
             <p className="text-muted-foreground">
-              Fill out the form below to submit your application. We'll review
-              your qualifications and get back to you soon.
+              Fill out the form below to submit your application. We&apos;ll
+              review your qualifications and get back to you soon.
             </p>
           </div>
 

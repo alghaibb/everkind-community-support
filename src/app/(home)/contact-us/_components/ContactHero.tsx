@@ -16,11 +16,11 @@ export default function ContactHero() {
             Get in Touch
           </h1>
           <h2 className="text-2xl font-semibold text-primary mb-4">
-            We're Here to Help
+            We&apos;re Here to Help
           </h2>
           <p className="text-muted-foreground">
-            We're available to help you navigate your community support needs.
-            Reach out to us through any of the channels below.
+            We&apos;re available to help you navigate your community support
+            needs. Reach out to us through any of the channels below.
           </p>
         </motion.div>
       </div>
