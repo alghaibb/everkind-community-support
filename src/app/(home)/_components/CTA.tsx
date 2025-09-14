@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function CTA() {
   return (
@@ -48,15 +49,16 @@ export default function CTA() {
                   viewport={{ once: true }}
                   className="flex flex-col sm:flex-row gap-4 justify-center"
                 >
-                  <Button size="lg" className="px-8 py-6 text-lg">
-                    Contact Our Team
+                  <Button size="lg" className="px-8 py-6 text-lg" asChild>
+                    <Link href="/contact-us">Contact Our Team</Link>
                   </Button>
                   <Button
                     variant="outline"
                     size="lg"
                     className="px-8 py-6 text-lg"
+                    asChild
                   >
-                    View All Services
+                    <Link href="/services">View All Services</Link>
                   </Button>
                 </motion.div>
 

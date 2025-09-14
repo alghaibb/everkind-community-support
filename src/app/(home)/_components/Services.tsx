@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { footerServicesSection } from "../constants";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function Services() {
   return (
@@ -75,8 +76,8 @@ export default function Services() {
                     {service.label.toLowerCase()} designed to enhance
                     independence and quality of life.
                   </p>
-                  <Button variant="outline" className="w-full">
-                    Learn More
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href={service.href}>Learn More</Link>
                   </Button>
                 </CardContent>
               </Card>

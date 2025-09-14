@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -49,11 +50,11 @@ export default function Hero() {
               transition={{ duration: 0.8, delay: 0.8 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <Button size="lg" className="text-lg px-8 py-6">
-                Get Started Today
+              <Button size="lg" className="text-lg px-8 py-6" asChild>
+                <Link href="/contact-us">Get Started Today</Link>
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6">
-                Learn More
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6" asChild>
+                <Link href="/about-us">Learn More</Link>
               </Button>
             </motion.div>
 
