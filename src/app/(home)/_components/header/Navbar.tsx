@@ -49,8 +49,9 @@ export default function Navbar() {
                   asChild
                   className={cn(
                     navigationMenuTriggerStyle(),
-                    "relative",
-                    pathname === link.href && "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-1 after:bg-primary after:rounded-full"
+                    "relative hover:bg-transparent focus:bg-transparent",
+                    pathname === link.href &&
+                      "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-1 after:bg-primary after:rounded-full"
                   )}
                 >
                   <Link href={link.href}>{link.label}</Link>
@@ -78,7 +79,7 @@ function ListItem({ title, children, href, isActive }: ListItemProps) {
         <Link
           href={href}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-all hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative",
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-all hover:bg-transparent hover:text-accent-foreground focus:bg-transparent focus:text-accent-foreground relative",
             isActive &&
               "text-accent-foreground after:absolute after:bottom-0 after:left-3 after:right-3 after:h-1 after:bg-primary after:rounded-full"
           )}
