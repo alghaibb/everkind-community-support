@@ -27,7 +27,9 @@ export default function TrainingSection({ form }: TrainingSectionProps) {
         name="ndisModules"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>NDIS Modules (Infection Control, Hand Hygiene) *</FormLabel>
+            <FormLabel>
+              NDIS Modules (Infection Control, Hand Hygiene) *
+            </FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Describe your completion of NDIS required modules"

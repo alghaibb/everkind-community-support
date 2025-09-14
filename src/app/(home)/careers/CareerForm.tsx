@@ -19,6 +19,7 @@ import ChecksSection from "./_components/ChecksSection";
 import TrainingSection from "./_components/TrainingSection";
 import ExperienceSection from "./_components/ExperienceSection";
 import FileUploadSection from "./_components/FileUploadSection";
+import { Award } from "lucide-react";
 
 interface UploadedFile {
   name: string;
