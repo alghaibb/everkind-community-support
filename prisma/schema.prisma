@@ -2,6 +2,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
+  binaryTargets = ["native", "linux-musl", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -83,23 +84,30 @@ model ContactMessage {
 }
 
 model CareerSubmission {
-  id        String   @id @default(cuid())
-  firstName String
-  lastName  String
-  email     String
-  phone     String   @unique
-  message   String
-  createdAt DateTime @default(now())
+  id                           String   @id @default(cuid())
+  firstName                    String
+  lastName                     String
+  email                        String
+  phone                        String   @unique
+
+  cert3IndividualSupport       String
+  covidVaccinations            String
+  influenzaVaccination         String
+
+  workingWithChildrenCheck     String
+  ndisScreeningCheck           String
+  policeCheck                  String
+  workingRights                String
+
+  ndisModules                  String
+  firstAidCPR                  String
+  experience                   String
+  availability                 String
+  resume                       String?
+  certificates                 String?
+  references                   String?
+
+  createdAt                    DateTime @default(now())
 
   @@map("career_submission")
 }
-
-// Cert 3 in individual support
-// 3 covid vaccinations
-// influenza vaccination 
-// working with children check
-// ndis screening check
-// ndis modules (infection control, hand hygiene) 
-// first aid, cpr 
-// working rights 
-// police check
