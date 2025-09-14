@@ -48,9 +48,8 @@ export default function Navbar() {
                 <NavigationMenuLink
                   asChild
                   className={cn(
-                    "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-transparent hover:text-accent-foreground focus:bg-transparent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-transparent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-transparent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 relative",
-                    pathname === link.href &&
-                      "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-1 after:bg-primary after:rounded-full"
+                    "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-transparent hover:text-accent-foreground focus:bg-transparent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-transparent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-transparent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:rounded-full after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left",
+                    pathname === link.href && "after:scale-x-100"
                   )}
                 >
                   <Link href={link.href}>{link.label}</Link>
@@ -78,9 +77,8 @@ function ListItem({ title, children, href, isActive }: ListItemProps) {
         <Link
           href={href}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-all hover:bg-transparent hover:text-accent-foreground focus:bg-transparent focus:text-accent-foreground relative",
-            isActive &&
-              "text-accent-foreground after:absolute after:bottom-0 after:left-3 after:right-3 after:h-1 after:bg-primary after:rounded-full"
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-all hover:bg-transparent hover:text-accent-foreground focus:bg-transparent focus:text-accent-foreground relative after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:bg-primary after:rounded-full after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left",
+            isActive && "text-accent-foreground after:scale-x-100"
           )}
         >
           <div className="text-sm font-medium leading-none">{title}</div>
