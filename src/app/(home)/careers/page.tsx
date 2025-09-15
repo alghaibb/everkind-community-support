@@ -1,5 +1,8 @@
-import CareerForm from "./CareerForm";
+import { Suspense } from "react";
 import { Metadata } from "next";
+import RoleSelectionClient from "./_components/RoleSelection";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { Spinner } from "@/components/ui/spinner";
 
 export const metadata: Metadata = {
   title: "Careers",
@@ -26,22 +29,12 @@ export default function CareersPage() {
         </div>
       </section>
 
-      {/* Application Form */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              Apply for a Position
-            </h2>
-            <p className="text-muted-foreground">
-              Fill out the form below to submit your application. We&apos;ll
-              review your qualifications and get back to you soon.
-            </p>
-          </div>
-
-          <CareerForm />
-        </div>
-      </section>
+      {/* Role Selection and Application */}
+      <ErrorBoundary>
+        <Suspense fallback={<Spinner variant="circle" />}>
+          <RoleSelectionClient />
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
 }
