@@ -1,4 +1,5 @@
 import ContactForm from "./ContactForm";
+import { ErrorBoundary } from "@/components/error-boundary";
 import ContactHero from "./_components/ContactHero";
 import ContactInfo from "./_components/ContactInfo";
 import ContactFAQ from "./_components/ContactFAQ";
@@ -26,7 +27,9 @@ export default function ContactUs() {
               <ContactInfo />
             </div>
             <div className="lg:col-span-2">
-              <ContactForm />
+              <ErrorBoundary>
+                <ContactForm />
+              </ErrorBoundary>
             </div>
           </div>
         </div>

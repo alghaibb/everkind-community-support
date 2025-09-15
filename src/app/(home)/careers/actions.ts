@@ -1,57 +1,64 @@
 "use server";
 
-import {
-  careerSchema,
-  CareerFormValues,
-} from "@/lib/validations/career.schema";
+import { getCareerSchema } from "@/lib/validations/careers/career.schema";
 import prisma from "@/lib/prisma";
+import { createErrorResponse, createSuccessResponse } from "@/lib/form-utils";
 
-export async function sendCareerApplication(values: CareerFormValues) {
-  const validatedFields = careerSchema.safeParse(values);
+/**
+ * Submits career application with role-specific validation
+ * @param values - Career application form data
+ * @returns Promise with success message or error
+ */
+export async function sendCareerApplication(values: Record<string, unknown>) {
+  try {
+    // Validate with dynamic schema
+    const schema = getCareerSchema(values.role as string);
+    const result = schema.safeParse(values);
 
-  if (!validatedFields.success) {
-    return {
-      error: "Invalid fields",
-    };
+    if (!result.success) {
+      return createErrorResponse("Invalid fields", result.error);
+    }
+
+    const data = result.data;
+
+    // Create submission
+    await prisma.careerSubmission.create({
+      data: {
+        // Basic info
+        role: data.role,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+
+        // Role-specific certifications
+        cert3IndividualSupport: data.role === "Support Worker" && "cert3IndividualSupport" in data
+          ? data.cert3IndividualSupport || ""
+          : "",
+        ahpraRegistration: data.role !== "Support Worker" && "ahpraRegistration" in data
+          ? data.ahpraRegistration || null
+          : null,
+
+        // Common fields
+        covidVaccinations: data.covidVaccinations,
+        influenzaVaccination: data.influenzaVaccination,
+        workingWithChildrenCheck: data.workingWithChildrenCheck,
+        ndisScreeningCheck: data.ndisScreeningCheck,
+        policeCheck: data.policeCheck,
+        workingRights: data.workingRights,
+        ndisModules: data.ndisModules,
+        firstAidCPR: data.firstAidCPR,
+        experience: data.experience,
+        availability: data.availability,
+        resume: data.resume,
+        certificates: data.certificates,
+      },
+    });
+
+    return createSuccessResponse(
+      "Application submitted successfully! We'll review your qualifications and get back to you soon."
+    );
+  } catch (error) {
+    return createErrorResponse("Failed to submit application. Please try again.", error);
   }
-
-  const { data } = validatedFields;
-
-  await prisma.careerSubmission.create({
-    data: {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      phone: data.phone,
-
-      // Certifications & Qualifications
-      cert3IndividualSupport: data.cert3IndividualSupport,
-      covidVaccinations: data.covidVaccinations,
-      influenzaVaccination: data.influenzaVaccination,
-
-      // Checks & Clearances
-      workingWithChildrenCheck: data.workingWithChildrenCheck,
-      ndisScreeningCheck: data.ndisScreeningCheck,
-      policeCheck: data.policeCheck,
-      workingRights: data.workingRights,
-
-      // Training & Modules
-      ndisModules: data.ndisModules,
-      firstAidCPR: data.firstAidCPR,
-
-      // Experience & Availability
-      experience: data.experience,
-      availability: data.availability,
-
-      // File Uploads
-      resume: data.resume,
-      certificates: data.certificates,
-      references: data.references,
-    },
-  });
-
-  return {
-    success:
-      "Application submitted successfully! We'll review your qualifications and get back to you soon.",
-  };
 }

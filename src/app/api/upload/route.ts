@@ -1,10 +1,11 @@
-import { put } from "@vercel/blob";
+import { put, del } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
+    const folder = formData.get("folder") as string;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -41,8 +42,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Upload to Vercel Blob
-    const blob = await put(file.name, file, {
+    // Create folder structure
+    const folderPath = folder ? `${folder}/` : "";
+    const fileName = `${folderPath}${Date.now()}-${file.name}`;
+
+    // Upload to Vercel Blob with folder structure
+    const blob = await put(fileName, file, {
       access: "public",
     });
 
@@ -50,12 +55,40 @@ export async function POST(request: NextRequest) {
       success: true,
       url: blob.url,
       pathname: blob.pathname,
+      fileName: file.name,
     });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(
       {
         error: "Failed to upload file. Please try again.",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const url = searchParams.get("url");
+
+    if (!url) {
+      return NextResponse.json({ error: "No URL provided" }, { status: 400 });
+    }
+
+    // Delete from Vercel Blob
+    await del(url);
+
+    return NextResponse.json({
+      success: true,
+      message: "File deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete error:", error);
+    return NextResponse.json(
+      {
+        error: "Failed to delete file. Please try again.",
       },
       { status: 500 }
     );
