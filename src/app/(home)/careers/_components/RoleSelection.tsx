@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import CareerForm from "../CareerForm";
 import RoleSelectionForm from "../forms/RoleSelectionForm";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ const CAREER_DATA_KEY = "everkind-career-data";
 export default function RoleSelectionClient() {
   const [selectedRole, setSelectedRole, clearSelectedRole, roleMounted] =
     useLocalStorageSSR(ROLE_STORAGE_KEY, "");
-  const [careerData, setCareerData, clearCareerData, dataMounted] =
+  const [careerData, setCareerData, , dataMounted] =
     useLocalStorageSSR<CareerFormData>(CAREER_DATA_KEY, {});
 
   const mounted = roleMounted && dataMounted;

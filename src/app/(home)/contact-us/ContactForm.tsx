@@ -42,7 +42,7 @@ export default function ContactForm() {
   const onSubmit = async (data: ContactFormValues) => {
     startTransition(async () => {
       const result = await sendContactForm(data);
-      if (result.success) {
+      if ("success" in result) {
         toast.success(result.success);
       } else {
         toast.error(result.error);

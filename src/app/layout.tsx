@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -59,6 +60,7 @@ export default function RootLayout({
           {children}
           <Toaster richColors closeButton theme="light" />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
