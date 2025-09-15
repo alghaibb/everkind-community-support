@@ -9,7 +9,7 @@ export default function HomeLayout({
   return (
     <div className="flex flex-col min-h-svh">
       <Header />
-      <main className="flex-1 max-w-7xl mx-auto">{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer />
     </div>
   );
