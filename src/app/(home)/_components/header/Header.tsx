@@ -14,7 +14,7 @@ export default function Header() {
               alt="EverKind Community Support"
               width={150}
               height={150}
-              className="dark:invert h-auto"
+              priority
             />
           </Link>
 

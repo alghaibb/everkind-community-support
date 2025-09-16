@@ -20,7 +20,6 @@ export default function Footer() {
                 alt="EverKind Community Support"
                 width={150}
                 height={150}
-                className="dark:invert"
               />
             </Link>
             <p className="text-muted-foreground mb-4">{footerDescription}</p>

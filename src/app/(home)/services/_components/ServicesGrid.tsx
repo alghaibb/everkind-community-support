@@ -220,7 +220,7 @@ export default function ServicesGrid() {
                       className="w-full"
                     >
                       <Link href={`/services/${service.slug}`}>
-                        Learn More
+                        Learn About {service.title}
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Link>
                     </Button>

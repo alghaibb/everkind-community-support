@@ -77,7 +77,7 @@ export default function Services() {
                     independence and quality of life.
                   </p>
                   <Button variant="outline" className="w-full" asChild>
-                    <Link href={service.href}>Learn More</Link>
+                    <Link href={service.href}>Learn About {service.label}</Link>
                   </Button>
                 </CardContent>
               </Card>

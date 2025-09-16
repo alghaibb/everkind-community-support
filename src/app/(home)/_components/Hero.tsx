@@ -53,8 +53,13 @@ export default function Hero() {
               <Button size="lg" className="text-lg px-8 py-6" asChild>
                 <Link href="/contact-us">Get Started Today</Link>
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6" asChild>
-                <Link href="/about-us">Learn More</Link>
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-lg px-8 py-6"
+                asChild
+              >
+                <Link href="/about-us">Learn About EverKind</Link>
               </Button>
             </motion.div>
 
