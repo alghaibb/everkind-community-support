@@ -1,9 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
+import PWAPrompt from "@/components/pwa-prompt";
+import PWARegister from "@/components/pwa-register";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
     absolute: "EverKind Community Support",
   },
   description:
-    "EverKind Community Support is an NDIS provider that providers support. We strive to promote independence, choice and control for our clients.",
+    "EverKind Community Support is an NDIS provider that provides support. We strive to promote independence, choice and control for our clients.",
   keywords: [
     "EverKind",
     "Community Support",
@@ -31,8 +33,6 @@ export const metadata: Metadata = {
     "NDIS Independence",
     "NDIS Choice",
     "NDIS Control",
-    "NDIS Provider",
-    "NDIS Support",
     "ekcs",
     "everkind community support",
     "everkind community support ndis",
@@ -42,6 +42,20 @@ export const metadata: Metadata = {
     "everkind community support ndis choice",
     "everkind community support ndis control",
   ],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "EKCS",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#0ea5e9",
 };
 
 export default function RootLayout({
@@ -51,6 +65,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="apple-mobile-web-app-title" content="EKCS" />
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className={`${poppins.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -59,6 +77,8 @@ export default function RootLayout({
         >
           {children}
           <Toaster richColors closeButton theme="light" />
+          <PWAPrompt />
+          <PWARegister />
         </ThemeProvider>
         <Analytics />
       </body>
