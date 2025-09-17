@@ -46,11 +46,11 @@ export default function UnauthorizedPage() {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ 
+              transition={{
                 type: "spring",
                 stiffness: 200,
                 damping: 15,
-                delay: 0.2 
+                delay: 0.2,
               }}
               className="relative mx-auto w-24 h-24"
             >
@@ -60,14 +60,14 @@ export default function UnauthorizedPage() {
               </div>
               <motion.div
                 className="absolute -inset-2 rounded-full border-2 border-orange-500/30"
-                animate={{ 
+                animate={{
                   scale: [1, 1.1, 1],
-                  opacity: [0.5, 0.2, 0.5]
+                  opacity: [0.5, 0.2, 0.5],
                 }}
-                transition={{ 
+                transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               />
             </motion.div>
@@ -81,7 +81,9 @@ export default function UnauthorizedPage() {
               <h1 className="text-7xl font-bold bg-gradient-to-r from-orange-500 to-orange-400 bg-clip-text text-transparent">
                 401
               </h1>
-              <h2 className="text-2xl font-semibold mt-2">Unauthorized Access</h2>
+              <h2 className="text-2xl font-semibold mt-2">
+                Unauthorized Access
+              </h2>
             </motion.div>
 
             {/* Description */}
@@ -91,7 +93,8 @@ export default function UnauthorizedPage() {
               transition={{ delay: 0.4 }}
               className="text-muted-foreground"
             >
-              You need to be logged in to access this page. Please sign in with your credentials to continue.
+              You need to be logged in to access this page. Please sign in with
+              your credentials to continue.
             </motion.p>
 
             {/* Security Badge */}
@@ -137,15 +140,15 @@ export default function UnauthorizedPage() {
               transition={{ delay: 0.7 }}
               className="flex items-center justify-center gap-4 text-sm"
             >
-              <Link 
-                href="/contact-us" 
+              <Link
+                href="/contact-us"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Need help?
               </Link>
               <span className="text-muted-foreground">•</span>
-              <Link 
-                href="/careers" 
+              <Link
+                href="/careers"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Join our team
@@ -161,7 +164,8 @@ export default function UnauthorizedPage() {
           transition={{ delay: 0.8 }}
           className="text-center text-sm text-muted-foreground mt-6"
         >
-          If you're having trouble accessing your account, please contact support.
+          If you're having trouble accessing your account, please contact
+          support.
         </motion.p>
       </motion.div>
     </div>
