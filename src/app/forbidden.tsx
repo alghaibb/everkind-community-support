@@ -4,11 +4,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { UserX, Home, ArrowLeft, LogIn } from "lucide-react";
+import { ShieldOff, Home, ArrowLeft, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
-export default function UnauthorizedPage() {
+export default function ForbiddenPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
@@ -28,10 +28,9 @@ export default function UnauthorizedPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center p-4">
-      {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-orange-500/5 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-destructive/5 blur-3xl" />
       </div>
 
       <motion.div
@@ -40,74 +39,70 @@ export default function UnauthorizedPage() {
         transition={{ duration: 0.5 }}
         className="relative z-10"
       >
-        <Card className="w-full max-w-md p-8 backdrop-blur-sm bg-background/95 shadow-2xl border-orange-500/20">
+        <Card className="w-full max-w-md p-8 backdrop-blur-sm bg-background/95 shadow-2xl border-destructive/20">
           <div className="text-center space-y-6">
-            {/* Animated Icon */}
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ 
+              transition={{
                 type: "spring",
                 stiffness: 200,
                 damping: 15,
-                delay: 0.2 
+                delay: 0.2,
               }}
               className="relative mx-auto w-24 h-24"
             >
-              <div className="absolute inset-0 bg-orange-500/10 rounded-full animate-pulse" />
+              <div className="absolute inset-0 bg-destructive/10 rounded-full animate-pulse" />
               <div className="relative flex items-center justify-center w-full h-full">
-                <UserX className="w-12 h-12 text-orange-500" />
+                <ShieldOff className="w-12 h-12 text-destructive" />
               </div>
               <motion.div
-                className="absolute -inset-2 rounded-full border-2 border-orange-500/30"
-                animate={{ 
+                className="absolute -inset-2 rounded-full border-2 border-destructive/30"
+                animate={{
                   scale: [1, 1.1, 1],
-                  opacity: [0.5, 0.2, 0.5]
+                  opacity: [0.5, 0.2, 0.5],
                 }}
-                transition={{ 
+                transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               />
             </motion.div>
 
-            {/* Error Code */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              <h1 className="text-7xl font-bold bg-gradient-to-r from-orange-500 to-orange-400 bg-clip-text text-transparent">
-                401
+              <h1 className="text-7xl font-bold bg-gradient-to-r from-destructive to-destructive/60 bg-clip-text text-transparent">
+                403
               </h1>
-              <h2 className="text-2xl font-semibold mt-2">Unauthorized Access</h2>
+              <h2 className="text-2xl font-semibold mt-2">Access Forbidden</h2>
             </motion.div>
 
-            {/* Description */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
               className="text-muted-foreground"
             >
-              You need to be logged in to access this page. Please sign in with your credentials to continue.
+              You don't have permission to access this resource. This area
+              requires special authorization.
             </motion.p>
 
-            {/* Security Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5 }}
-              className="flex items-center justify-center gap-2 py-2 px-4 bg-orange-500/10 rounded-full mx-auto w-fit"
+              className="flex items-center justify-center gap-2 py-2 px-4 bg-destructive/10 rounded-full mx-auto w-fit"
             >
-              <LogIn className="w-4 h-4 text-orange-500" />
-              <span className="text-sm font-medium text-orange-500">
-                Authentication Required
+              <Lock className="w-4 h-4 text-destructive" />
+              <span className="text-sm font-medium text-destructive">
+                Admin Access Required
               </span>
             </motion.div>
 
-            {/* Action Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -129,39 +124,16 @@ export default function UnauthorizedPage() {
                 </Link>
               </Button>
             </motion.div>
-
-            {/* Additional Actions */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
-              className="flex items-center justify-center gap-4 text-sm"
-            >
-              <Link 
-                href="/contact-us" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                Need help?
-              </Link>
-              <span className="text-muted-foreground">•</span>
-              <Link 
-                href="/careers" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                Join our team
-              </Link>
-            </motion.div>
           </div>
         </Card>
 
-        {/* Help Text */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.7 }}
           className="text-center text-sm text-muted-foreground mt-6"
         >
-          If you're having trouble accessing your account, please contact support.
+          If you believe this is an error, please contact your administrator.
         </motion.p>
       </motion.div>
     </div>

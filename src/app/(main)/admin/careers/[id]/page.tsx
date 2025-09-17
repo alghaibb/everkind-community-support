@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { redirect, notFound } from "next/navigation";
+import { notFound, forbidden } from "next/navigation";
 import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { ArrowLeft, Download, Mail, Phone, Calendar, MapPin } from "lucide-react";
+import { ArrowLeft, Download, Mail, Calendar } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Career Application Details | Admin",
@@ -20,15 +20,15 @@ export default async function CareerDetailsPage({
 }) {
   // Check authentication
   const session = await getServerSession();
-  
+
   if (!session?.user) {
-    redirect("/");
+    return forbidden();
   }
 
   const userWithRole = session.user as typeof session.user & { role?: string };
-  
+
   if (userWithRole.role !== "ADMIN") {
-    redirect("/");
+    return forbidden();
   }
 
   // Fetch the career submission
@@ -140,17 +140,21 @@ export default async function CareerDetailsPage({
                     <p className="text-sm font-medium text-muted-foreground">
                       Cert III Individual Support
                     </p>
-                    <p className="text-sm">{submission.cert3IndividualSupport}</p>
-                  </div>
-                )}
-                {(submission.role === "Registered Nurse" || submission.role === "Enrolled Nurse") && submission.ahpraRegistration && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      AHPRA Registration
+                    <p className="text-sm">
+                      {submission.cert3IndividualSupport}
                     </p>
-                    <p className="text-sm">{submission.ahpraRegistration}</p>
                   </div>
                 )}
+                {(submission.role === "Registered Nurse" ||
+                  submission.role === "Enrolled Nurse") &&
+                  submission.ahpraRegistration && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        AHPRA Registration
+                      </p>
+                      <p className="text-sm">{submission.ahpraRegistration}</p>
+                    </div>
+                  )}
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
                     COVID Vaccinations
@@ -167,7 +171,9 @@ export default async function CareerDetailsPage({
                   <p className="text-sm font-medium text-muted-foreground">
                     Working with Children Check
                   </p>
-                  <p className="text-sm">{submission.workingWithChildrenCheck}</p>
+                  <p className="text-sm">
+                    {submission.workingWithChildrenCheck}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
@@ -213,7 +219,9 @@ export default async function CareerDetailsPage({
                 <p className="text-sm font-medium text-muted-foreground">
                   Experience
                 </p>
-                <p className="text-sm whitespace-pre-wrap">{submission.experience}</p>
+                <p className="text-sm whitespace-pre-wrap">
+                  {submission.experience}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -263,7 +271,11 @@ export default async function CareerDetailsPage({
             </CardHeader>
             <CardContent className="space-y-2">
               {submission.resume && (
-                <Button variant="outline" className="w-full justify-start" asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  asChild
+                >
                   <a
                     href={submission.resume}
                     download

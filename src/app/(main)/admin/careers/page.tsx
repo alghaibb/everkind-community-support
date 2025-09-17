@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { forbidden } from "next/navigation";
 import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import CareerSubmissionsTable from "./_components/CareerSubmissionsTable";
@@ -24,15 +24,15 @@ export default async function CareersAdminPage({
 }) {
   // Check authentication
   const session = await getServerSession();
-  
+
   if (!session?.user) {
-    redirect("/");
+    return forbidden();
   }
 
   const userWithRole = session.user as typeof session.user & { role?: string };
-  
+
   if (userWithRole.role !== "ADMIN") {
-    redirect("/");
+    return forbidden();
   }
 
   // Pagination
@@ -44,9 +44,24 @@ export default async function CareersAdminPage({
   const where = {
     ...(searchParams.search && {
       OR: [
-        { firstName: { contains: searchParams.search, mode: "insensitive" as const } },
-        { lastName: { contains: searchParams.search, mode: "insensitive" as const } },
-        { email: { contains: searchParams.search, mode: "insensitive" as const } },
+        {
+          firstName: {
+            contains: searchParams.search,
+            mode: "insensitive" as const,
+          },
+        },
+        {
+          lastName: {
+            contains: searchParams.search,
+            mode: "insensitive" as const,
+          },
+        },
+        {
+          email: {
+            contains: searchParams.search,
+            mode: "insensitive" as const,
+          },
+        },
       ],
     }),
     ...(searchParams.role && { role: searchParams.role }),
@@ -70,7 +85,9 @@ export default async function CareersAdminPage({
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Career Applications</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Career Applications
+          </h1>
           <p className="text-muted-foreground">
             Manage and review all career applications
           </p>

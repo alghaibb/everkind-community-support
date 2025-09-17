@@ -108,7 +108,6 @@ export default function ContactMessagesTable({
           </Table>
         </div>
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
@@ -149,7 +148,6 @@ export default function ContactMessagesTable({
         )}
       </div>
 
-      {/* Message View Dialog */}
       <Dialog
         open={!!selectedMessage}
         onOpenChange={() => setSelectedMessage(null)}

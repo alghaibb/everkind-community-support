@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { forbidden } from "next/navigation";
 import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import DashboardStats from "./_components/DashboardStats";
@@ -13,13 +13,13 @@ export default async function AdminDashboard() {
   const session = await getServerSession();
 
   if (!session?.user) {
-    redirect("/");
+    return forbidden();
   }
 
   const userWithRole = session.user as typeof session.user & { role?: string };
 
   if (userWithRole.role !== "ADMIN") {
-    redirect("/");
+    return forbidden();
   }
 
   // Fetch dashboard statistics
@@ -54,8 +54,8 @@ export default async function AdminDashboard() {
   const stats = {
     totalApplications: careerCount,
     totalMessages: messageCount,
-    pendingReviews: careerCount, 
-    activeStaffMembers: 0, 
+    pendingReviews: careerCount,
+    activeStaffMembers: 0,
   };
 
   return (
