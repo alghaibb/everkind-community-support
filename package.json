@@ -13,6 +13,7 @@
     "db:studio": "prisma generate && prisma studio"
   },
   "dependencies": {
+    "@better-fetch/fetch": "^1.1.18",
     "@hookform/resolvers": "^5.2.1",
     "@prisma/client": "6.16.1",
     "@prisma/extension-accelerate": "^2.0.2",
