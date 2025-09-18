@@ -1,6 +1,4 @@
 import { Metadata } from "next";
-import { forbidden } from "next/navigation";
-import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import ContactMessagesTable from "./_components/ContactMessagesTable";
 import { Input } from "@/components/ui/input";
@@ -21,18 +19,6 @@ export default async function MessagesAdminPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const session = await getServerSession();
-
-  if (!session?.user) {
-    return forbidden();
-  }
-
-  const userWithRole = session.user as typeof session.user & { role?: string };
-
-  if (userWithRole.role !== "ADMIN") {
-    return forbidden();
-  }
-
   const page = parseInt(searchParams.page || "1");
   const pageSize = 10;
   const skip = (page - 1) * pageSize;

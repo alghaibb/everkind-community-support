@@ -1,6 +1,4 @@
 import { Metadata } from "next";
-import { forbidden } from "next/navigation";
-import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import DashboardStats from "./_components/DashboardStats";
 import RecentActivity from "./_components/RecentActivity";
@@ -10,19 +8,6 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminDashboard() {
-  const session = await getServerSession();
-
-  if (!session?.user) {
-    return forbidden();
-  }
-
-  const userWithRole = session.user as typeof session.user & { role?: string };
-
-  if (userWithRole.role !== "ADMIN") {
-    return forbidden();
-  }
-
-  // Fetch dashboard statistics
   const [careerCount, messageCount, recentCareers, recentMessages] =
     await Promise.all([
       prisma.careerSubmission.count(),
@@ -60,7 +45,6 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
@@ -68,10 +52,8 @@ export default async function AdminDashboard() {
         </p>
       </div>
 
-      {/* Stats Cards */}
       <DashboardStats stats={stats} />
 
-      {/* Recent Activity */}
       <div className="grid gap-6 lg:grid-cols-2">
         <RecentActivity
           title="Recent Career Applications"

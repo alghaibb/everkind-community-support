@@ -1,6 +1,4 @@
 import { Metadata } from "next";
-import { forbidden } from "next/navigation";
-import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import CareerSubmissionsTable from "./_components/CareerSubmissionsTable";
 import { Input } from "@/components/ui/input";
@@ -22,25 +20,10 @@ export default async function CareersAdminPage({
 }: {
   searchParams: SearchParams;
 }) {
-  // Check authentication
-  const session = await getServerSession();
-
-  if (!session?.user) {
-    return forbidden();
-  }
-
-  const userWithRole = session.user as typeof session.user & { role?: string };
-
-  if (userWithRole.role !== "ADMIN") {
-    return forbidden();
-  }
-
-  // Pagination
   const page = parseInt(searchParams.page || "1");
   const pageSize = 10;
   const skip = (page - 1) * pageSize;
 
-  // Build where clause for filtering
   const where = {
     ...(searchParams.search && {
       OR: [
@@ -67,7 +50,6 @@ export default async function CareersAdminPage({
     ...(searchParams.role && { role: searchParams.role }),
   };
 
-  // Fetch career submissions with pagination
   const [submissions, totalCount] = await Promise.all([
     prisma.careerSubmission.findMany({
       where,
@@ -82,7 +64,6 @@ export default async function CareersAdminPage({
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
@@ -98,7 +79,6 @@ export default async function CareersAdminPage({
         </Button>
       </div>
 
-      {/* Search and Filters */}
       <div className="flex gap-4">
         <form className="relative flex-1" action="/admin/careers">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -130,7 +110,6 @@ export default async function CareersAdminPage({
         </select>
       </div>
 
-      {/* Submissions Table */}
       <CareerSubmissionsTable
         submissions={submissions}
         currentPage={page}

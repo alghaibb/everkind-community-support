@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { forbidden } from "next/navigation";
+import { forbidden, unauthorized } from "next/navigation";
 import { getServerSession } from "@/lib/get-session";
 import AdminSidebar from "./_components/AdminSidebar";
 import AdminHeader from "./_components/AdminHeader";
@@ -15,12 +15,13 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession();
+  const user = session?.user;
 
-  if (!session?.user) {
-    return forbidden();
+  if (!user) {
+    return unauthorized();
   }
 
-  const userWithRole = session.user as typeof session.user & { role?: string };
+  const userWithRole = user as typeof user & { role?: string };
 
   if (userWithRole.role !== "ADMIN") {
     return forbidden();
@@ -28,7 +29,7 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      <AdminHeader user={session.user} />
+      <AdminHeader user={user} />
 
       <div className="flex">
         <AdminSidebar />

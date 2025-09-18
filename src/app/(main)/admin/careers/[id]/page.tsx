@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { notFound, forbidden } from "next/navigation";
-import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,20 +17,6 @@ export default async function CareerDetailsPage({
 }: {
   params: { id: string };
 }) {
-  // Check authentication
-  const session = await getServerSession();
-
-  if (!session?.user) {
-    return forbidden();
-  }
-
-  const userWithRole = session.user as typeof session.user & { role?: string };
-
-  if (userWithRole.role !== "ADMIN") {
-    return forbidden();
-  }
-
-  // Fetch the career submission
   const submission = await prisma.careerSubmission.findUnique({
     where: { id: params.id },
   });
@@ -40,7 +25,6 @@ export default async function CareerDetailsPage({
     notFound();
   }
 
-  // Parse availability JSON
   const availability = submission.availability as Record<
     string,
     { am: boolean; pm: boolean }
@@ -48,7 +32,6 @@ export default async function CareerDetailsPage({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
@@ -89,9 +72,7 @@ export default async function CareerDetailsPage({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Personal Information */}
           <Card>
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
@@ -128,7 +109,6 @@ export default async function CareerDetailsPage({
             </CardContent>
           </Card>
 
-          {/* Certifications & Checks */}
           <Card>
             <CardHeader>
               <CardTitle>Certifications & Checks</CardTitle>
@@ -197,7 +177,6 @@ export default async function CareerDetailsPage({
             </CardContent>
           </Card>
 
-          {/* Training & Experience */}
           <Card>
             <CardHeader>
               <CardTitle>Training & Experience</CardTitle>
@@ -227,9 +206,7 @@ export default async function CareerDetailsPage({
           </Card>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Availability */}
           <Card>
             <CardHeader>
               <CardTitle>Availability</CardTitle>
@@ -264,7 +241,6 @@ export default async function CareerDetailsPage({
             </CardContent>
           </Card>
 
-          {/* Documents */}
           <Card>
             <CardHeader>
               <CardTitle>Documents</CardTitle>
@@ -314,7 +290,6 @@ export default async function CareerDetailsPage({
             </CardContent>
           </Card>
 
-          {/* Application Info */}
           <Card>
             <CardHeader>
               <CardTitle>Application Info</CardTitle>
