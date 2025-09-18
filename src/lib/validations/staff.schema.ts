@@ -12,7 +12,7 @@ export const createStaffSchema = z.object({
 
 export const editStaffSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
+  email: z.email("Invalid email address"),
   role: z.enum(["STAFF", "ADMIN"], {
     error: "Please select a role",
   }),

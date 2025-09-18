@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "./Navbar";
 import MobileNav from "./MobileNav";
+import StaffLoginButton from "./StaffLoginButton";
 
 export default function Header() {
   return (
@@ -21,6 +22,9 @@ export default function Header() {
           <div className="hidden md:flex flex-1 justify-center">
             <Navbar />
           </div>
+
+          {/* Staff Login Button - Only shows when not logged in */}
+          <StaffLoginButton />
 
           <div className="md:hidden flex-1 flex justify-end">
             <MobileNav />
