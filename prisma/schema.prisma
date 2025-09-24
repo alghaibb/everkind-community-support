@@ -14,20 +14,236 @@ enum Role {
   ADMIN
 }
 
+enum UserType {
+  INTERNAL
+  FAMILY
+}
+
+enum StaffRole {
+  SUPPORT_WORKER
+  ENROLLED_NURSE
+  REGISTERED_NURSE
+  COORDINATOR
+  DIRECTOR
+}
+
+enum ParticipantStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  DISCHARGED
+}
+
+// Universal user model for all user types
 model User {
   id            String    @id
   name          String
-  email         String
+  email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
-  role          Role      @default(STAFF)
+  userType      UserType  @default(INTERNAL)
+  role          Role? // Only for INTERNAL users (STAFF/ADMIN)
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
+  updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
 
-  @@unique([email])
+  // Link to specific profiles based on user type
+  staffProfile  Staff?
+  familyProfile FamilyMember?
+
   @@map("user")
+}
+
+// Detailed staff information
+model Staff {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Professional Details
+  staffRole  StaffRole
+  employeeId String?   @unique
+  startDate  DateTime
+  endDate    DateTime?
+
+  // Contact Information
+  phone            String?
+  emergencyContact String?
+  emergencyPhone   String?
+  address          String?
+
+  // Qualifications & Certifications
+  cert3IndividualSupport   Boolean @default(false)
+  ahpraRegistration        String?
+  covidVaccinations        Boolean @default(false)
+  influenzaVaccination     Boolean @default(false)
+  workingWithChildrenCheck Boolean @default(false)
+  ndisScreeningCheck       Boolean @default(false)
+  policeCheck              Boolean @default(false)
+  firstAidCPR              Boolean @default(false)
+
+  // Work Details
+  workingRights Boolean  @default(false)
+  ndisModules   String[] // Array of completed modules
+  availability  Json? // Weekly availability
+  hourlyRate    Decimal? @db.Decimal(8, 2)
+
+  // Documents
+  resume       String?
+  certificates String[] // File paths
+
+  // Status
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  assignedParticipants ParticipantStaff[]
+  serviceRecords       ServiceRecord[]
+
+  @@map("staff")
+}
+
+// Family members who can access participant information
+model FamilyMember {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Personal Information
+  firstName    String
+  lastName     String
+  phone        String?
+  relationship String // e.g., "Parent", "Guardian", "Sibling"
+
+  // Access permissions
+  canViewReports     Boolean @default(true)
+  canUpdateInfo      Boolean @default(false)
+  isEmergencyContact Boolean @default(false)
+
+  // Relations
+  participants ParticipantFamily[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("family_member")
+}
+
+// NDIS Participants
+model Participant {
+  id String @id @default(cuid())
+
+  // Personal Information
+  firstName     String
+  lastName      String
+  preferredName String?
+  dateOfBirth   DateTime
+  gender        String?
+
+  // Contact Information
+  email             String?
+  phone             String?
+  address           String
+  emergencyContact  String
+  emergencyPhone    String
+  emergencyRelation String
+
+  // NDIS Information
+  ndisNumber         String   @unique
+  planStartDate      DateTime
+  planEndDate        DateTime
+  planBudget         Decimal  @db.Decimal(10, 2)
+  planManager        String?
+  supportCoordinator String?
+
+  // Medical Information
+  disabilities String[] // Array of disabilities
+  medications  String[] // Current medications
+  allergies    String[] // Known allergies
+  medicalNotes String? // Additional medical info
+
+  // Support Requirements
+  supportNeeds        String[] // Types of support needed
+  communicationMethod String? // Preferred communication
+  behavioralNotes     String? // Behavioral support notes
+
+  // Status
+  status ParticipantStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  assignedStaff  ParticipantStaff[]
+  familyMembers  ParticipantFamily[]
+  serviceRecords ServiceRecord[]
+
+  @@map("participant")
+}
+
+// Many-to-many relationship between Participants and Family Members
+model ParticipantFamily {
+  id            String       @id @default(cuid())
+  participantId String
+  familyId      String
+  participant   Participant  @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  family        FamilyMember @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  // Relationship details
+  isPrimaryContact Boolean @default(false)
+  canPickup        Boolean @default(false)
+  notes            String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([participantId, familyId])
+  @@map("participant_family")
+}
+
+// Many-to-many relationship between Staff and Participants
+model ParticipantStaff {
+  id            String      @id @default(cuid())
+  participantId String
+  staffId       String
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  staff         Staff       @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  // Assignment details
+  assignedDate DateTime  @default(now())
+  endDate      DateTime?
+  isPrimary    Boolean   @default(false)
+  notes        String?
+
+  @@unique([participantId, staffId])
+  @@map("participant_staff")
+}
+
+// Service delivery records
+model ServiceRecord {
+  id            String      @id @default(cuid())
+  participantId String
+  staffId       String
+  participant   Participant @relation(fields: [participantId], references: [id])
+  staff         Staff       @relation(fields: [staffId], references: [id])
+
+  // Service Details
+  serviceDate DateTime
+  duration    Int // Minutes
+  serviceType String // Type of support provided
+  description String // What was done
+  location    String? // Where service was provided
+
+  // Billing
+  hourlyRate Decimal @db.Decimal(8, 2)
+  totalCost  Decimal @db.Decimal(8, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("service_record")
 }
 
 model Session {
@@ -70,7 +286,7 @@ model Verification {
   value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
+  updatedAt  DateTime @updatedAt
 
   @@map("verification")
 }
@@ -109,8 +325,7 @@ model CareerSubmission {
   availability             Json
   resume                   String?
   certificates             String[]
-
-  createdAt DateTime @default(now())
+  createdAt                DateTime @default(now())
 
   @@map("career_submission")
 }

@@ -8,6 +8,11 @@ export const auth = betterAuth({
   }),
   user: {
     additionalFields: {
+      userType: {
+        type: "string",
+        required: false,
+        defaultValue: "INTERNAL",
+      },
       role: {
         type: "string",
         required: false,

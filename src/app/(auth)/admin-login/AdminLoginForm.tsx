@@ -12,45 +12,57 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/ui/password-input";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import {
-  loginSchema,
-  LoginFormValues,
-} from "@/lib/validations/auth/login.schema";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { User } from "@/lib/auth";
+import {
+  adminLoginSchema,
+  AdminLoginFormValues,
+} from "@/lib/validations/auth/admin-login.schema";
 
-export default function LoginForm() {
+export default function AdminLoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const redirectTo = searchParams.get("redirect");
-
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<AdminLoginFormValues>({
+    resolver: zodResolver(adminLoginSchema),
     defaultValues: {
       email: "",
       password: "",
-      rememberMe: false,
     },
+    mode: "onSubmit",
   });
 
-  async function onSubmit(data: LoginFormValues) {
+  async function onSubmit(data: AdminLoginFormValues) {
     const { error } = await authClient.signIn.email({
       email: data.email,
       password: data.password,
-      rememberMe: data.rememberMe,
     });
 
     if (error) {
-      toast.error(error.message || "Failed to login");
-    } else {
-      toast.success("Login successful");
-      router.push(redirectTo ?? "/dashboard");
+      toast.error(error.message || "Login failed");
+      return;
     }
+
+    // Check if user is admin
+    const session = await authClient.getSession();
+    if (!session.data?.user) {
+      toast.error("Authentication failed");
+      return;
+    }
+
+    const user = session.data.user as User;
+
+    // Ensure user is internal type and has admin role
+    if (user.userType !== "INTERNAL" || user.role !== "ADMIN") {
+      await authClient.signOut();
+      toast.error("Access denied. This portal is for administrators only.");
+      return;
+    }
+
+    toast.success("Admin login successful");
+    router.push("/admin");
   }
 
   const isLoading = form.formState.isSubmitting;
@@ -69,7 +81,7 @@ export default function LoginForm() {
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="john@example.com"
+                  placeholder="admin@everkind.com.au"
                   className="h-10 sm:h-11"
                   {...field}
                   disabled={isLoading}
@@ -85,16 +97,7 @@ export default function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <div className="flex items-center justify-between">
-                <FormLabel className="text-sm font-medium">Password</FormLabel>
-                <Button
-                  asChild
-                  variant="link"
-                  className="px-0 h-auto text-xs sm:text-sm"
-                >
-                  <Link href="/forgot-password">Forgot password?</Link>
-                </Button>
-              </div>
+              <FormLabel className="text-sm font-medium">Password</FormLabel>
               <FormControl>
                 <PasswordInput
                   placeholder="Enter your password"
@@ -108,33 +111,13 @@ export default function LoginForm() {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="rememberMe"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled={isLoading}
-                  className="h-4 w-4"
-                />
-              </FormControl>
-              <FormLabel className="text-sm font-normal cursor-pointer">
-                Remember me
-              </FormLabel>
-            </FormItem>
-          )}
-        />
-
         <Button
           type="submit"
-          className="w-full md:w-auto"
+          className="w-full"
           loading={isLoading}
           loadingText="Signing in..."
         >
-          Log In
+          Sign In
         </Button>
       </form>
     </Form>
