@@ -1,16 +1,33 @@
 "use client";
 
-import { useTransition, useState, useEffect } from "react";
+import React, { useTransition, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Award, CheckCircle } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Award,
+  CheckCircle,
+  Sparkles,
+  Clock,
+  FileText,
+  Shield,
+  GraduationCap,
+  Upload,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 import { hasAvailabilitySelected, isFieldEmpty } from "@/lib/form-utils";
 import { CareerFormValues } from "@/lib/validations/careers/career.schema";
 import { careerSteps } from "./steps";
 import { sendCareerApplication } from "./actions";
+import { useSmartForm } from "@/hooks/use-smart-form";
+import ApplicationProgress from "./_components/ApplicationProgress";
 import {
   PersonalInfoForm,
   CertificationsForm,
@@ -26,6 +43,15 @@ const COMPLETED_STEPS_KEY = "everkind-completed-steps";
 interface CareerFormProps {
   selectedRole?: string;
 }
+
+// Step icons mapping
+const stepIcons = {
+  "personal-info": FileText,
+  certifications: Award,
+  checks: Shield,
+  "training-experience": GraduationCap,
+  documents: Upload,
+};
 
 export default function CareerForm({ selectedRole }: CareerFormProps) {
   const [isPending, startTransition] = useTransition();
@@ -76,6 +102,19 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
     Math.min(careerSteps.length - 1, parseInt(searchParams.get("step") || "0"))
   );
 
+  // Smart form integration
+  const {
+    lastSaved,
+    isSaving,
+    estimatedTimeRemaining,
+    completionScore,
+    showSmartNotification,
+  } = useSmartForm(careerData, setCareerData, {
+    autoSaveDelay: 2000,
+    showProgressEstimation: true,
+    enableSmartSuggestions: true,
+  });
+
   // Save careerData to localStorage whenever it changes
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -105,6 +144,17 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Smart notifications based on progress
+  useEffect(() => {
+    if (
+      completionScore === 25 ||
+      completionScore === 50 ||
+      completionScore === 75
+    ) {
+      showSmartNotification("progress");
+    }
+  }, [completionScore, showSmartNotification]);
 
   const handleNext = async () => {
     setCompletedSteps((prev) =>
@@ -283,159 +333,269 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
   const progress = ((currentStep + 1) / careerSteps.length) * 100;
 
   return (
-    <Card className="max-w-4xl mx-auto shadow-2xl border-0 bg-gradient-to-br from-background to-muted/20">
-      <CardHeader className="pb-6">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Award className="h-6 w-6 text-primary" />
-            </div>
-            Career Application
-          </CardTitle>
-          <div className="flex items-center gap-4">
-            {mounted &&
-              (Object.keys(careerData).length > 1 ||
-                completedSteps.size > 0) && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setCareerData({ certificates: [] });
-                    setCompletedSteps(new Set());
-                    if (typeof window !== "undefined") {
-                      try {
-                        localStorage.removeItem(CAREER_DATA_KEY);
-                        localStorage.removeItem(COMPLETED_STEPS_KEY);
-                      } catch (error) {
-                        console.error("Error clearing localStorage:", error);
-                      }
-                    }
-                    toast.success("Form cleared successfully");
-                  }}
-                  className="text-xs"
+    <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Main Form - Left Side */}
+      <div className="lg:col-span-2">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="shadow-2xl border-0 bg-gradient-to-br from-background to-muted/10 overflow-hidden">
+            {/* Enhanced Header */}
+            <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b pb-8">
+              {/* Title Section */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-xl shadow-lg">
+                    <Award className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold">Career Application</h1>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedRole} Position
+                    </p>
+                  </div>
+                </div>
+
+                {/* Smart Status Indicators */}
+                <div className="flex items-center gap-4 text-sm">
+                  {lastSaved && (
+                    <div className="flex items-center gap-2">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-2 h-2 rounded-full bg-green-500"
+                      />
+                      <span className="text-green-600 text-xs">
+                        Saved {new Date(lastSaved).toLocaleTimeString()}
+                      </span>
+                    </div>
+                  )}
+
+                  {estimatedTimeRemaining && estimatedTimeRemaining > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-muted-foreground text-xs">
+                        ~{Math.ceil(estimatedTimeRemaining / 60)} min left
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Enhanced Progress Section */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <div className="p-1 bg-primary/10 rounded">
+                      {React.createElement(
+                        stepIcons[
+                          careerSteps[currentStep].key as keyof typeof stepIcons
+                        ],
+                        { className: "h-4 w-4 text-primary" }
+                      )}
+                    </div>
+                    {careerSteps[currentStep].title}
+                  </h3>
+                  <div className="flex items-center gap-4">
+                    <Badge
+                      variant="secondary"
+                      className="bg-primary/10 text-primary"
+                    >
+                      Step {currentStep + 1} of {careerSteps.length}
+                    </Badge>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-primary">
+                        {Math.round(progress)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Enhanced Progress Bar */}
+                <div className="relative">
+                  <Progress value={progress} className="h-3 bg-muted/30" />
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-primary/30 to-primary/50 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                  />
+                </div>
+
+                <p className="text-muted-foreground leading-relaxed">
+                  {careerSteps[currentStep].description}
+                </p>
+              </div>
+
+              {/* Smart Step Navigation */}
+              <div className="mt-6">
+                <div className="flex flex-wrap gap-2">
+                  {careerSteps.map((step, index) => {
+                    const StepIcon =
+                      stepIcons[step.key as keyof typeof stepIcons];
+                    const isCompleted = mounted && completedSteps.has(step.key);
+                    const isCurrent = index === currentStep;
+                    const isAccessible = index <= currentStep || isCompleted;
+
+                    return (
+                      <motion.button
+                        key={step.key}
+                        onClick={() => handleStepClick(index)}
+                        disabled={!isAccessible}
+                        className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+                          isCurrent
+                            ? "bg-primary text-primary-foreground shadow-lg"
+                            : isCompleted
+                            ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100"
+                            : isAccessible
+                            ? "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+                            : "bg-muted/20 text-muted-foreground/50 cursor-not-allowed"
+                        }`}
+                        whileHover={isAccessible ? { scale: 1.02 } : {}}
+                        whileTap={isAccessible ? { scale: 0.98 } : {}}
+                      >
+                        <div
+                          className={`flex items-center justify-center w-6 h-6 rounded-full text-xs transition-all ${
+                            isCurrent
+                              ? "bg-primary-foreground/20"
+                              : isCompleted
+                              ? "bg-green-600 text-white"
+                              : "bg-muted-foreground/20"
+                          }`}
+                        >
+                          {isCompleted ? (
+                            <CheckCircle className="h-4 w-4" />
+                          ) : (
+                            <StepIcon className="h-4 w-4" />
+                          )}
+                        </div>
+                        <span className="hidden sm:inline">{step.title}</span>
+                        <span className="sm:hidden">Step {index + 1}</span>
+
+                        {/* Status Badge */}
+                        {isCompleted && (
+                          <Badge
+                            variant="secondary"
+                            className="text-xs py-0.5 px-1.5 bg-green-100 text-green-700"
+                          >
+                            Done
+                          </Badge>
+                        )}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+            </CardHeader>
+
+            {/* Form Content */}
+            <CardContent className="p-8">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStep}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="min-h-[500px]"
                 >
-                  Reset Form
+                  {renderStepContent()}
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between pt-8 border-t mt-8 flex-col md:flex-row gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePrevious}
+                  disabled={currentStep === 0}
+                  className="flex items-center gap-2 px-6"
+                  size="lg"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
                 </Button>
-              )}
-            <div className="text-right">
-              <div className="text-2xl font-bold text-primary">
-                {currentStep + 1}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                of {careerSteps.length}
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="font-medium">
-                {careerSteps[currentStep].title}
-              </span>
-              <span className="text-muted-foreground">
-                {Math.round(progress)}% Complete
-              </span>
-            </div>
-            <div className="relative">
-              <Progress value={progress} className="h-3 bg-muted/30" />
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/40 rounded-full animate-pulse" />
-            </div>
-          </div>
-
-          <p className="text-muted-foreground leading-relaxed">
-            {careerSteps[currentStep].description}
-          </p>
-        </div>
-
-        {/* Step Navigation */}
-        <div className="flex flex-wrap gap-3 mt-6">
-          {careerSteps.map((step, index) => (
-            <button
-              key={step.key}
-              onClick={() => handleStepClick(index)}
-              className={`group relative flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
-                index === currentStep
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                  : mounted && completedSteps.has(step.key)
-                  ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300"
-                  : index < currentStep
-                  ? "bg-muted/50 text-muted-foreground cursor-not-allowed opacity-60"
-                  : "bg-muted/30 text-muted-foreground hover:bg-muted/50 border border-transparent hover:border-muted-foreground/20"
-              }`}
-              disabled={
-                index > currentStep &&
-                (!mounted ||
-                  !Array.from({ length: index }, (_, i) =>
-                    completedSteps.has(careerSteps[i].key)
-                  ).every(Boolean))
-              }
-            >
-              <div
-                className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold transition-all ${
-                  index === currentStep
-                    ? "bg-primary-foreground/20"
-                    : mounted && completedSteps.has(step.key)
-                    ? "bg-green-600 text-white"
-                    : "bg-muted-foreground/20"
-                }`}
-              >
-                {mounted && completedSteps.has(step.key) ? (
-                  <CheckCircle className="h-4 w-4" />
+                {currentStep === careerSteps.length - 1 ? (
+                  <Button
+                    type="button"
+                    onClick={onSubmit}
+                    disabled={isPending}
+                    size="lg"
+                  >
+                    {isPending ? (
+                      <>
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                        >
+                          <Sparkles className="h-4 w-4" />
+                        </motion.div>
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        Submit Application
+                        <Award className="h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
                 ) : (
-                  index + 1
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    className="flex items-center gap-2 px-6"
+                    size="lg"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
                 )}
               </div>
-              <span className="hidden sm:inline">{step.title}</span>
-              <span className="sm:hidden">Step {index + 1}</span>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
 
-              {/* Active step indicator */}
-              {index === currentStep && (
-                <div className="absolute inset-0 rounded-xl bg-primary/10 animate-pulse" />
-              )}
-            </button>
-          ))}
+      {/* Smart Progress Sidebar - Right Side */}
+      <div className="lg:col-span-1">
+        <div className="sticky top-8">
+          <ApplicationProgress
+            currentStep={currentStep}
+            totalSteps={careerSteps.length}
+            completedSteps={completedSteps}
+            formData={careerData}
+            estimatedTimeRemaining={estimatedTimeRemaining || undefined}
+            onStepClick={handleStepClick}
+          />
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent>
-        <div className="min-h-[500px] mb-8">{renderStepContent()}</div>
-
-        <div className="flex justify-between pt-6 border-t">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handlePrevious}
-            disabled={currentStep === 0}
-            className="flex items-center gap-2"
+      {/* Auto-save Indicator */}
+      <AnimatePresence>
+        {isSaving && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed bottom-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-2 z-50"
           >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </Button>
-
-          {currentStep === careerSteps.length - 1 ? (
-            <Button
-              type="button"
-              onClick={onSubmit}
-              disabled={isPending}
-              className="flex items-center gap-2 px-8"
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             >
-              {isPending ? "Submitting..." : "Submit Application"}
-              <Award className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              onClick={handleNext}
-              className="flex items-center gap-2"
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+              <Sparkles className="h-4 w-4" />
+            </motion.div>
+            Auto-saving...
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
