@@ -23,7 +23,7 @@ export async function sendWelcomeEmail({
   );
 
   return await resend.emails.send({
-    from: "EverKind Community Support <noreply@yourdomain.com>",
+    from: "EverKind Community Support <noreply@ekcs.com.au>",
     to,
     subject: "Welcome to EverKind Community Support - Staff Portal Access",
     html: emailHtml,

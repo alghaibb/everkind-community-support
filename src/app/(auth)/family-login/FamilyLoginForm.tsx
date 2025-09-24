@@ -2,7 +2,6 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -123,7 +122,7 @@ export default function FamilyLoginForm() {
 
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
-            Don't have access? Contact your care coordinator to set up your
+            Don&apos;t have access? Contact your care coordinator to set up your
             family portal account.
           </p>
         </div>

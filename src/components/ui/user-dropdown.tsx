@@ -17,10 +17,8 @@ import {
   Settings,
   LayoutDashboard,
   Users,
-  FileText,
   MessageSquare,
   Shield,
-  LogOut,
 } from "lucide-react";
 import Link from "next/link";
 import LogoutButton from "@/components/logout-button";

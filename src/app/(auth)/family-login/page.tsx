@@ -25,7 +25,8 @@ export default function FamilyLoginPage() {
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                &ldquo;Stay connected with your loved one's care. View updates,
+                &ldquo;Stay connected with your loved one&apos;s care. View updates,
+
                 schedules, and communicate with the care team.&rdquo;
               </p>
               <footer className="text-sm">Family Portal</footer>
@@ -39,7 +40,7 @@ export default function FamilyLoginPage() {
                 Family Portal
               </h1>
               <p className="text-sm text-muted-foreground">
-                Access your family member's care information
+                Access your family member&apos;s care information
               </p>
             </div>
             <FamilyLoginForm />
