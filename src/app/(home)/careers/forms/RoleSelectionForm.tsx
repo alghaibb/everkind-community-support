@@ -145,7 +145,7 @@ export default function RoleSelectionForm({
         </h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Each position offers unique opportunities to make a difference in
-          people's lives. Select the role that aligns with your skills and
+          people&apos;s lives. Select the role that aligns with your skills and
           passion.
         </p>
       </motion.div>
@@ -155,7 +155,7 @@ export default function RoleSelectionForm({
         <FormField
           control={form.control}
           name="role"
-          render={({ field }) => (
+          render={({ field: _field }) => (
             <FormItem>
               <FormControl>
                 <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
@@ -303,7 +303,7 @@ export default function RoleSelectionForm({
               <div>
                 <h4 className="font-semibold">Great Choice!</h4>
                 <p className="text-sm text-muted-foreground">
-                  You've selected the{" "}
+                  You&apos;ve selected the{" "}
                   <span className="font-medium text-primary">
                     {selectedRole}
                   </span>{" "}
@@ -312,7 +312,7 @@ export default function RoleSelectionForm({
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Ready to start your application? Click "Start Application" to
+              Ready to start your application? Click &quot;Start Application&quot; to
               begin the process.
             </p>
           </motion.div>

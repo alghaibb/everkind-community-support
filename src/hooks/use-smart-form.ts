@@ -10,8 +10,8 @@ interface SmartFormOptions {
 }
 
 export function useSmartForm(
-  formData: Record<string, any>,
-  onSave: (data: Record<string, any>) => void,
+  formData: Record<string, unknown>,
+  onSave: (data: Record<string, unknown>) => void,
   options: SmartFormOptions = {}
 ) {
   const {
@@ -66,7 +66,7 @@ export function useSmartForm(
   }, [formData, showProgressEstimation]);
 
   // Smart field suggestions
-  const getFieldSuggestions = useCallback((fieldName: string, currentValue: string) => {
+  const getFieldSuggestions = useCallback((fieldName: string, _currentValue: string) => {
     if (!enableSmartSuggestions) return [];
 
     const suggestions: Record<string, string[]> = {
@@ -91,20 +91,20 @@ export function useSmartForm(
   }, [enableSmartSuggestions]);
 
   // Validation helpers
-  const validateField = useCallback((fieldName: string, value: any) => {
-    const validations: Record<string, (val: any) => string | null> = {
+  const validateField = useCallback((fieldName: string, value: unknown) => {
+    const validations: Record<string, (val: unknown) => string | null> = {
       email: (val) => {
-        if (!val) return "Email is required";
+        if (!val || typeof val !== 'string') return "Email is required";
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(val) ? null : "Please enter a valid email address";
       },
       phone: (val) => {
-        if (!val) return "Phone number is required";
+        if (!val || typeof val !== 'string') return "Phone number is required";
         const phoneRegex = /^(\+61|0)[2-9]\d{8}$/;
         return phoneRegex.test(val.replace(/\s/g, '')) ? null : "Please enter a valid Australian phone number";
       },
-      firstName: (val) => val && val.length >= 2 ? null : "First name must be at least 2 characters",
-      lastName: (val) => val && val.length >= 2 ? null : "Last name must be at least 2 characters",
+      firstName: (val) => (typeof val === 'string' && val.length >= 2) ? null : "First name must be at least 2 characters",
+      lastName: (val) => (typeof val === 'string' && val.length >= 2) ? null : "Last name must be at least 2 characters",
     };
 
     return validations[fieldName]?.(value) || null;

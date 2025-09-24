@@ -195,7 +195,7 @@ export default function RoleSelection() {
                       Perfect Choice!
                     </h2>
                     <p className="text-lg text-muted-foreground">
-                      You've selected the{" "}
+                      You&apos;ve selected the{" "}
                       <span className="font-semibold text-primary bg-primary/10 px-2 py-1 rounded">
                         {selectedRole}
                       </span>{" "}
@@ -207,7 +207,7 @@ export default function RoleSelection() {
                   <div className="bg-muted/30 rounded-lg p-6 space-y-4">
                     <div className="flex items-center justify-center gap-2 text-primary">
                       <Sparkles className="h-5 w-5" />
-                      <span className="font-medium">What's Next?</span>
+                      <span className="font-medium">What&apos;s Next?</span>
                     </div>
                     <ul className="text-sm text-muted-foreground space-y-2">
                       <li className="flex items-center gap-2">
@@ -286,7 +286,7 @@ export default function RoleSelection() {
                   transition={{ delay: 0.3 }}
                   className="text-lg text-muted-foreground max-w-2xl mx-auto"
                 >
-                  Complete your application below. We'll review your
+                  Complete your application below. We&apos;ll review your
                   qualifications and get back to you soon.
                 </motion.p>
 

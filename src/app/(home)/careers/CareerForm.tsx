@@ -19,8 +19,6 @@ import {
   Shield,
   GraduationCap,
   Upload,
-  TrendingUp,
-  Zap,
 } from "lucide-react";
 import { hasAvailabilitySelected, isFieldEmpty } from "@/lib/form-utils";
 import { CareerFormValues } from "@/lib/validations/careers/career.schema";
