@@ -28,7 +28,6 @@ export default function UnauthorizedPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center p-4">
-      {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
         <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-orange-500/5 blur-3xl" />
@@ -42,7 +41,6 @@ export default function UnauthorizedPage() {
       >
         <Card className="w-full max-w-md p-8 backdrop-blur-sm bg-background/95 shadow-2xl border-orange-500/20">
           <div className="text-center space-y-6">
-            {/* Animated Icon */}
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -72,7 +70,6 @@ export default function UnauthorizedPage() {
               />
             </motion.div>
 
-            {/* Error Code */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -86,7 +83,6 @@ export default function UnauthorizedPage() {
               </h2>
             </motion.div>
 
-            {/* Description */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -97,7 +93,6 @@ export default function UnauthorizedPage() {
               your credentials to continue.
             </motion.p>
 
-            {/* Security Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -110,7 +105,6 @@ export default function UnauthorizedPage() {
               </span>
             </motion.div>
 
-            {/* Action Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -133,7 +127,6 @@ export default function UnauthorizedPage() {
               </Button>
             </motion.div>
 
-            {/* Additional Actions */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -157,14 +150,13 @@ export default function UnauthorizedPage() {
           </div>
         </Card>
 
-        {/* Help Text */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
           className="text-center text-sm text-muted-foreground mt-6"
         >
-          If you're having trouble accessing your account, please contact
+          If you&apos;re having trouble accessing your account, please contact
           support.
         </motion.p>
       </motion.div>

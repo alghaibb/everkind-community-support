@@ -2,11 +2,15 @@ import MobileNavClient from "./MobileNavClient";
 import { getServerSession } from "@/lib/get-session";
 
 export default async function MobileNav() {
-  // Check session on server
   const session = await getServerSession();
+  const user = session?.user;
 
-  // Pass down whether to show staff login
-  const showStaffLogin = !session?.user;
+  const userForDropdown = user
+    ? {
+        ...user,
+        role: user.role || undefined,
+      }
+    : undefined;
 
-  return <MobileNavClient showStaffLogin={showStaffLogin} />;
+  return <MobileNavClient user={userForDropdown} />;
 }

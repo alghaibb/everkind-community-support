@@ -44,7 +44,7 @@ export default async function LoginPage() {
       <div className="text-center space-y-2">
         <h1 className="text-2xl sm:text-3xl font-bold">Staff Portal</h1>
         <p className="text-sm sm:text-base text-muted-foreground">
-          Sign in to access your dashboard
+          Log in to access your dashboard
         </p>
       </div>
 

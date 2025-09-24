@@ -17,19 +17,36 @@ export default function PWARegister() {
             registration
           );
 
-          // Check for updates
+          // Force update and activation for development
           registration.addEventListener("updatefound", () => {
             const newWorker = registration.installing;
             if (newWorker) {
               newWorker.addEventListener("statechange", () => {
-                if (
-                  newWorker.state === "installed" &&
-                  navigator.serviceWorker.controller
-                ) {
-                  console.log("[PWA] New content available, refresh to update");
-                  // You could show a toast notification here
+                if (newWorker.state === "installed") {
+                  if (navigator.serviceWorker.controller) {
+                    console.log(
+                      "[PWA] New service worker available, activating..."
+                    );
+                    // Force activation of new service worker
+                    newWorker.postMessage({ type: "SKIP_WAITING" });
+                    window.location.reload();
+                  } else {
+                    console.log(
+                      "[PWA] Service worker installed for first time"
+                    );
+                  }
                 }
               });
+            }
+          });
+
+          // Listen for service worker messages
+          navigator.serviceWorker.addEventListener("message", (event) => {
+            if (event.data && event.data.type === "SKIP_WAITING") {
+              console.log(
+                "[PWA] Skipping waiting, activating new service worker"
+              );
+              registration.waiting?.postMessage({ type: "SKIP_WAITING" });
             }
           });
         })

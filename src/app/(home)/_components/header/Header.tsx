@@ -3,8 +3,22 @@ import Link from "next/link";
 import Navbar from "./Navbar";
 import MobileNav from "./MobileNav";
 import StaffLoginButton from "./StaffLoginButton";
+import { UserDropdown } from "@/components/ui/user-dropdown";
+import { getServerSession } from "@/lib/get-session";
 
-export default function Header() {
+export default async function Header() {
+  const session = await getServerSession();
+  const user = session?.user;
+
+  const userForDropdown = user
+    ? {
+        ...user,
+        role: user.role || undefined,
+      }
+    : null;
+
+  const showAdminRoutes = userForDropdown?.role === "ADMIN";
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,8 +37,17 @@ export default function Header() {
             <Navbar />
           </div>
 
-          {/* Staff Login Button - Only shows when not logged in */}
-          <StaffLoginButton />
+          {/* Desktop User Dropdown */}
+          <div className="hidden md:block">
+            {userForDropdown ? (
+              <UserDropdown
+                user={userForDropdown}
+                showAdminRoutes={showAdminRoutes}
+              />
+            ) : (
+              <StaffLoginButton />
+            )}
+          </div>
 
           <div className="md:hidden flex-1 flex justify-end">
             <MobileNav />

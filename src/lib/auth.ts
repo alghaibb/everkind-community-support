@@ -10,8 +10,7 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: "string",
-        enum: ["STAFF", "ADMIN"],
-        default: "STAFF",
+        required: false,
       },
     },
   },

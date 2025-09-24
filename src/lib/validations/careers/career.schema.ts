@@ -13,7 +13,7 @@ const dayAvailability = z.object({
 
 // Base schemas
 export const roleSelectionSchema = z.object({
-  role: z.enum(ROLES),
+  role: z.enum(ROLES).optional(),
 });
 
 export const personalInfoSchema = z.object({

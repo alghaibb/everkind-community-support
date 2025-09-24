@@ -134,7 +134,7 @@ export default function LoginForm() {
           loading={isLoading}
           loadingText="Signing in..."
         >
-          Sign In
+          Log In
         </Button>
       </form>
     </Form>

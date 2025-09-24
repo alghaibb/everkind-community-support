@@ -87,7 +87,7 @@ export default function ForbiddenPage() {
               transition={{ delay: 0.4 }}
               className="text-muted-foreground"
             >
-              You don't have permission to access this resource. This area
+              You don&apos;t have permission to access this resource. This area
               requires special authorization.
             </motion.p>
 

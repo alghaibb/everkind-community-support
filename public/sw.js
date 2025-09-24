@@ -1,5 +1,5 @@
 // EverKind Community Support Service Worker
-const CACHE_NAME = 'ekcs-v1';
+const CACHE_NAME = 'ekcs-v1.1';
 const STATIC_CACHE_URLS = [
   '/',
   '/about-us',
@@ -62,6 +62,20 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip JavaScript files and other dynamic assets from caching
+  if (event.request.url.includes('.js') ||
+    event.request.url.includes('.jsx') ||
+    event.request.url.includes('.ts') ||
+    event.request.url.includes('.tsx') ||
+    event.request.url.includes('.hot-update') ||
+    event.request.url.includes('/_next/static/chunks/') ||
+    event.request.url.includes('/admin') ||
+    event.request.url.includes('/api/auth') ||
+    event.request.url.includes('/api/')) {
+    console.log('[SW] Skipping cache for dynamic asset:', event.request.url);
+    return fetch(event.request);
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((cachedResponse) => {
@@ -73,8 +87,14 @@ self.addEventListener('fetch', (event) => {
         console.log('[SW] Fetching from network:', event.request.url);
         return fetch(event.request)
           .then((response) => {
-            // Only cache successful responses
-            if (response.status === 200) {
+            // Only cache static assets and images, not dynamic HTML or API responses
+            if (response.status === 200 &&
+              (event.request.url.includes('.png') ||
+                event.request.url.includes('.jpg') ||
+                event.request.url.includes('.jpeg') ||
+                event.request.url.includes('.svg') ||
+                event.request.url.includes('.ico') ||
+                event.request.url.includes('/manifest.json'))) {
               const responseClone = response.clone();
               caches.open(CACHE_NAME)
                 .then((cache) => {
@@ -134,3 +154,32 @@ async function syncCareerForms() {
     console.error('[SW] Failed to sync career forms:', error);
   }
 }
+
+// Message event - handle cache clearing and service worker updates
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    console.log('[SW] Clearing cache on logout');
+    event.waitUntil(
+      caches.keys()
+        .then((cacheNames) => {
+          return Promise.all(
+            cacheNames.map((cacheName) => {
+              console.log('[SW] Deleting cache:', cacheName);
+              return caches.delete(cacheName);
+            })
+          );
+        })
+        .then(() => {
+          console.log('[SW] Cache cleared successfully');
+        })
+        .catch((error) => {
+          console.error('[SW] Failed to clear cache:', error);
+        })
+    );
+  }
+
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('[SW] Skipping waiting phase');
+    self.skipWaiting();
+  }
+});
