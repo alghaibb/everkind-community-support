@@ -25,7 +25,7 @@ export async function sendCareerApplication(values: Record<string, unknown>) {
     await prisma.careerSubmission.create({
       data: {
         // Basic info
-        role: data.role,
+        role: data.role || "",
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
