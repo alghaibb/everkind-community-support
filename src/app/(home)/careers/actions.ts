@@ -26,10 +26,10 @@ export async function sendCareerApplication(values: Record<string, unknown>) {
       data: {
         // Basic info
         role: data.role || "",
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        email: data.email || "",
+        phone: data.phone || "",
 
         // Role-specific certifications
         cert3IndividualSupport: data.role === "Support Worker" && "cert3IndividualSupport" in data
@@ -40,18 +40,18 @@ export async function sendCareerApplication(values: Record<string, unknown>) {
           : null,
 
         // Common fields
-        covidVaccinations: data.covidVaccinations,
-        influenzaVaccination: data.influenzaVaccination,
-        workingWithChildrenCheck: data.workingWithChildrenCheck,
-        ndisScreeningCheck: data.ndisScreeningCheck,
-        policeCheck: data.policeCheck,
-        workingRights: data.workingRights,
-        ndisModules: data.ndisModules,
-        firstAidCPR: data.firstAidCPR,
-        experience: data.experience,
-        availability: data.availability,
-        resume: data.resume,
-        certificates: data.certificates,
+        covidVaccinations: data.covidVaccinations || "",
+        influenzaVaccination: data.influenzaVaccination || "",
+        workingWithChildrenCheck: data.workingWithChildrenCheck || "",
+        ndisScreeningCheck: data.ndisScreeningCheck || "",
+        policeCheck: data.policeCheck || "",
+        workingRights: data.workingRights || "",
+        ndisModules: data.ndisModules || "",
+        firstAidCPR: data.firstAidCPR || "",
+        experience: data.experience || "",
+        availability: data.availability || {},
+        resume: data.resume || "",
+        certificates: data.certificates || [],
       },
     });
 

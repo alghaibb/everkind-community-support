@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Checkbox } from "@/components/ui/checkbox";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { CareerFormStepProps } from "@/app/(home)/careers/steps";
@@ -17,12 +19,76 @@ import {
   roleSelectionSchema,
   RoleSelectionValues,
 } from "@/lib/validations/careers/career.schema";
-import { UserCheck } from "lucide-react";
+import {
+  Heart,
+  Stethoscope,
+  GraduationCap,
+  CheckCircle,
+  ArrowRight,
+  Users,
+  Shield,
+  Award,
+} from "lucide-react";
+
+const roleData = [
+  {
+    value: "Support Worker",
+    title: "Support Worker",
+    description:
+      "Provide essential support and assistance to individuals with disabilities in their daily activities and community participation.",
+    icon: Heart,
+    color: "bg-gradient-to-br from-pink-500 to-rose-600",
+    features: [
+      "Personal Care",
+      "Community Access",
+      "Life Skills",
+      "Companionship",
+    ],
+    requirements: "Cert III Individual Support preferred",
+    salary: "$28-35/hour",
+  },
+  {
+    value: "Enrolled Nurse",
+    title: "Enrolled Nurse",
+    description:
+      "Deliver nursing care under the supervision of registered nurses, focusing on medication management and health monitoring.",
+    icon: Stethoscope,
+    color: "bg-gradient-to-br from-blue-500 to-cyan-600",
+    features: [
+      "Medication Management",
+      "Health Monitoring",
+      "Clinical Care",
+      "Documentation",
+    ],
+    requirements: "Diploma of Nursing (Enrolled)",
+    salary: "$32-38/hour",
+  },
+  {
+    value: "Registered Nurse",
+    title: "Registered Nurse",
+    description:
+      "Provide comprehensive nursing care and clinical leadership, developing care plans and supervising other healthcare staff.",
+    icon: GraduationCap,
+    color: "bg-gradient-to-br from-emerald-500 to-teal-600",
+    features: [
+      "Clinical Leadership",
+      "Care Planning",
+      "Staff Supervision",
+      "Complex Care",
+    ],
+    requirements: "Bachelor of Nursing + AHPRA Registration",
+    salary: "$38-45/hour",
+  },
+];
 
 export default function RoleSelectionForm({
   careerData,
   setCareerData,
 }: CareerFormStepProps) {
+  const [selectedRole, setSelectedRole] = useState<
+    "Support Worker" | "Enrolled Nurse" | "Registered Nurse" | undefined
+  >(careerData.role);
+
   const form = useForm<RoleSelectionValues>({
     resolver: zodResolver(roleSelectionSchema),
     defaultValues: {
@@ -31,94 +97,227 @@ export default function RoleSelectionForm({
   });
 
   useEffect(() => {
-    const { unsubscribe } = form.watch(async (values) => {
-      const isValid = await form.trigger();
-      if (!isValid) return;
-
+    if (selectedRole) {
+      form.setValue(
+        "role",
+        selectedRole as "Support Worker" | "Enrolled Nurse" | "Registered Nurse"
+      );
       setCareerData({
         ...careerData,
-        role: values.role,
+        role: selectedRole,
       });
-    });
-    return unsubscribe;
-  }, [form, careerData, setCareerData]);
+    }
+  }, [selectedRole, form, careerData, setCareerData]);
+
+  const handleRoleSelect = (
+    roleValue: "Support Worker" | "Enrolled Nurse" | "Registered Nurse"
+  ) => {
+    if (selectedRole === roleValue) {
+      // Deselect if already selected
+      setSelectedRole(undefined);
+      form.setValue("role", undefined);
+      setCareerData({
+        ...careerData,
+        role: undefined,
+      });
+    } else {
+      // Select new role
+      setSelectedRole(roleValue);
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1.5 text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <UserCheck className="h-5 w-5 text-primary" />
-          <h2 className="text-2xl font-semibold">Choose Your Role</h2>
+    <div className="space-y-8">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center space-y-4"
+      >
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+          <Users className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium text-primary">
+            Choose Your Career Path
+          </span>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Select the position you&apos;re applying for. Each role has different
-          requirements and responsibilities.
+        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+          Find Your Perfect Role
+        </h2>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Each position offers unique opportunities to make a difference in
+          people's lives. Select the role that aligns with your skills and
+          passion.
         </p>
-      </div>
+      </motion.div>
 
+      {/* Role Cards */}
       <Form {...form}>
-        <div className="max-w-2xl mx-auto">
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-base font-medium">
-                  Select Your Position
-                </FormLabel>
-                <FormControl>
-                  <div className="grid gap-4 md:grid-cols-1">
-                    {[
-                      {
-                        value: "Support Worker",
-                        title: "Support Worker",
-                        description:
-                          "Provide essential support and assistance to individuals with disabilities",
-                      },
-                      {
-                        value: "Enrolled Nurse",
-                        title: "Enrolled Nurse",
-                        description:
-                          "Deliver nursing care under the supervision of registered nurses",
-                      },
-                      {
-                        value: "Registered Nurse",
-                        title: "Registered Nurse",
-                        description:
-                          "Provide comprehensive nursing care and clinical leadership",
-                      },
-                    ].map((role) => (
-                      <div
+        <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+                  {roleData.map((role, index) => {
+                    const Icon = role.icon;
+                    const isSelected = selectedRole === role.value;
+
+                    return (
+                      <motion.div
                         key={role.value}
-                        className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        whileHover={{ y: -8 }}
+                        className="relative"
                       >
-                        <Checkbox
-                          checked={field.value === role.value}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              field.onChange(role.value);
-                            } else {
-                              field.onChange(undefined);
-                            }
-                          }}
-                          className="mt-1"
-                        />
-                        <div className="flex-1">
-                          <h3 className="font-medium text-sm">{role.title}</h3>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {role.description}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                        <Card
+                          className={`cursor-pointer transition-all duration-300 hover:shadow-xl border-2 ${
+                            isSelected
+                              ? "border-primary shadow-lg shadow-primary/25 ring-4 ring-primary/10"
+                              : "border-border hover:border-primary/50"
+                          }`}
+                          onClick={() =>
+                            handleRoleSelect(
+                              role.value as
+                                | "Support Worker"
+                                | "Enrolled Nurse"
+                                | "Registered Nurse"
+                            )
+                          }
+                        >
+                          <CardContent className="p-6 space-y-4">
+                            {/* Header */}
+                            <div className="flex items-start justify-between">
+                              <div
+                                className={`p-3 rounded-xl ${role.color} text-white shadow-lg`}
+                              >
+                                <Icon className="h-6 w-6" />
+                              </div>
+                              <AnimatePresence>
+                                {isSelected && (
+                                  <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    exit={{ scale: 0 }}
+                                    className="p-2 bg-primary/10 rounded-full"
+                                  >
+                                    <CheckCircle className="h-5 w-5 text-primary" />
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+
+                            {/* Title & Description */}
+                            <div className="space-y-2">
+                              <h3 className="text-xl font-semibold">
+                                {role.title}
+                              </h3>
+                              <p className="text-sm text-muted-foreground leading-relaxed">
+                                {role.description}
+                              </p>
+                            </div>
+
+                            {/* Features */}
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2">
+                                <Shield className="h-4 w-4 text-primary" />
+                                <span className="text-sm font-medium">
+                                  Key Responsibilities
+                                </span>
+                              </div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {role.features.map((feature) => (
+                                  <Badge
+                                    key={feature}
+                                    variant="secondary"
+                                    className="text-xs py-1"
+                                  >
+                                    {feature}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Requirements & Salary */}
+                            <div className="space-y-2 pt-2 border-t">
+                              <div className="flex items-center gap-2">
+                                <Award className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground">
+                                  {role.requirements}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-primary">
+                                  {role.salary}
+                                </span>
+                                <Button
+                                  size="sm"
+                                  variant={isSelected ? "default" : "ghost"}
+                                  className="h-8 text-xs"
+                                >
+                                  {isSelected ? "Selected" : "Select Role"}
+                                  <ArrowRight className="h-3 w-3 ml-1" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Selection Overlay */}
+                        <AnimatePresence>
+                          {isSelected && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className="absolute inset-0 bg-primary/5 rounded-lg pointer-events-none"
+                            />
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </Form>
+
+      {/* Selection Summary */}
+      <AnimatePresence>
+        {selectedRole && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg p-6 border border-primary/20"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-primary/10 rounded-full">
+                <CheckCircle className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h4 className="font-semibold">Great Choice!</h4>
+                <p className="text-sm text-muted-foreground">
+                  You've selected the{" "}
+                  <span className="font-medium text-primary">
+                    {selectedRole}
+                  </span>{" "}
+                  position.
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Ready to start your application? Click "Start Application" to
+              begin the process.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
