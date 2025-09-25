@@ -1,6 +1,13 @@
 "use client";
 
-import React, { useTransition, useState, useEffect } from "react";
+import React, {
+  useTransition,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  memo,
+} from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -154,7 +161,7 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
     }
   }, [completionScore, showSmartNotification]);
 
-  const handleNext = async () => {
+  const handleNext = useCallback(async () => {
     setCompletedSteps((prev) =>
       new Set(prev).add(careerSteps[currentStep].key)
     );
@@ -165,16 +172,16 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
       params.set("step", nextStep.toString());
       router.push(`?${params.toString()}`, { scroll: false });
     }
-  };
+  }, [currentStep, searchParams, router, setCompletedSteps]);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     if (currentStep > 0) {
       const prevStep = currentStep - 1;
       const params = new URLSearchParams(searchParams);
       params.set("step", prevStep.toString());
       router.push(`?${params.toString()}`, { scroll: false });
     }
-  };
+  }, [currentStep, searchParams, router]);
 
   const handleStepClick = (stepIndex: number) => {
     if (stepIndex < currentStep) {
@@ -236,7 +243,7 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
     return missingFields;
   };
 
-  const onSubmit = async () => {
+  const onSubmit = useCallback(async () => {
     // Mark final step as completed when submitting
     setCompletedSteps((prev) =>
       new Set(prev).add(careerSteps[careerSteps.length - 1].key)
@@ -284,7 +291,15 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
         toast.error("Failed to submit application. Please try again.");
       }
     });
-  };
+  }, [
+    careerData,
+    validateAllSteps,
+    startTransition,
+    setCareerData,
+    setCompletedSteps,
+    searchParams,
+    router,
+  ]);
 
   const renderStepContent = () => {
     const stepKey = careerSteps[currentStep].key;
@@ -328,7 +343,10 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
     }
   };
 
-  const progress = ((currentStep + 1) / careerSteps.length) * 100;
+  const progress = useMemo(
+    () => ((currentStep + 1) / careerSteps.length) * 100,
+    [currentStep]
+  );
 
   return (
     <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -445,10 +463,10 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
                           isCurrent
                             ? "bg-primary text-primary-foreground shadow-lg"
                             : isCompleted
-                            ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100"
-                            : isAccessible
-                            ? "bg-muted/30 text-muted-foreground hover:bg-muted/50"
-                            : "bg-muted/20 text-muted-foreground/50 cursor-not-allowed"
+                              ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100"
+                              : isAccessible
+                                ? "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+                                : "bg-muted/20 text-muted-foreground/50 cursor-not-allowed"
                         }`}
                         whileHover={isAccessible ? { scale: 1.02 } : {}}
                         whileTap={isAccessible ? { scale: 0.98 } : {}}
@@ -458,8 +476,8 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
                             isCurrent
                               ? "bg-primary-foreground/20"
                               : isCompleted
-                              ? "bg-green-600 text-white"
-                              : "bg-muted-foreground/20"
+                                ? "bg-green-600 text-white"
+                                : "bg-muted-foreground/20"
                           }`}
                         >
                           {isCompleted ? (

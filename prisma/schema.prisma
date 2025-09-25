@@ -34,7 +34,6 @@ enum ParticipantStatus {
   DISCHARGED
 }
 
-// Universal user model for all user types
 model User {
   id            String    @id
   name          String
@@ -301,6 +300,8 @@ model ContactMessage {
   message   String
   createdAt DateTime @default(now())
 
+  @@index([createdAt(sort: Desc)])
+  @@index([email])
   @@map("contact_message")
 }
 
@@ -344,5 +345,10 @@ model CareerSubmission {
   reviewedAt               DateTime?
   createdAt                DateTime          @default(now())
 
+  @@index([createdAt(sort: Desc)])
+  @@index([status])
+  @@index([role])
+  @@index([email])
+  @@index([status, createdAt(sort: Desc)])
   @@map("career_submission")
 }

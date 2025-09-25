@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/get-session";
 import { User } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getDateRanges } from "@/lib/date-utils";
 
 export async function GET() {
   try {
@@ -17,99 +18,107 @@ export async function GET() {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Get dashboard statistics
-    const [
-      totalApplications,
-      weeklyApplications,
-      monthlyApplications,
-      totalMessages,
-      weeklyMessages,
-      monthlyMessages,
-      totalStaff,
-      recentApplications,
-      recentMessages,
-    ] = await Promise.all([
-      // Career application stats
-      prisma.careerSubmission.count(),
-      prisma.careerSubmission.count({
-        where: {
-          createdAt: {
-            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-          },
-        },
-      }),
-      prisma.careerSubmission.count({
-        where: {
-          createdAt: {
-            gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-          },
-        },
-      }),
+    // Get centralized date ranges for consistent queries
+    const dateRanges = getDateRanges();
 
-      // Contact message stats
-      prisma.contactMessage.count(),
-      prisma.contactMessage.count({
-        where: {
-          createdAt: {
-            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    const result = await prisma.$transaction(async (tx) => {
+      const [
+        totalApplications,
+        weeklyApplications,
+        monthlyApplications,
+        totalMessages,
+        weeklyMessages,
+        monthlyMessages,
+        totalStaff,
+        recentApplications,
+        recentMessages,
+      ] = await Promise.all([
+        // Career application stats
+        tx.careerSubmission.count(),
+        tx.careerSubmission.count({
+          where: {
+            createdAt: dateRanges.weekly,
           },
-        },
-      }),
-      prisma.contactMessage.count({
-        where: {
-          createdAt: {
-            gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        }),
+        tx.careerSubmission.count({
+          where: {
+            createdAt: dateRanges.monthly,
           },
-        },
-      }),
+        }),
 
-      // Staff count
-      prisma.staff.count(),
+        // Contact message stats
+        tx.contactMessage.count(),
+        tx.contactMessage.count({
+          where: {
+            createdAt: dateRanges.weekly,
+          },
+        }),
+        tx.contactMessage.count({
+          where: {
+            createdAt: dateRanges.monthly,
+          },
+        }),
 
-      // Recent applications
-      prisma.careerSubmission.findMany({
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          role: true,
-          createdAt: true,
-        },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-      }),
+        // Staff count
+        tx.staff.count(),
 
-      // Recent messages
-      prisma.contactMessage.findMany({
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          subject: true,
-          createdAt: true,
-        },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-      }),
-    ]);
+        // Recent applications
+        tx.careerSubmission.findMany({
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            role: true,
+            createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        }),
+
+        // Recent messages
+        tx.contactMessage.findMany({
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            subject: true,
+            createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        }),
+      ]);
+
+      return {
+        totalApplications,
+        weeklyApplications,
+        monthlyApplications,
+        totalMessages,
+        weeklyMessages,
+        monthlyMessages,
+        totalStaff,
+        recentApplications,
+        recentMessages,
+      };
+    });
 
     return NextResponse.json({
       applications: {
-        total: totalApplications,
-        weekly: weeklyApplications,
-        monthly: monthlyApplications,
+        total: result.totalApplications,
+        weekly: result.weeklyApplications,
+        monthly: result.monthlyApplications,
       },
       messages: {
-        total: totalMessages,
-        weekly: weeklyMessages,
-        monthly: monthlyMessages,
+        total: result.totalMessages,
+        weekly: result.weeklyMessages,
+        monthly: result.monthlyMessages,
       },
       staff: {
-        total: totalStaff,
+        total: result.totalStaff,
       },
       recent: {
-        applications: recentApplications,
-        messages: recentMessages,
+        applications: result.recentApplications,
+        messages: result.recentMessages,
       },
     });
   } catch (error) {

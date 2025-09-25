@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Review job applications from potential staff members.",
 };
 
-export default async function CareersPage() {
+export default function CareersPage() {
   return (
     <Suspense fallback={<CareersTableSkeleton />}>
       <CareersPageContent />

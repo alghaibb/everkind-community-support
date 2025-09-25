@@ -4,7 +4,7 @@ import {
   CareerApplicationsResponse,
   CareerApplicationsApiResponse,
   ContactMessagesResponse,
-  ContactMessagesApiResponse
+  ContactMessagesApiResponse,
 } from "@/lib/types/admin";
 import { ApplicationStatus } from "@/generated/prisma";
 import { env } from "@/lib/env";
@@ -13,30 +13,31 @@ export const adminQueryKeys = {
   all: ["admin"] as const,
   dashboard: () => [...adminQueryKeys.all, "dashboard"] as const,
   careers: () => [...adminQueryKeys.all, "careers"] as const,
-  careersList: (params: {
-    search?: string;
-    role?: string;
-    page?: number;
-  }) => [...adminQueryKeys.careers(), "list", {
-    search: params.search || undefined,
-    role: params.role || undefined,
-    page: params.page || 1,
-  }] as const,
-  careerDetails: (id: string) => [...adminQueryKeys.careers(), "detail", id] as const,
+  careersList: (params: { search?: string; role?: string; page?: number }) =>
+    [
+      ...adminQueryKeys.careers(),
+      "list",
+      {
+        search: params.search || undefined,
+        role: params.role || undefined,
+        page: params.page || 1,
+      },
+    ] as const,
+  careerDetails: (id: string) =>
+    [...adminQueryKeys.careers(), "detail", id] as const,
   messages: () => [...adminQueryKeys.all, "messages"] as const,
-  messagesList: (params: {
-    search?: string;
-    page?: number;
-  }) => [...adminQueryKeys.messages(), "list", {
-    search: params.search || undefined,
-    page: params.page || 1,
-  }] as const,
+  messagesList: (params: { search?: string; page?: number }) =>
+    [
+      ...adminQueryKeys.messages(),
+      "list",
+      {
+        search: params.search || undefined,
+        page: params.page || 1,
+      },
+    ] as const,
   staff: () => [...adminQueryKeys.all, "staff"] as const,
-  staffList: (params: {
-    search?: string;
-    role?: string;
-    page?: number;
-  }) => [...adminQueryKeys.staff(), "list", params] as const,
+  staffList: (params: { search?: string; role?: string; page?: number }) =>
+    [...adminQueryKeys.staff(), "list", params] as const,
 } as const;
 
 // Helper function to get base URL for fetch requests
@@ -65,7 +66,9 @@ async function fetchCareerApplications(params: {
   if (params.role) searchParams.set("role", params.role);
   if (params.page) searchParams.set("page", params.page.toString());
 
-  const response = await fetch(`${getBaseUrl()}/api/admin/careers?${searchParams}`);
+  const response = await fetch(
+    `${getBaseUrl()}/api/admin/careers?${searchParams}`
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch career applications");
   }
@@ -96,7 +99,9 @@ async function fetchContactMessages(params: {
   if (params.search) searchParams.set("search", params.search);
   if (params.page) searchParams.set("page", params.page.toString());
 
-  const response = await fetch(`${getBaseUrl()}/api/admin/messages?${searchParams}`);
+  const response = await fetch(
+    `${getBaseUrl()}/api/admin/messages?${searchParams}`
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch contact messages");
   }
@@ -148,7 +153,7 @@ export function useCareerApplicationsSuspense(params: {
   role?: string;
   page?: number;
 }) {
-  return useSuspenseQuery({
+  return useQuery({
     queryKey: adminQueryKeys.careersList(params),
     queryFn: () => fetchCareerApplications(params),
     staleTime: 2 * 60 * 1000,
@@ -156,10 +161,7 @@ export function useCareerApplicationsSuspense(params: {
   });
 }
 
-export function useContactMessages(params: {
-  search?: string;
-  page?: number;
-}) {
+export function useContactMessages(params: { search?: string; page?: number }) {
   return useQuery({
     queryKey: adminQueryKeys.messagesList(params),
     queryFn: () => fetchContactMessages(params),

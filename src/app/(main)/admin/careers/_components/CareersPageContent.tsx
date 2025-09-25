@@ -5,6 +5,7 @@ import CareersTable from "./CareersTable";
 import CareersSearch from "./CareersSearch";
 import CareersStats from "./CareersStats";
 import { useCareerApplicationsSuspense } from "@/lib/queries/admin-queries";
+import { CareersTableSkeleton } from "./CareersTableSkeleton";
 
 export function CareersPageContent() {
   const searchParams = useSearchParams();
@@ -12,11 +13,15 @@ export function CareersPageContent() {
   const role = searchParams.get("role");
   const page = parseInt(searchParams.get("page") || "1");
 
-  const { data } = useCareerApplicationsSuspense({
+  const { data, isLoading } = useCareerApplicationsSuspense({
     search: search || undefined,
     role: role || undefined,
     page,
   });
+
+  if (isLoading || !data) {
+    return <CareersTableSkeleton />;
+  }
 
   return (
     <div className="space-y-6">
