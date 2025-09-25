@@ -51,7 +51,12 @@ export async function sendCareerApplication(values: Record<string, unknown>) {
         experience: data.experience || "",
         availability: data.availability || {},
         resume: data.resume || "",
-        certificates: data.certificates || [],
+        wwccDocument: data.wwccDocument || null,
+        ndisDocument: data.ndisDocument || null,
+        policeCheckDocument: data.policeCheckDocument || null,
+        firstAidCertificate: data.firstAidCertificate || null,
+        qualificationCertificate: data.qualificationCertificate || null,
+        ahpraCertificate: data.ahpraCertificate || null,
       },
     });
 

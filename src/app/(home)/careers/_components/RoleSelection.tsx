@@ -15,7 +15,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { RoleSelectData, CareerFormData } from "@/types/career";
+import {
+  RoleSelectionValues,
+  CareerFormValues,
+} from "@/lib/validations/careers/career.schema";
 import { useLocalStorageSSR } from "@/hooks/use-local-storage";
 import RoleSelectionForm from "../forms/RoleSelectionForm";
 import CareerForm from "../CareerForm";
@@ -38,8 +41,9 @@ export default function RoleSelection() {
   const router = useRouter();
   const [selectedRole, setSelectedRole, clearSelectedRole, roleMounted] =
     useLocalStorageSSR(ROLE_STORAGE_KEY, "");
-  const [careerData, setCareerData, , dataMounted] =
-    useLocalStorageSSR<CareerFormData>(CAREER_DATA_KEY, {});
+  const [careerData, setCareerData, , dataMounted] = useLocalStorageSSR<
+    Partial<CareerFormValues>
+  >(CAREER_DATA_KEY, {});
   const [applicationStarted, setApplicationStarted] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -48,7 +52,7 @@ export default function RoleSelection() {
   /**
    * Handles role selection and updates both role and career data
    */
-  const handleRoleSelect = (data: RoleSelectData) => {
+  const handleRoleSelect = (data: RoleSelectionValues) => {
     const newRole = data.role || "";
     const updatedCareerData = { ...careerData, role: data.role };
 
@@ -85,7 +89,10 @@ export default function RoleSelection() {
 
     // Check if there's meaningful form data (more than just role)
     const meaningfulFields = Object.keys(careerData).filter(
-      (key) => key !== "role" && careerData[key] && careerData[key] !== ""
+      (key) =>
+        key !== "role" &&
+        careerData[key as keyof typeof careerData] &&
+        careerData[key as keyof typeof careerData] !== ""
     );
 
     return applicationStarted || meaningfulFields.length > 0;

@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { X, Download, Smartphone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocalStorage } from "@/hooks/use-local-storage";
@@ -30,6 +32,7 @@ export default function PWAPrompt() {
     "pwa-prompt-dismissed",
     false
   );
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   useEffect(() => {
     // Check if running in standalone mode
@@ -80,13 +83,20 @@ export default function PWAPrompt() {
       const { outcome } = await deferredPrompt.userChoice;
       console.log(`User response to install prompt: ${outcome}`);
       setDeferredPrompt(null);
+
+      // If user installed or if "don't show again" is checked, mark as seen
+      if (outcome === "accepted" || dontShowAgain) {
+        setHasSeenPrompt(true);
+      }
     }
     setShowPrompt(false);
   };
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    setHasSeenPrompt(true);
+    if (dontShowAgain) {
+      setHasSeenPrompt(true);
+    }
   };
 
   // Don't show if already installed
@@ -120,6 +130,24 @@ export default function PWAPrompt() {
                       ? "Add to your home screen for quick access to our services."
                       : "Install our app for faster access and offline support."}
                   </p>
+
+                  {/* Don't show again checkbox */}
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Checkbox
+                      id="dont-show-again"
+                      checked={dontShowAgain}
+                      onCheckedChange={(checked) =>
+                        setDontShowAgain(checked === true)
+                      }
+                      className="h-3 w-3"
+                    />
+                    <Label
+                      htmlFor="dont-show-again"
+                      className="text-xs text-muted-foreground cursor-pointer"
+                    >
+                      Don&apos;t show again
+                    </Label>
+                  </div>
 
                   <div className="flex gap-2">
                     {isIOS ? (

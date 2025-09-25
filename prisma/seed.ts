@@ -90,7 +90,12 @@ async function main() {
         sunday: { am: false, pm: false },
       },
       resume: null,
-      certificates: [],
+      wwccDocument: null,
+      ndisDocument: null,
+      policeCheckDocument: null,
+      firstAidCertificate: null,
+      qualificationCertificate: null,
+      ahpraCertificate: null,
     },
   });
 

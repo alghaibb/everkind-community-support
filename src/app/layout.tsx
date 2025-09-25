@@ -6,6 +6,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import PWAPrompt from "@/components/pwa-prompt";
 import PWARegister from "@/components/pwa-register";
+import { QueryProvider } from "@/providers/query-provider";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -73,7 +74,7 @@ export default function RootLayout({
           defaultTheme="light"
           disableTransitionOnChange
         >
-          {children}
+          <QueryProvider>{children}</QueryProvider>
           <Toaster richColors closeButton theme="light" />
           <PWAPrompt />
           <PWARegister />

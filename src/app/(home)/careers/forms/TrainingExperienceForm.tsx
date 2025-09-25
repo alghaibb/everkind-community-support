@@ -6,6 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Form,
   FormControl,
   FormField,
@@ -16,7 +23,16 @@ import {
 import { CareerFormStepProps } from "@/app/(home)/careers/steps";
 import { trainingExperienceSchema } from "@/lib/validations/careers/career.schema";
 import { BookOpen, Clock } from "lucide-react";
-import { AvailabilityData } from "@/types/career";
+
+type AvailabilityData = {
+  monday: { am: boolean; pm: boolean };
+  tuesday: { am: boolean; pm: boolean };
+  wednesday: { am: boolean; pm: boolean };
+  thursday: { am: boolean; pm: boolean };
+  friday: { am: boolean; pm: boolean };
+  saturday: { am: boolean; pm: boolean };
+  sunday: { am: boolean; pm: boolean };
+};
 
 export default function TrainingExperienceForm({
   careerData,
@@ -45,7 +61,7 @@ export default function TrainingExperienceForm({
   const form = useForm({
     resolver: zodResolver(trainingExperienceSchema),
     defaultValues: {
-      ndisModules: careerData.ndisModules || "",
+      ndisModules: careerData.ndisModules || undefined,
       firstAidCPR: careerData.firstAidCPR || "",
       experience: careerData.experience || "",
       availability: getDefaultAvailability(),
@@ -56,7 +72,7 @@ export default function TrainingExperienceForm({
     const subscription = form.watch((values) => {
       setCareerData({
         ...careerData,
-        ndisModules: values.ndisModules || "",
+        ndisModules: values.ndisModules || undefined,
         firstAidCPR: values.firstAidCPR || "",
         experience: values.experience || "",
         availability:
@@ -86,12 +102,21 @@ export default function TrainingExperienceForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>NDIS Modules Completed *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="e.g., Core Modules, Specialist Modules completed"
-                    {...field}
-                  />
-                </FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select your NDIS modules completion status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Completed">Completed</SelectItem>
+                    <SelectItem value="In Progress">In Progress</SelectItem>
+                    <SelectItem value="Not Started">Not Started</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

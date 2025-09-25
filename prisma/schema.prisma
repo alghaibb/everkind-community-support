@@ -304,13 +304,20 @@ model ContactMessage {
   @@map("contact_message")
 }
 
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  ACCEPTED
+  REJECTED
+}
+
 model CareerSubmission {
-  id                       String   @id @default(cuid())
+  id                       String            @id @default(cuid())
   role                     String
   firstName                String
   lastName                 String
-  email                    String   @unique
-  phone                    String   @unique
+  email                    String            @unique
+  phone                    String            @unique
   cert3IndividualSupport   String
   ahpraRegistration        String?
   covidVaccinations        String
@@ -324,8 +331,18 @@ model CareerSubmission {
   experience               String
   availability             Json
   resume                   String?
-  certificates             String[]
-  createdAt                DateTime @default(now())
+  wwccDocument             String?
+  ndisDocument             String?
+  policeCheckDocument      String?
+  firstAidCertificate      String?
+  qualificationCertificate String?
+  ahpraCertificate         String?
+  status                   ApplicationStatus @default(PENDING)
+  rejectedAt               DateTime?
+  rejectionReason          String?
+  reviewedBy               String?
+  reviewedAt               DateTime?
+  createdAt                DateTime          @default(now())
 
   @@map("career_submission")
 }

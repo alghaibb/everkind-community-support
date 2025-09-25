@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,102 +20,52 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, UserPlus, AlertCircle } from "lucide-react";
+import { UserPlus, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { CareerApplication } from "@/lib/types/admin";
+import { createStaffFromCareer } from "../actions";
+import { StaffRole } from "@/generated/prisma";
+import { useModal } from "@/hooks/use-modal";
+import { STAFF_ROLE_OPTIONS, MODAL_TYPES } from "../../constants";
 
-interface CareerSubmission {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  role: string;
-  cert3IndividualSupport: string;
-  ahpraRegistration?: string;
-  covidVaccinations: string;
-  influenzaVaccination: string;
-  workingWithChildrenCheck: string;
-  ndisScreeningCheck: string;
-  policeCheck: string;
-  workingRights: string;
-  ndisModules: string;
-  firstAidCPR: string;
-  experience: string;
-  availability: unknown;
-  resume?: string;
-  certificates: string[];
-}
-
-interface CreateStaffFromCareerProps {
-  career: CareerSubmission;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export default function CreateStaffFromCareer({
-  career,
-  open,
-  onOpenChange,
-}: CreateStaffFromCareerProps) {
-  const [isLoading, setIsLoading] = useState(false);
+export default function CreateStaffFromCareer() {
+  const { isOpen, type, data, onClose } = useModal();
+  const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
   const [staffRole, setStaffRole] = useState("");
   const [startDate, setStartDate] = useState("");
-  const router = useRouter();
 
-  const handleCreateStaff = async () => {
-    if (!staffRole || !startDate) {
+  const isModalOpen = isOpen && type === MODAL_TYPES.CREATE_STAFF;
+  const career = data?.application as CareerApplication;
+
+  const handleCreateStaff = () => {
+    if (!career || !staffRole || !startDate) {
       setError("Please fill in all required fields");
       return;
     }
 
-    try {
-      setIsLoading(true);
+    startTransition(async () => {
       setError("");
-
-      const response = await fetch("/api/admin/staff/create-from-career", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          careerId: career.id,
-          staffRole,
-          startDate,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to create staff account");
-      }
-
-      toast.success("Staff account created successfully! Welcome email sent.");
-      onOpenChange(false);
-      router.refresh();
-    } catch (error) {
-      console.error("Error creating staff account:", error);
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to create staff account"
+      const result = await createStaffFromCareer(
+        career.id,
+        staffRole as StaffRole,
+        startDate
       );
-    } finally {
-      setIsLoading(false);
-    }
+
+      if ("success" in result) {
+        toast.success(result.message);
+        onClose();
+      } else {
+        setError(result.error);
+      }
+    });
   };
 
-  const staffRoleOptions = [
-    { value: "SUPPORT_WORKER", label: "Support Worker" },
-    { value: "ENROLLED_NURSE", label: "Enrolled Nurse" },
-    { value: "REGISTERED_NURSE", label: "Registered Nurse" },
-    { value: "COORDINATOR", label: "Coordinator" },
-  ];
+  if (!career) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={isModalOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <UserPlus className="mr-2 h-5 w-5" />
@@ -164,7 +113,7 @@ export default function CreateStaffFromCareer({
                 <SelectValue placeholder="Select staff role" />
               </SelectTrigger>
               <SelectContent>
-                {staffRoleOptions.map((option) => (
+                {STAFF_ROLE_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -188,23 +137,19 @@ export default function CreateStaffFromCareer({
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isLoading}
+            onClick={() => onClose()}
+            disabled={isPending}
           >
             Cancel
           </Button>
-          <Button onClick={handleCreateStaff} disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating Account...
-              </>
-            ) : (
-              <>
-                <UserPlus className="mr-2 h-4 w-4" />
-                Create Staff Account
-              </>
-            )}
+          <Button
+            onClick={handleCreateStaff}
+            disabled={isPending}
+            loading={isPending}
+            loadingText="Creating Account..."
+          >
+            <UserPlus className="mr-2 h-4 w-4" />
+            Create Staff Account
           </Button>
         </DialogFooter>
       </DialogContent>
