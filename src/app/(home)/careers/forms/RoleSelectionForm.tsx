@@ -19,67 +19,8 @@ import {
   roleSelectionSchema,
   RoleSelectionValues,
 } from "@/lib/validations/careers/career.schema";
-import {
-  Heart,
-  Stethoscope,
-  GraduationCap,
-  CheckCircle,
-  ArrowRight,
-  Users,
-  Shield,
-  Award,
-} from "lucide-react";
-
-const roleData = [
-  {
-    value: "Support Worker",
-    title: "Support Worker",
-    description:
-      "Provide essential support and assistance to individuals with disabilities in their daily activities and community participation.",
-    icon: Heart,
-    color: "bg-gradient-to-br from-pink-500 to-rose-600",
-    features: [
-      "Personal Care",
-      "Community Access",
-      "Life Skills",
-      "Companionship",
-    ],
-    requirements: "Cert III Individual Support preferred",
-    salary: "$28-35/hour",
-  },
-  {
-    value: "Enrolled Nurse",
-    title: "Enrolled Nurse",
-    description:
-      "Deliver nursing care under the supervision of registered nurses, focusing on medication management and health monitoring.",
-    icon: Stethoscope,
-    color: "bg-gradient-to-br from-blue-500 to-cyan-600",
-    features: [
-      "Medication Management",
-      "Health Monitoring",
-      "Clinical Care",
-      "Documentation",
-    ],
-    requirements: "Diploma of Nursing (Enrolled)",
-    salary: "$32-38/hour",
-  },
-  {
-    value: "Registered Nurse",
-    title: "Registered Nurse",
-    description:
-      "Provide comprehensive nursing care and clinical leadership, developing care plans and supervising other healthcare staff.",
-    icon: GraduationCap,
-    color: "bg-gradient-to-br from-emerald-500 to-teal-600",
-    features: [
-      "Clinical Leadership",
-      "Care Planning",
-      "Staff Supervision",
-      "Complex Care",
-    ],
-    requirements: "Bachelor of Nursing + AHPRA Registration",
-    salary: "$38-45/hour",
-  },
-];
+import { CheckCircle, ArrowRight, Users, Shield, Award } from "lucide-react";
+import { CAREER_ROLES } from "../constants";
 
 export default function RoleSelectionForm({
   careerData,
@@ -155,11 +96,11 @@ export default function RoleSelectionForm({
         <FormField
           control={form.control}
           name="role"
-          render={({ field: _field }) => (
+          render={() => (
             <FormItem>
               <FormControl>
                 <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
-                  {roleData.map((role, index) => {
+                  {CAREER_ROLES.map((role, index) => {
                     const Icon = role.icon;
                     const isSelected = selectedRole === role.value;
 
@@ -312,8 +253,8 @@ export default function RoleSelectionForm({
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Ready to start your application? Click &quot;Start Application&quot; to
-              begin the process.
+              Ready to start your application? Click &quot;Start
+              Application&quot; to begin the process.
             </p>
           </motion.div>
         )}

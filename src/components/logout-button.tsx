@@ -36,7 +36,8 @@ export default function LogoutButton({
       }
 
       toast.success("Logged out successfully");
-      router.push("/login");
+      router.push("/");
+      router.refresh();
     }
 
     setIsLoading(false);

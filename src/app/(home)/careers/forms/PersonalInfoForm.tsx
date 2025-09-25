@@ -26,6 +26,7 @@ import {
   PersonalInfoValues,
 } from "@/lib/validations/careers/career.schema";
 import { useSmartForm } from "@/hooks/use-smart-form";
+import { formatPhoneInput } from "@/lib/phone-utils";
 import {
   User,
   Mail,
@@ -100,16 +101,13 @@ export default function PersonalInfoForm({
     }
   }, [completionScore, showSmartNotification]);
 
-  // Format phone number as user types
-  const formatPhoneNumber = (value: string) => {
-    const numbers = value.replace(/\D/g, "");
-    if (numbers.startsWith("61")) {
-      return numbers.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, "+$1 $2 $3 $4");
-    }
-    if (numbers.startsWith("0")) {
-      return numbers.replace(/(\d{2})(\d{4})(\d{4})/, "$1 $2 $3");
-    }
-    return numbers.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
+  // Handle phone number formatting as user types
+  const handlePhoneChange = (
+    value: string,
+    onChange: (value: string) => void
+  ) => {
+    const formatted = formatPhoneInput(value);
+    onChange(formatted);
   };
 
   const getFieldIcon = (
@@ -373,8 +371,7 @@ export default function PersonalInfoForm({
                         }`}
                         {...field}
                         onChange={(e) => {
-                          const formatted = formatPhoneNumber(e.target.value);
-                          field.onChange(formatted);
+                          handlePhoneChange(e.target.value, field.onChange);
                         }}
                         onFocus={() => setFieldFocus("phone")}
                         onBlur={() => setFieldFocus(null)}

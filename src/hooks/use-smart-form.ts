@@ -66,7 +66,7 @@ export function useSmartForm(
   }, [formData, showProgressEstimation]);
 
   // Smart field suggestions
-  const getFieldSuggestions = useCallback((fieldName: string, _currentValue: string) => {
+  const getFieldSuggestions = useCallback((fieldName: string) => {
     if (!enableSmartSuggestions) return [];
 
     const suggestions: Record<string, string[]> = {

@@ -71,7 +71,7 @@ export default function AboutStats() {
       }, 500);
 
       return () => clearTimeout(timer);
-    }, [number, mounted]);
+    }, [number]);
 
     return (
       <span>

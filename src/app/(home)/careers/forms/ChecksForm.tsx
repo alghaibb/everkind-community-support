@@ -5,6 +5,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Form,
   FormControl,
   FormField,
@@ -29,7 +36,7 @@ export default function ChecksForm({
       workingWithChildrenCheck: careerData.workingWithChildrenCheck || "",
       ndisScreeningCheck: careerData.ndisScreeningCheck || "",
       policeCheck: careerData.policeCheck || "",
-      workingRights: careerData.workingRights || "",
+      workingRights: careerData.workingRights || undefined,
     },
   });
 
@@ -61,7 +68,7 @@ export default function ChecksForm({
 
       <Form {...form}>
         <div className="space-y-6">
-          <FormField
+          <FormField<ChecksValues>
             control={form.control}
             name="workingWithChildrenCheck"
             render={({ field }) => (
@@ -78,7 +85,7 @@ export default function ChecksForm({
             )}
           />
 
-          <FormField
+          <FormField<ChecksValues>
             control={form.control}
             name="ndisScreeningCheck"
             render={({ field }) => (
@@ -95,7 +102,7 @@ export default function ChecksForm({
             )}
           />
 
-          <FormField
+          <FormField<ChecksValues>
             control={form.control}
             name="policeCheck"
             render={({ field }) => (
@@ -112,18 +119,32 @@ export default function ChecksForm({
             )}
           />
 
-          <FormField
+          <FormField<ChecksValues>
             control={form.control}
             name="workingRights"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Working Rights *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="e.g., Australian Citizen, Permanent Resident, Visa Type"
-                    {...field}
-                  />
-                </FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select your working rights status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Australian Citizen">
+                      Australian Citizen
+                    </SelectItem>
+                    <SelectItem value="Permanent Resident">
+                      Permanent Resident
+                    </SelectItem>
+                    <SelectItem value="Work Visa">Work Visa</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
