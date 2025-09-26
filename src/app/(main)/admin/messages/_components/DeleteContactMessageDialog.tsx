@@ -14,7 +14,7 @@ import { Loader2 } from "lucide-react";
 import { MODAL_TYPES } from "../../constants";
 import { useModal } from "@/hooks/use-modal";
 import { useDeleteContactMessage } from "@/lib/mutations/admin-mutations";
-import { ContactMessage } from "@/lib/types/admin";
+import { ContactMessage } from "@/types/admin";
 
 export default function DeleteContactMessageDialog() {
   const { isOpen, type, data, onClose } = useModal();

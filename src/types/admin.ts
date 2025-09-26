@@ -157,3 +157,55 @@ export interface ContactMessagesResponse {
   totalPages: number;
   currentPage: number;
 }
+
+// Staff types
+export interface StaffMember {
+  id: string;
+  user: {
+    name: string;
+    email: string;
+  };
+  staffRole: string;
+  employeeId?: string;
+  startDate: string;
+  endDate?: string;
+  phone?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  address?: string;
+  cert3IndividualSupport: boolean;
+  ahpraRegistration?: string;
+  covidVaccinations: boolean;
+  influenzaVaccination: boolean;
+  workingWithChildrenCheck: boolean;
+  ndisScreeningCheck: boolean;
+  policeCheck: boolean;
+  firstAidCPR: boolean;
+  workingRights: boolean;
+  ndisModules: string[];
+  availability?: Record<string, { am: boolean; pm: boolean }>;
+  hourlyRate?: number;
+  resume?: string;
+  certificates: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StaffResponse {
+  staff: StaffMember[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  stats: StaffStats;
+}
+
+export interface StaffStats {
+  total: number;
+  active: number;
+  thisMonth: number;
+  byRole: Array<{
+    role: string;
+    _count: { staffRole: number };
+  }>;
+}

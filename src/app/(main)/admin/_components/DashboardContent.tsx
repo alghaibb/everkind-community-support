@@ -15,7 +15,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useDashboardStatsSuspense } from "@/lib/queries/admin-queries";
-import { RecentApplication, RecentMessage } from "@/lib/types/admin";
+import { RecentApplication, RecentMessage } from "@/types/admin";
 
 export function DashboardContent({ userName }: { userName: string }) {
   const { data: stats } = useDashboardStatsSuspense();

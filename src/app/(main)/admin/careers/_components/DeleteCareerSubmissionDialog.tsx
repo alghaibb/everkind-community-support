@@ -14,7 +14,7 @@ import { Loader2 } from "lucide-react";
 import { MODAL_TYPES } from "../../constants";
 import { useModal } from "@/hooks/use-modal";
 import { useDeleteCareerSubmission } from "@/lib/mutations/admin-mutations";
-import { CareerApplication } from "@/lib/types/admin";
+import { CareerApplication } from "@/types/admin";
 
 export default function DeleteCareerSubmissionDialog() {
   const { isOpen, type, data, onClose } = useModal();

@@ -4,9 +4,16 @@ import { adminQueryKeys } from "@/lib/queries/admin-queries";
 import {
   ContactMessagesResponse,
   CareerApplicationsResponse,
-} from "@/lib/types/admin";
+  StaffResponse,
+} from "@/types/admin";
 import { deleteContactMessage } from "@/app/(main)/admin/messages/actions";
 import { deleteCareerSubmission } from "@/app/(main)/admin/careers/actions";
+import {
+  createStaff,
+  updateStaff,
+  deleteStaff,
+  toggleStaffStatus,
+} from "@/app/(main)/admin/staff/actions";
 
 // Delete contact message mutation with optimistic updates
 export function useDeleteContactMessage() {
@@ -163,6 +170,241 @@ export function useDeleteCareerSubmission() {
       toast.error(
         error.message || "Failed to delete career submission. Please try again."
       );
+    },
+  });
+}
+
+// Staff mutations
+export function useCreateStaff() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createStaff,
+
+    // Optimistic update - add new staff immediately
+    onMutate: async (_newStaffData) => {
+      await queryClient.cancelQueries({ queryKey: adminQueryKeys.staff() });
+
+      const staffQueries = queryClient.getQueriesData({
+        queryKey: adminQueryKeys.staff(),
+      });
+
+      const previousData = staffQueries.map(([queryKey, data]) => ({
+        queryKey,
+        data,
+      }));
+
+      // Note: For create, we can't reliably add optimistic data without the generated ID
+      // The success handler will invalidate and refetch
+
+      return { previousData };
+    },
+
+    onSuccess: () => {
+      toast.success("Staff member created successfully");
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.staff() });
+    },
+
+    onError: (error, newStaffData, context) => {
+      console.error("Failed to create staff:", error);
+
+      // Rollback optimistic updates
+      if (context?.previousData) {
+        context.previousData.forEach(({ queryKey, data }) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+
+      toast.error("Failed to create staff member. Please try again.");
+    },
+  });
+}
+
+export function useUpdateStaff() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ staffId, data }: { staffId: string; data: any }) =>
+      updateStaff(staffId, data),
+
+    // Optimistic update - update staff immediately
+    onMutate: async ({ staffId, data }) => {
+      await queryClient.cancelQueries({ queryKey: adminQueryKeys.staff() });
+
+      const staffQueries = queryClient.getQueriesData({
+        queryKey: adminQueryKeys.staff(),
+      });
+
+      const previousData = staffQueries.map(([queryKey, data]) => ({
+        queryKey,
+        data,
+      }));
+
+      // Optimistically update the staff member in all queries
+      staffQueries.forEach(([queryKey, data]) => {
+        if (data && typeof data === "object" && "staff" in data) {
+          const staffData = data as StaffResponse;
+          const updatedStaff = staffData.staff.map((staff) =>
+            staff.id === staffId ? { ...staff, ...data } : staff
+          );
+
+          queryClient.setQueryData(queryKey, {
+            ...staffData,
+            staff: updatedStaff,
+          });
+        }
+      });
+
+      return { previousData };
+    },
+
+    onSuccess: () => {
+      toast.success("Staff member updated successfully");
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.staff() });
+    },
+
+    onError: (error, variables, context) => {
+      console.error("Failed to update staff:", error);
+
+      // Rollback optimistic updates
+      if (context?.previousData) {
+        context.previousData.forEach(({ queryKey, data }) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+
+      toast.error("Failed to update staff member. Please try again.");
+    },
+  });
+}
+
+export function useDeleteStaff() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteStaff,
+
+    // Optimistic update - remove staff immediately
+    onMutate: async (staffId: string) => {
+      await queryClient.cancelQueries({ queryKey: adminQueryKeys.staff() });
+
+      const staffQueries = queryClient.getQueriesData({
+        queryKey: adminQueryKeys.staff(),
+      });
+
+      const previousData = staffQueries.map(([queryKey, data]) => ({
+        queryKey,
+        data,
+      }));
+
+      // Optimistically remove the staff member from all queries
+      staffQueries.forEach(([queryKey, data]) => {
+        if (data && typeof data === "object" && "staff" in data) {
+          const staffData = data as StaffResponse;
+          const updatedStaff = staffData.staff.filter(
+            (staff) => staff.id !== staffId
+          );
+
+          queryClient.setQueryData(queryKey, {
+            ...staffData,
+            staff: updatedStaff,
+            totalCount: staffData.totalCount - 1,
+            stats: {
+              ...staffData.stats,
+              total: staffData.stats.total - 1,
+              active: Math.max(0, staffData.stats.active - 1), // Approximate
+            },
+          });
+        }
+      });
+
+      return { previousData };
+    },
+
+    onSuccess: () => {
+      toast.success("Staff member deleted successfully");
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.staff() });
+    },
+
+    onError: (error, staffId, context) => {
+      console.error("Failed to delete staff:", error);
+
+      // Rollback optimistic updates
+      if (context?.previousData) {
+        context.previousData.forEach(({ queryKey, data }) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+
+      toast.error("Failed to delete staff member. Please try again.");
+    },
+  });
+}
+
+export function useToggleStaffStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: toggleStaffStatus,
+
+    // Optimistic update - toggle status immediately
+    onMutate: async (staffId: string) => {
+      await queryClient.cancelQueries({ queryKey: adminQueryKeys.staff() });
+
+      const staffQueries = queryClient.getQueriesData({
+        queryKey: adminQueryKeys.staff(),
+      });
+
+      const previousData = staffQueries.map(([queryKey, data]) => ({
+        queryKey,
+        data,
+      }));
+
+      // Optimistically toggle the staff status in all queries
+      staffQueries.forEach(([queryKey, data]) => {
+        if (data && typeof data === "object" && "staff" in data) {
+          const staffData = data as StaffResponse;
+          const updatedStaff = staffData.staff.map((staff) =>
+            staff.id === staffId
+              ? { ...staff, isActive: !staff.isActive }
+              : staff
+          );
+
+          const activeCountChange = updatedStaff.find((s) => s.id === staffId)
+            ?.isActive
+            ? 1
+            : -1;
+
+          queryClient.setQueryData(queryKey, {
+            ...staffData,
+            staff: updatedStaff,
+            stats: {
+              ...staffData.stats,
+              active: staffData.stats.active + activeCountChange,
+            },
+          });
+        }
+      });
+
+      return { previousData };
+    },
+
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.staff() });
+    },
+
+    onError: (error, staffId, context) => {
+      console.error("Failed to toggle staff status:", error);
+
+      // Rollback optimistic updates
+      if (context?.previousData) {
+        context.previousData.forEach(({ queryKey, data }) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+
+      toast.error("Failed to update staff status. Please try again.");
     },
   });
 }

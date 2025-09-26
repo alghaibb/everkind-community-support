@@ -33,7 +33,7 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { formatPhoneNumber } from "@/lib/phone-utils";
-import { CareerApplication } from "@/lib/types/admin";
+import { CareerApplication } from "@/types/admin";
 import { useModal } from "@/hooks/use-modal";
 import {
   ROLE_COLORS,

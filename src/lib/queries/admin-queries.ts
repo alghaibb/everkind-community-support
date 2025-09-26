@@ -5,7 +5,8 @@ import {
   CareerApplicationsApiResponse,
   ContactMessagesResponse,
   ContactMessagesApiResponse,
-} from "@/lib/types/admin";
+  StaffResponse,
+} from "@/types/admin";
 import { ApplicationStatus } from "@/generated/prisma";
 import { env } from "@/lib/env";
 
@@ -179,5 +180,44 @@ export function useContactMessagesSuspense(params: {
     queryFn: () => fetchContactMessages(params),
     staleTime: 2 * 60 * 1000,
     retry: false,
+  });
+}
+
+// Staff queries
+async function fetchStaff(params: {
+  search?: string;
+  role?: string;
+  status?: string;
+  page?: number;
+}): Promise<StaffResponse> {
+  const searchParams = new URLSearchParams();
+
+  if (params.search) searchParams.set("search", params.search);
+  if (params.role) searchParams.set("role", params.role);
+  if (params.status) searchParams.set("status", params.status);
+  if (params.page) searchParams.set("page", params.page.toString());
+
+  const response = await fetch(
+    `${getBaseUrl()}/api/admin/staff?${searchParams.toString()}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch staff");
+  }
+
+  return response.json();
+}
+
+export function useStaffList(params: {
+  search?: string;
+  role?: string;
+  status?: string;
+  page?: number;
+}) {
+  return useQuery({
+    queryKey: adminQueryKeys.staffList(params),
+    queryFn: () => fetchStaff(params),
+    staleTime: 2 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
   });
 }

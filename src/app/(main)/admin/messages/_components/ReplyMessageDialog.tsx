@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { ContactMessage } from "@/lib/types/admin";
+import { ContactMessage } from "@/types/admin";
 import { useModal } from "@/hooks/use-modal";
 import { MODAL_TYPES } from "../../constants";
 import { sendReplyEmail } from "../actions";

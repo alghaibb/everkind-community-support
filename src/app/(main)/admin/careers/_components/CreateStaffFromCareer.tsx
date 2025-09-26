@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { UserPlus, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { CareerApplication } from "@/lib/types/admin";
+import { CareerApplication } from "@/types/admin";
 import { createStaffFromCareer } from "../actions";
 import { StaffRole } from "@/generated/prisma";
 import { useModal } from "@/hooks/use-modal";

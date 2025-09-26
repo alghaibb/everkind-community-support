@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { formatPhoneNumber } from "@/lib/phone-utils";
-import { ContactMessage } from "@/lib/types/admin";
+import { ContactMessage } from "@/types/admin";
 import { useModal } from "@/hooks/use-modal";
 import { MODAL_TYPES } from "../../constants";
 

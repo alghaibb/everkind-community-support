@@ -145,6 +145,7 @@ export const MODAL_TYPES = {
   VIEW_APPLICATION: "view-application",
   DELETE_STAFF: "delete-staff",
   EDIT_STAFF: "edit-staff",
+  VIEW_STAFF: "view-staff",
   VIEW_MESSAGE: "view-message",
   REPLY_MESSAGE: "reply-message",
   DELETE_CONTACT_MESSAGE: "delete-contact-message",

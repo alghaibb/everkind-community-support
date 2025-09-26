@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { CareerApplication } from "@/lib/types/admin";
+import { CareerApplication } from "@/types/admin";
 import { rejectApplication } from "../actions";
 import { useModal } from "@/hooks/use-modal";
 import { MODAL_TYPES } from "../../constants";
