@@ -6,7 +6,6 @@ import React, {
   useEffect,
   useCallback,
   useMemo,
-  memo,
 } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -208,7 +207,7 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
     }
   };
 
-  const validateAllSteps = () => {
+  const validateAllSteps = useCallback(() => {
     // Check if all required fields are filled
     const requiredFields = [
       "firstName",
@@ -241,7 +240,7 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
     }
 
     return missingFields;
-  };
+  }, [careerData]);
 
   const onSubmit = useCallback(async () => {
     // Mark final step as completed when submitting

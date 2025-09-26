@@ -35,7 +35,6 @@ import { formatDistanceToNow } from "date-fns";
 import { formatPhoneNumber } from "@/lib/phone-utils";
 import { CareerApplication } from "@/lib/types/admin";
 import { useModal } from "@/hooks/use-modal";
-import { useDeleteCareerSubmission } from "@/lib/mutations/admin-mutations";
 import {
   ROLE_COLORS,
   APPLICATION_STATUS,
@@ -80,7 +79,6 @@ export default function CareersTable({
   currentPage,
 }: CareersTableProps) {
   const { onOpen } = useModal();
-  const deleteSubmissionMutation = useDeleteCareerSubmission();
 
   const handleViewDetails = (application: Application) => {
     onOpen(MODAL_TYPES.VIEW_APPLICATION, { application });
