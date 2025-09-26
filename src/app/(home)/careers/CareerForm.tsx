@@ -349,239 +349,254 @@ export default function CareerForm({ selectedRole }: CareerFormProps) {
   );
 
   return (
-    <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* Main Form - Left Side */}
-      <div className="lg:col-span-2">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Card className="shadow-2xl border-0 bg-gradient-to-br from-background to-muted/10 overflow-hidden">
-            {/* Enhanced Header */}
-            <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b pb-8">
-              {/* Title Section */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-xl shadow-lg">
-                    <Award className="h-6 w-6 text-white" />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+        <div className="lg:col-span-3">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Card className="shadow-xl lg:shadow-2xl border-0 bg-gradient-to-br from-background to-muted/10 overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b pb-4 lg:pb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 lg:mb-6">
+                  <div className="flex items-center gap-3 lg:gap-4">
+                    <div className="p-2 lg:p-3 bg-gradient-to-br from-primary to-primary/80 rounded-lg lg:rounded-xl shadow-lg">
+                      <Award className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
+                    </div>
+                    <div>
+                      <h1 className="text-xl lg:text-2xl font-bold">
+                        Career Application
+                      </h1>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedRole} Position
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h1 className="text-2xl font-bold">Career Application</h1>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedRole} Position
-                    </p>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+                    {lastSaved && (
+                      <div className="flex items-center gap-2">
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="w-2 h-2 rounded-full bg-green-500"
+                        />
+                        <span className="text-green-600 text-xs">
+                          Saved {new Date(lastSaved).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    )}
+
+                    {estimatedTimeRemaining && estimatedTimeRemaining > 0 && (
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-muted-foreground text-xs">
+                          ~{Math.ceil(estimatedTimeRemaining / 60)} min left
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Smart Status Indicators */}
-                <div className="flex items-center gap-4 text-sm">
-                  {lastSaved && (
-                    <div className="flex items-center gap-2">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-2 h-2 rounded-full bg-green-500"
-                      />
-                      <span className="text-green-600 text-xs">
-                        Saved {new Date(lastSaved).toLocaleTimeString()}
+                <div className="space-y-3 lg:space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                    <h3 className="text-base lg:text-lg font-semibold flex items-center gap-2">
+                      <div className="p-1 bg-primary/10 rounded">
+                        {React.createElement(
+                          stepIcons[
+                            careerSteps[currentStep]
+                              .key as keyof typeof stepIcons
+                          ],
+                          { className: "h-4 w-4 text-primary" }
+                        )}
+                      </div>
+                      <span className="truncate">
+                        {careerSteps[currentStep].title}
                       </span>
-                    </div>
-                  )}
-
-                  {estimatedTimeRemaining && estimatedTimeRemaining > 0 && (
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-muted-foreground text-xs">
-                        ~{Math.ceil(estimatedTimeRemaining / 60)} min left
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Enhanced Progress Section */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <div className="p-1 bg-primary/10 rounded">
-                      {React.createElement(
-                        stepIcons[
-                          careerSteps[currentStep].key as keyof typeof stepIcons
-                        ],
-                        { className: "h-4 w-4 text-primary" }
-                      )}
-                    </div>
-                    {careerSteps[currentStep].title}
-                  </h3>
-                  <div className="flex items-center gap-4">
-                    <Badge
-                      variant="secondary"
-                      className="bg-primary/10 text-primary"
-                    >
-                      Step {currentStep + 1} of {careerSteps.length}
-                    </Badge>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">
-                        {Math.round(progress)}%
+                    </h3>
+                    <div className="flex items-center gap-3 lg:gap-4">
+                      <Badge
+                        variant="secondary"
+                        className="bg-primary/10 text-primary text-xs"
+                      >
+                        Step {currentStep + 1} of {careerSteps.length}
+                      </Badge>
+                      <div className="text-right">
+                        <div className="text-xl lg:text-2xl font-bold text-primary">
+                          {Math.round(progress)}%
+                        </div>
                       </div>
                     </div>
                   </div>
+
+                  {/* Enhanced Progress Bar */}
+                  <div className="relative">
+                    <Progress value={progress} className="h-3 bg-muted/30" />
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-primary/30 to-primary/50 rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                    />
+                  </div>
+
+                  <p className="text-muted-foreground leading-relaxed">
+                    {careerSteps[currentStep].description}
+                  </p>
                 </div>
 
-                {/* Enhanced Progress Bar */}
-                <div className="relative">
-                  <Progress value={progress} className="h-3 bg-muted/30" />
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-primary/30 to-primary/50 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                  />
-                </div>
+                {/* Smart Step Navigation */}
+                <div className="mt-4 lg:mt-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2">
+                    {careerSteps.map((step, index) => {
+                      const StepIcon =
+                        stepIcons[step.key as keyof typeof stepIcons];
+                      const isCompleted =
+                        mounted && completedSteps.has(step.key);
+                      const isCurrent = index === currentStep;
+                      const isAccessible = index <= currentStep || isCompleted;
 
-                <p className="text-muted-foreground leading-relaxed">
-                  {careerSteps[currentStep].description}
-                </p>
-              </div>
-
-              {/* Smart Step Navigation */}
-              <div className="mt-6">
-                <div className="flex flex-wrap gap-2">
-                  {careerSteps.map((step, index) => {
-                    const StepIcon =
-                      stepIcons[step.key as keyof typeof stepIcons];
-                    const isCompleted = mounted && completedSteps.has(step.key);
-                    const isCurrent = index === currentStep;
-                    const isAccessible = index <= currentStep || isCompleted;
-
-                    return (
-                      <motion.button
-                        key={step.key}
-                        onClick={() => handleStepClick(index)}
-                        disabled={!isAccessible}
-                        className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
-                          isCurrent
-                            ? "bg-primary text-primary-foreground shadow-lg"
-                            : isCompleted
-                              ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100"
-                              : isAccessible
-                                ? "bg-muted/30 text-muted-foreground hover:bg-muted/50"
-                                : "bg-muted/20 text-muted-foreground/50 cursor-not-allowed"
-                        }`}
-                        whileHover={isAccessible ? { scale: 1.02 } : {}}
-                        whileTap={isAccessible ? { scale: 0.98 } : {}}
-                      >
-                        <div
-                          className={`flex items-center justify-center w-6 h-6 rounded-full text-xs transition-all ${
+                      return (
+                        <motion.button
+                          key={step.key}
+                          onClick={() => handleStepClick(index)}
+                          disabled={!isAccessible}
+                          className={`group relative flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2 lg:py-3 rounded-lg lg:rounded-xl text-sm font-medium transition-all duration-300 ${
                             isCurrent
-                              ? "bg-primary-foreground/20"
+                              ? "bg-primary text-primary-foreground shadow-lg"
                               : isCompleted
-                                ? "bg-green-600 text-white"
-                                : "bg-muted-foreground/20"
+                                ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100"
+                                : isAccessible
+                                  ? "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+                                  : "bg-muted/20 text-muted-foreground/50 cursor-not-allowed"
                           }`}
+                          whileHover={isAccessible ? { scale: 1.02 } : {}}
+                          whileTap={isAccessible ? { scale: 0.98 } : {}}
                         >
-                          {isCompleted ? (
-                            <CheckCircle className="h-4 w-4" />
-                          ) : (
-                            <StepIcon className="h-4 w-4" />
-                          )}
-                        </div>
-                        <span className="hidden sm:inline">{step.title}</span>
-                        <span className="sm:hidden">Step {index + 1}</span>
-
-                        {/* Status Badge */}
-                        {isCompleted && (
-                          <Badge
-                            variant="secondary"
-                            className="text-xs py-0.5 px-1.5 bg-green-100 text-green-700"
+                          <div
+                            className={`flex items-center justify-center w-5 h-5 lg:w-6 lg:h-6 rounded-full text-xs transition-all ${
+                              isCurrent
+                                ? "bg-primary-foreground/20"
+                                : isCompleted
+                                  ? "bg-green-600 text-white"
+                                  : "bg-muted-foreground/20"
+                            }`}
                           >
-                            Done
-                          </Badge>
-                        )}
-                      </motion.button>
-                    );
-                  })}
+                            {isCompleted ? (
+                              <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4" />
+                            ) : (
+                              <StepIcon className="h-3 w-3 lg:h-4 lg:w-4" />
+                            )}
+                          </div>
+                          <span className="truncate text-left">
+                            {step.title}
+                          </span>
+
+                          {isCompleted && (
+                            <Badge
+                              variant="secondary"
+                              className="text-xs py-0.5 px-1.5 bg-green-100 text-green-700 ml-auto"
+                            >
+                              Done
+                            </Badge>
+                          )}
+                        </motion.button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
+              </CardHeader>
 
-            {/* Form Content */}
-            <CardContent className="p-8">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentStep}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="min-h-[500px]"
-                >
-                  {renderStepContent()}
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Navigation Buttons */}
-              <div className="flex justify-between pt-8 border-t mt-8 flex-col md:flex-row gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handlePrevious}
-                  disabled={currentStep === 0}
-                  className="flex items-center gap-2 px-6"
-                  size="lg"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
-                </Button>
-
-                {currentStep === careerSteps.length - 1 ? (
-                  <Button
-                    type="button"
-                    onClick={onSubmit}
-                    disabled={isPending}
-                    size="lg"
+              {/* Form Content */}
+              <CardContent className="p-4 lg:p-8">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentStep}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="min-h-[400px] lg:min-h-[500px]"
                   >
-                    {isPending ? (
-                      <>
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{
-                            duration: 1,
-                            repeat: Infinity,
-                            ease: "linear",
-                          }}
-                        >
-                          <Sparkles className="h-4 w-4" />
-                        </motion.div>
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        Submit Application
-                        <Award className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                ) : (
+                    {renderStepContent()}
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Navigation Buttons */}
+                <div className="flex justify-between pt-8 border-t mt-8 flex-col md:flex-row gap-4">
                   <Button
                     type="button"
-                    onClick={handleNext}
+                    variant="outline"
+                    onClick={handlePrevious}
+                    disabled={currentStep === 0}
                     className="flex items-center gap-2 px-6"
                     size="lg"
                   >
-                    Next
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
                   </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
 
-      {/* Smart Progress Sidebar - Right Side */}
-      <div className="lg:col-span-1">
-        <div className="sticky top-8">
+                  {currentStep === careerSteps.length - 1 ? (
+                    <Button
+                      type="button"
+                      onClick={onSubmit}
+                      disabled={isPending}
+                      size="lg"
+                    >
+                      {isPending ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
+                          >
+                            <Sparkles className="h-4 w-4" />
+                          </motion.div>
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          Submit Application
+                          <Award className="h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={handleNext}
+                      className="flex items-center gap-2 px-6"
+                      size="lg"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        {/* Smart Progress Sidebar - Right Side */}
+        <div className="hidden lg:block lg:col-span-1">
+          <div className="sticky top-8">
+            <ApplicationProgress
+              currentStep={currentStep}
+              totalSteps={careerSteps.length}
+              completedSteps={completedSteps}
+              formData={careerData}
+              estimatedTimeRemaining={estimatedTimeRemaining || undefined}
+              onStepClick={handleStepClick}
+            />
+          </div>
+        </div>
+
+        {/* Mobile Progress - Show below form on mobile */}
+        <div className="lg:hidden mt-6">
           <ApplicationProgress
             currentStep={currentStep}
             totalSteps={careerSteps.length}

@@ -21,7 +21,10 @@ type AvailabilityData = {
 };
 import { revalidatePath } from "next/cache";
 
-export async function rejectApplication(applicationId: string, reason?: string) {
+export async function rejectApplication(
+  applicationId: string,
+  reason?: string
+) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
@@ -67,7 +70,10 @@ export async function rejectApplication(applicationId: string, reason?: string) 
         to: application.email,
         name: `${application.firstName} ${application.lastName}`,
         role: application.role,
-        applicationDate: format(new Date(application.createdAt), "MMMM d, yyyy"),
+        applicationDate: format(
+          new Date(application.createdAt),
+          "MMMM d, yyyy"
+        ),
       });
 
       console.log("Rejection email sent successfully");
@@ -84,7 +90,7 @@ export async function rejectApplication(applicationId: string, reason?: string) 
     };
   } catch (error) {
     console.error("Error rejecting application:", error);
-    return { error: "Failed to reject application" }
+    return { error: "Failed to reject application" };
   }
 }
 
@@ -166,7 +172,7 @@ export async function createStaffFromCareer(
         policeCheck: career.policeCheck === "Yes",
         firstAidCPR: career.firstAidCPR === "Yes",
         workingRights: career.workingRights === "Yes",
-        ndisModules: career.ndisModules.split(",").map(m => m.trim()),
+        ndisModules: career.ndisModules.split(",").map((m) => m.trim()),
         availability: career.availability as AvailabilityData,
         resume: career.resume,
       },
@@ -202,6 +208,31 @@ export async function createStaffFromCareer(
     };
   } catch (error) {
     console.error("Error creating staff from career:", error);
-    return { error: "Failed to create staff from career" }
+    return { error: "Failed to create staff from career" };
+  }
+}
+
+export async function deleteCareerSubmission(careerId: string) {
+  try {
+    const session = await getServerSession();
+    if (!session?.user) {
+      throw new Error("Unauthorized");
+    }
+
+    if (session.user.userType !== "INTERNAL" || session.user.role !== "ADMIN") {
+      throw new Error("Forbidden");
+    }
+
+    await prisma.careerSubmission.delete({
+      where: { id: careerId },
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/careers");
+
+    return { success: true, message: "Career submission deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting career submission:", error);
+    return { error: "Failed to delete career submission" };
   }
 }

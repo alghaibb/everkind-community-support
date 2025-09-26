@@ -35,6 +35,7 @@ import { formatDistanceToNow } from "date-fns";
 import { formatPhoneNumber } from "@/lib/phone-utils";
 import { CareerApplication } from "@/lib/types/admin";
 import { useModal } from "@/hooks/use-modal";
+import { useDeleteCareerSubmission } from "@/lib/mutations/admin-mutations";
 import {
   ROLE_COLORS,
   APPLICATION_STATUS,
@@ -79,6 +80,7 @@ export default function CareersTable({
   currentPage,
 }: CareersTableProps) {
   const { onOpen } = useModal();
+  const deleteSubmissionMutation = useDeleteCareerSubmission();
 
   const handleViewDetails = (application: Application) => {
     onOpen(MODAL_TYPES.VIEW_APPLICATION, { application });
@@ -86,6 +88,10 @@ export default function CareersTable({
 
   const handleCreateStaff = (application: Application) => {
     onOpen(MODAL_TYPES.CREATE_STAFF, { application });
+  };
+
+  const handleDeleteSubmission = (application: Application) => {
+    onOpen(MODAL_TYPES.DELETE_CAREER_SUBMISSION, { application });
   };
 
   if (applications.length === 0) {
@@ -178,6 +184,14 @@ export default function CareersTable({
                         <Mail className="h-4 w-4 mr-2" />
                         Email
                       </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => handleDeleteSubmission(application)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Delete Application
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -335,6 +349,14 @@ export default function CareersTable({
                               <Mail className="h-4 w-4 mr-2" />
                               Send Email
                             </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteSubmission(application)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <XCircle className="h-4 w-4 mr-2" />
+                            Delete Application
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

@@ -203,8 +203,7 @@ export default function ApplicationProgress({
             </div>
           </div>
 
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="text-center">
               <div className="flex items-center justify-center gap-1 text-green-600 mb-1">
                 <CheckCircle2 className="h-4 w-4" />
@@ -281,8 +280,8 @@ export default function ApplicationProgress({
                               isCompleted
                                 ? "bg-green-100 text-green-700"
                                 : isCurrent
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-muted text-muted-foreground"
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-muted text-muted-foreground"
                             }`}
                           >
                             {isCompleted ? "✓" : i + 1}

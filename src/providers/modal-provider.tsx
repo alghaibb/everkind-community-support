@@ -21,6 +21,12 @@ const DeleteContactMessageDialog = lazy(
   () =>
     import("@/app/(main)/admin/messages/_components/DeleteContactMessageDialog")
 );
+const DeleteCareerSubmissionDialog = lazy(
+  () =>
+    import(
+      "@/app/(main)/admin/careers/_components/DeleteCareerSubmissionDialog"
+    )
+);
 
 export function ModalProvider() {
   return (
@@ -42,6 +48,9 @@ export function ModalProvider() {
       </Suspense>
       <Suspense fallback={null}>
         <DeleteContactMessageDialog />
+      </Suspense>
+      <Suspense fallback={null}>
+        <DeleteCareerSubmissionDialog />
       </Suspense>
     </>
   );

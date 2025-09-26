@@ -10,6 +10,7 @@ type ModalType =
   | typeof MODAL_TYPES.VIEW_MESSAGE
   | typeof MODAL_TYPES.REPLY_MESSAGE
   | typeof MODAL_TYPES.DELETE_CONTACT_MESSAGE
+  | typeof MODAL_TYPES.DELETE_CAREER_SUBMISSION
   | null;
 
 interface ModalData {

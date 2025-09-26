@@ -9,7 +9,7 @@ import {
   Activity,
   MessageSquare,
   Calendar,
-  FileText
+  FileText,
 } from "lucide-react";
 
 // Role definitions
@@ -106,32 +106,32 @@ export const COMPLIANCE_CHECKS = {
 // Compliance check configuration
 export const COMPLIANCE_CHECK_CONFIG = [
   {
-    key: 'workingWithChildrenCheck',
+    key: "workingWithChildrenCheck",
     label: COMPLIANCE_CHECKS.WWCC,
     required: true,
   },
   {
-    key: 'ndisScreeningCheck',
+    key: "ndisScreeningCheck",
     label: COMPLIANCE_CHECKS.NDIS_SCREENING,
     required: true,
   },
   {
-    key: 'policeCheck',
+    key: "policeCheck",
     label: COMPLIANCE_CHECKS.POLICE_CHECK,
     required: true,
   },
   {
-    key: 'firstAidCPR',
+    key: "firstAidCPR",
     label: COMPLIANCE_CHECKS.FIRST_AID,
     required: true,
   },
   {
-    key: 'cert3IndividualSupport',
+    key: "cert3IndividualSupport",
     label: COMPLIANCE_CHECKS.CERT3,
     required: (role: string) => role === "Support Worker",
   },
   {
-    key: 'ahpraRegistration',
+    key: "ahpraRegistration",
     label: COMPLIANCE_CHECKS.AHPRA,
     required: (role: string) => role.includes("Nurse"),
     defaultValue: "N/A",
@@ -148,6 +148,7 @@ export const MODAL_TYPES = {
   VIEW_MESSAGE: "view-message",
   REPLY_MESSAGE: "reply-message",
   DELETE_CONTACT_MESSAGE: "delete-contact-message",
+  DELETE_CAREER_SUBMISSION: "delete-career-submission",
 } as const;
 
 // Pagination defaults
