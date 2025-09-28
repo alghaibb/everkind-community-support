@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ResetPasswordForm from "./ResetPasswordForm";
+import ResetPasswordFormSkeleton from "./ResetPasswordFormSkeleton";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Reset Password",
@@ -48,7 +50,9 @@ export default function ResetPasswordPage() {
                 Enter your new password below
               </p>
             </div>
-            <ResetPasswordForm />
+            <Suspense fallback={<ResetPasswordFormSkeleton />}>
+              <ResetPasswordForm />
+            </Suspense>
             <Separator />
             <Button asChild variant="link">
               <Link href="/staff-login">
