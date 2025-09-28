@@ -64,7 +64,8 @@ export default function StaffStats({ stats }: StaffStatsProps) {
         <CardContent>
           <div className="space-y-2">
             {stats.byRole.map((roleData) => {
-              const roleName = roleData.role.replace("_", " ");
+              const roleName =
+                roleData.role?.replace("_", " ") || "Unknown Role";
               return (
                 <div
                   key={roleData.role}

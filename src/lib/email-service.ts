@@ -3,6 +3,7 @@ import { render } from "@react-email/components";
 import WelcomeEmail from "@/components/emails/welcome-email";
 import RejectionEmail from "@/components/emails/rejection-email";
 import ReplyEmail from "@/components/emails/reply-email";
+import PasswordResetEmail from "@/components/emails/password-reset-email";
 import { env } from "./env";
 
 const resend = new Resend(env.RESEND_API_KEY);
@@ -34,6 +35,12 @@ interface ReplyEmailData {
   };
 }
 
+interface PasswordResetEmailData {
+  to: string;
+  name: string;
+  resetUrl: string;
+}
+
 export async function sendWelcomeEmail({
   to,
   name,
@@ -59,7 +66,9 @@ export async function sendRejectionEmail({
   role,
   applicationDate,
 }: RejectionEmailData) {
-  const emailHtml = await render(RejectionEmail({ applicantName: name, role, applicationDate }));
+  const emailHtml = await render(
+    RejectionEmail({ applicantName: name, role, applicationDate })
+  );
 
   return await resend.emails.send({
     from: "EverKind Community Support <noreply@ekcs.com.au>",
@@ -76,7 +85,15 @@ export async function sendReplyEmail({
   message,
   originalMessage,
 }: ReplyEmailData) {
-  const emailHtml = await render(ReplyEmail({ recipientName: toName, replyMessage: message, originalSubject: originalMessage.subject, originalMessage: originalMessage.message, originalDate: originalMessage.createdAt }));
+  const emailHtml = await render(
+    ReplyEmail({
+      recipientName: toName,
+      replyMessage: message,
+      originalSubject: originalMessage.subject,
+      originalMessage: originalMessage.message,
+      originalDate: originalMessage.createdAt,
+    })
+  );
 
   return await resend.emails.send({
     from: "EverKind Community Support <noreply@ekcs.com.au>",
@@ -86,5 +103,17 @@ export async function sendReplyEmail({
   });
 }
 
+export async function sendPasswordResetEmail({
+  to,
+  name,
+  resetUrl,
+}: PasswordResetEmailData) {
+  const emailHtml = await render(PasswordResetEmail({ name, resetUrl }));
 
-
+  return await resend.emails.send({
+    from: "EverKind Community Support <noreply@ekcs.com.au>",
+    to,
+    subject: "Reset your password - EverKind Community Support",
+    html: emailHtml,
+  });
+}

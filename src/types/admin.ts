@@ -51,6 +51,7 @@ export interface CareerApplication {
   ndisScreeningCheck: string;
   policeCheck: string;
   firstAidCPR: string;
+  availability?: Record<string, unknown>;
   resume: string | null;
   wwccDocument: string | null;
   ndisDocument: string | null;
@@ -78,6 +79,7 @@ export interface CareerApplicationRaw {
   ndisScreeningCheck: string | null;
   policeCheck: string | null;
   firstAidCPR: string | null;
+  availability?: Record<string, unknown>;
   resume: string | null;
   wwccDocument: string | null;
   ndisDocument: string | null;
@@ -208,4 +210,53 @@ export interface StaffStats {
     role: string;
     _count: { staffRole: number };
   }>;
+}
+
+// Participants types
+export interface Participant {
+  id: string;
+  firstName: string;
+  lastName: string;
+  preferredName?: string;
+  dateOfBirth: string;
+  gender?: string;
+  email?: string;
+  phone?: string;
+  address: string;
+  emergencyContact: string;
+  emergencyPhone: string;
+  emergencyRelation: string;
+  ndisNumber: string;
+  planStartDate: string;
+  planEndDate: string;
+  planBudget?: number | null;
+  planManager?: string;
+  supportCoordinator?: string;
+  disabilities: string[];
+  medications: string[];
+  allergies: string[];
+  medicalNotes?: string;
+  supportNeeds: string[];
+  communicationMethod?: string;
+  behavioralNotes?: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface ParticipantsApiResponse {
+  participants: Participant[];
+  total: number;
+}
+
+export interface ParticipantsResponse extends ParticipantsApiResponse {
+  participants: Participant[];
+  total: number;
+}
+
+export interface ParticipantsStats {
+  total: number;
+  active: number;
+  inactive: number;
+  pending: number;
+  discharged: number;
 }

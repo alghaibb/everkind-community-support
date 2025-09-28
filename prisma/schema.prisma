@@ -67,14 +67,14 @@ model Staff {
   endDate    DateTime?
 
   // Contact Information
-  phone            String?
+  phone            String? @unique
   emergencyContact String?
   emergencyPhone   String?
   address          String?
 
   // Qualifications & Certifications
   cert3IndividualSupport   Boolean @default(false)
-  ahpraRegistration        String?
+  ahpraRegistration        String? @unique
   covidVaccinations        Boolean @default(false)
   influenzaVaccination     Boolean @default(false)
   workingWithChildrenCheck Boolean @default(false)
@@ -154,7 +154,7 @@ model Participant {
   ndisNumber         String   @unique
   planStartDate      DateTime
   planEndDate        DateTime
-  planBudget         Decimal  @db.Decimal(10, 2)
+  planBudget Decimal @db.Decimal(10, 2) @default(0)
   planManager        String?
   supportCoordinator String?
 

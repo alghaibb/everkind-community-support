@@ -150,6 +150,10 @@ export const MODAL_TYPES = {
   REPLY_MESSAGE: "reply-message",
   DELETE_CONTACT_MESSAGE: "delete-contact-message",
   DELETE_CAREER_SUBMISSION: "delete-career-submission",
+  CREATE_PARTICIPANT: "create-participant",
+  EDIT_PARTICIPANT: "edit-participant",
+  VIEW_PARTICIPANT: "view-participant",
+  DELETE_PARTICIPANT: "delete-participant",
 } as const;
 
 // Pagination defaults

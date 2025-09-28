@@ -22,6 +22,7 @@ import {
   MapPin,
   DollarSign,
   Edit,
+  Clock,
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { formatPhoneNumber } from "@/lib/phone-utils";
@@ -53,6 +54,71 @@ export default function StaffDetailsModal() {
         Inactive
       </Badge>
     );
+  };
+
+  const formatAvailability = (availability: Record<string, unknown>) => {
+    if (!availability) return null;
+
+    const days = [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+    ];
+
+    return days
+      .map((day) => {
+        const dayData = availability[day] as
+          | Record<string, unknown>
+          | undefined;
+        if (!dayData) return null;
+
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1);
+
+        // Check different availability formats
+        const isAvailable = dayData.available !== false;
+        const hasTimeSlots =
+          dayData.am !== undefined || dayData.pm !== undefined;
+        const hasTimeRange = dayData.startTime && dayData.endTime;
+
+        if (!isAvailable) {
+          return (
+            <div
+              key={day}
+              className="flex items-center justify-between text-sm"
+            >
+              <span className="capitalize">{dayName}:</span>
+              <Badge variant="secondary" className="bg-red-100 text-red-800">
+                Unavailable
+              </Badge>
+            </div>
+          );
+        }
+
+        let timeDisplay = "Available";
+
+        if (hasTimeRange) {
+          timeDisplay = `${dayData.startTime} - ${dayData.endTime}`;
+        } else if (hasTimeSlots) {
+          const slots = [];
+          if (dayData.am) slots.push("AM");
+          if (dayData.pm) slots.push("PM");
+          timeDisplay = slots.length > 0 ? slots.join(", ") : "Available";
+        }
+
+        return (
+          <div key={day} className="flex items-center justify-between text-sm">
+            <span className="capitalize">{dayName}:</span>
+            <Badge variant="secondary" className="bg-green-100 text-green-800">
+              {timeDisplay}
+            </Badge>
+          </div>
+        );
+      })
+      .filter(Boolean);
   };
 
   return (
@@ -268,6 +334,23 @@ export default function StaffDetailsModal() {
                       </span>
                     </div>
                   )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Availability */}
+          {staff.availability && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                  <Clock className="h-4 w-4" />
+                  Weekly Availability
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2">
+                  {formatAvailability(staff.availability)}
                 </div>
               </CardContent>
             </Card>

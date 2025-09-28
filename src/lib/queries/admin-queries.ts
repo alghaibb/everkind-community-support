@@ -6,6 +6,7 @@ import {
   ContactMessagesResponse,
   ContactMessagesApiResponse,
   StaffResponse,
+  ParticipantsResponse,
 } from "@/types/admin";
 import { ApplicationStatus } from "@/generated/prisma";
 import { env } from "@/lib/env";
@@ -39,6 +40,13 @@ export const adminQueryKeys = {
   staff: () => [...adminQueryKeys.all, "staff"] as const,
   staffList: (params: { search?: string; role?: string; page?: number }) =>
     [...adminQueryKeys.staff(), "list", params] as const,
+  participants: () => [...adminQueryKeys.all, "participants"] as const,
+  participantsList: (params: {
+    search?: string;
+    status?: string;
+    disability?: string;
+    supportCoordinator?: string;
+  }) => [...adminQueryKeys.participants(), "list", params] as const,
 } as const;
 
 // Helper function to get base URL for fetch requests
@@ -217,6 +225,46 @@ export function useStaffList(params: {
   return useQuery({
     queryKey: adminQueryKeys.staffList(params),
     queryFn: () => fetchStaff(params),
+    staleTime: 2 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
+  });
+}
+
+// Participants queries
+async function fetchParticipants(params: {
+  search?: string;
+  status?: string;
+  disability?: string;
+  supportCoordinator?: string;
+}): Promise<ParticipantsResponse> {
+  const searchParams = new URLSearchParams();
+
+  if (params.search) searchParams.set("search", params.search);
+  if (params.status) searchParams.set("status", params.status);
+  if (params.disability) searchParams.set("disability", params.disability);
+  if (params.supportCoordinator)
+    searchParams.set("supportCoordinator", params.supportCoordinator);
+
+  const response = await fetch(
+    `${getBaseUrl()}/api/admin/participants?${searchParams.toString()}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch participants");
+  }
+
+  return response.json();
+}
+
+export function useParticipantsList(params: {
+  search?: string;
+  status?: string;
+  disability?: string;
+  supportCoordinator?: string;
+}) {
+  return useQuery({
+    queryKey: adminQueryKeys.participantsList(params),
+    queryFn: () => fetchParticipants(params),
     staleTime: 2 * 60 * 1000,
     placeholderData: (previousData) => previousData,
   });
