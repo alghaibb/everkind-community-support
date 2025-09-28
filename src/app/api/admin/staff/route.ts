@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/get-session";
 import { User } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { Prisma } from "@/generated/prisma";
+import { Prisma, StaffRole } from "@/generated/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (role && role !== "all") {
-      where.staffRole = role as any; // Will be validated by Pris
+      where.staffRole = role as StaffRole; // Will be validated by Prisma
     }
 
     if (status && status !== "all") {
@@ -79,17 +79,30 @@ export async function GET(request: NextRequest) {
             },
           },
         }),
-        prisma.staff.groupBy({
-          by: ["staffRole"],
-          _count: { staffRole: true },
-        }),
+        prisma.staff
+          .groupBy({
+            by: ["staffRole"],
+            _count: { staffRole: true },
+          })
+          .then((roleBreakdown) =>
+            roleBreakdown.map((item) => ({
+              role: item.staffRole,
+              _count: { staffRole: item._count.staffRole },
+            }))
+          ),
       ]),
     ]);
 
     const [totalStaff, activeStaff, monthlyHires, roleBreakdown] = stats;
 
+    // Serialize staff data to handle Decimal objects
+    const serializedStaff = staffMembers.map((staff) => ({
+      ...staff,
+      hourlyRate: staff.hourlyRate ? Number(staff.hourlyRate) : null,
+    }));
+
     return NextResponse.json({
-      staff: staffMembers,
+      staff: serializedStaff,
       totalCount,
       totalPages: Math.ceil(totalCount / pageSize),
       currentPage: page,

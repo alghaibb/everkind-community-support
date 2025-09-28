@@ -14,11 +14,34 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { useDashboardStatsSuspense } from "@/lib/queries/admin-queries";
+import { useDashboardStats } from "@/lib/queries/admin-queries";
 import { RecentApplication, RecentMessage } from "@/types/admin";
+import { AdminDashboardSkeleton } from "./AdminDashboardSkeleton";
 
 export function DashboardContent({ userName }: { userName: string }) {
-  const { data: stats } = useDashboardStatsSuspense();
+  const { data: stats, isLoading, error } = useDashboardStats();
+
+  if (isLoading || !stats) {
+    return <AdminDashboardSkeleton />;
+  }
+
+  if (error) {
+    console.error("Dashboard error:", error);
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">Welcome back, {userName}.</p>
+        </div>
+        <div className="text-center py-8">
+          <p className="text-red-600 mb-4">
+            Failed to load dashboard data. Please try refreshing the page.
+          </p>
+          <Button onClick={() => window.location.reload()}>Refresh Page</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

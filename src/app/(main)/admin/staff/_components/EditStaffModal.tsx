@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -23,17 +24,33 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  User,
-  Phone,
-  Award,
-  Shield,
-  Loader2,
-} from "lucide-react";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { User, Phone, Award, Shield, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { StaffMember } from "@/types/admin";
 import { useModal } from "@/hooks/use-modal";
 import { useUpdateStaff } from "@/lib/mutations/admin-mutations";
 import { MODAL_TYPES, STAFF_ROLE_OPTIONS } from "../../constants";
+import {
+  EditStaffFormData,
+  editStaffSchema,
+} from "@/lib/validations/staff.schema";
+
+const NDIS_MODULES = [
+  "Module 1: Understanding Disability",
+  "Module 2: Communication",
+  "Module 3: Legal and Ethical",
+  "Module 4: Service Planning",
+  "Module 5: Daily Living Skills",
+  "Module 6: Behaviour Support",
+  "Module 7: Health and Safety",
+] as const;
 
 export default function EditStaffModal() {
   const { isOpen, type, data, onClose } = useModal();
@@ -42,36 +59,45 @@ export default function EditStaffModal() {
   const isModalOpen = isOpen && type === MODAL_TYPES.EDIT_STAFF;
   const staff = data?.staff as StaffMember;
 
-  const [formData, setFormData] = useState({
-    staffRole: "",
-    employeeId: "",
-    startDate: "",
-    endDate: "",
-    phone: "",
-    emergencyContact: "",
-    emergencyPhone: "",
-    address: "",
-    cert3IndividualSupport: false,
-    ahpraRegistration: "",
-    covidVaccinations: false,
-    influenzaVaccination: false,
-    workingWithChildrenCheck: false,
-    ndisScreeningCheck: false,
-    policeCheck: false,
-    firstAidCPR: false,
-    workingRights: false,
-    ndisModules: [] as string[],
-    hourlyRate: "",
+  const form = useForm({
+    resolver: zodResolver(editStaffSchema),
+    defaultValues: {
+      staffRole: "SUPPORT_WORKER",
+      employeeId: "",
+      startDate: "",
+      endDate: "",
+      phone: "",
+      emergencyContact: "",
+      emergencyPhone: "",
+      address: "",
+      cert3IndividualSupport: false,
+      ahpraRegistration: "",
+      covidVaccinations: false,
+      influenzaVaccination: false,
+      workingWithChildrenCheck: false,
+      ndisScreeningCheck: false,
+      policeCheck: false,
+      firstAidCPR: false,
+      workingRights: false,
+      ndisModules: [],
+      hourlyRate: "",
+    },
   });
 
   // Initialize form data when staff data is available
   useEffect(() => {
-    if (staff) {
-      setFormData({
-        staffRole: staff.staffRole,
+    if (staff && isModalOpen) {
+      form.reset({
+        staffRole: staff.staffRole as
+          | "SUPPORT_WORKER"
+          | "ENROLLED_NURSE"
+          | "REGISTERED_NURSE"
+          | "COORDINATOR",
         employeeId: staff.employeeId || "",
         startDate: format(new Date(staff.startDate), "yyyy-MM-dd"),
-        endDate: staff.endDate ? format(new Date(staff.endDate), "yyyy-MM-dd") : "",
+        endDate: staff.endDate
+          ? format(new Date(staff.endDate), "yyyy-MM-dd")
+          : "",
         phone: staff.phone || "",
         emergencyContact: staff.emergencyContact || "",
         emergencyPhone: staff.emergencyPhone || "",
@@ -85,20 +111,19 @@ export default function EditStaffModal() {
         policeCheck: staff.policeCheck,
         firstAidCPR: staff.firstAidCPR,
         workingRights: staff.workingRights,
-        ndisModules: staff.ndisModules,
+        ndisModules: staff.ndisModules || [],
         hourlyRate: staff.hourlyRate?.toString() || "",
       });
     }
-  }, [staff]);
+  }, [staff, isModalOpen, form]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (data: EditStaffFormData) => {
     if (!staff) return;
 
     const updateData = {
-      ...formData,
-      hourlyRate: formData.hourlyRate ? parseFloat(formData.hourlyRate) : undefined,
-      endDate: formData.endDate || undefined,
+      ...data,
+      hourlyRate: data.hourlyRate ? parseFloat(data.hourlyRate) : undefined,
+      endDate: data.endDate || undefined,
     };
 
     updateStaffMutation.mutate(
@@ -111,33 +136,7 @@ export default function EditStaffModal() {
     );
   };
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const toggleNdIsModule = (module: string) => {
-    setFormData(prev => ({
-      ...prev,
-      ndisModules: prev.ndisModules.includes(module)
-        ? prev.ndisModules.filter(m => m !== module)
-        : [...prev.ndisModules, module]
-    }));
-  };
-
   if (!staff) return null;
-
-  const ndisModules = [
-    "Module 1: Understanding Disability",
-    "Module 2: Communication",
-    "Module 3: Legal and Ethical",
-    "Module 4: Service Planning",
-    "Module 5: Daily Living Skills",
-    "Module 6: Behaviour Support",
-    "Module 7: Health and Safety",
-  ];
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
@@ -152,282 +151,451 @@ export default function EditStaffModal() {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-            {/* Basic Information */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                  <User className="h-4 w-4" />
-                  Basic Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-0">
-                <div className="grid gap-2">
-                  <Label htmlFor="staffRole">Role</Label>
-                  <Select
-                    value={formData.staffRole}
-                    onValueChange={(value) => handleInputChange("staffRole", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {STAFF_ROLE_OPTIONS.map((role) => (
-                        <SelectItem key={role.value} value={role.value}>
-                          {role.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="employeeId">Employee ID</Label>
-                  <Input
-                    id="employeeId"
-                    value={formData.employeeId}
-                    onChange={(e) => handleInputChange("employeeId", e.target.value)}
-                    placeholder="Enter employee ID"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-6"
+          >
+            <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+              {/* Basic Information */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                    <User className="h-4 w-4" />
+                    Basic Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-0">
+                  <FormField
+                    control={form.control}
+                    name="staffRole"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Role *</FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {STAFF_ROLE_OPTIONS.map((role) => (
+                                <SelectItem key={role.value} value={role.value}>
+                                  {role.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="startDate">Start Date</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) => handleInputChange("startDate", e.target.value)}
+                  <FormField
+                    control={form.control}
+                    name="employeeId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Employee ID</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter employee ID" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="endDate">End Date (Optional)</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) => handleInputChange("endDate", e.target.value)}
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Start Date *</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="hourlyRate">Hourly Rate</Label>
-                  <Input
-                    id="hourlyRate"
-                    type="number"
-                    step="0.01"
-                    value={formData.hourlyRate}
-                    onChange={(e) => handleInputChange("hourlyRate", e.target.value)}
-                    placeholder="0.00"
+                  <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>End Date (Optional)</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Contact Information */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                  <Phone className="h-4 w-4" />
-                  Contact Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-0">
-                <div className="grid gap-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                    placeholder="Enter phone number"
+                  <FormField
+                    control={form.control}
+                    name="hourlyRate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Hourly Rate</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="emergencyContact">Emergency Contact</Label>
-                  <Input
-                    id="emergencyContact"
-                    value={formData.emergencyContact}
-                    onChange={(e) => handleInputChange("emergencyContact", e.target.value)}
-                    placeholder="Enter emergency contact name"
+              {/* Contact Information */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                    <Phone className="h-4 w-4" />
+                    Contact Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-0">
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="tel"
+                            placeholder="0412 345 678"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="emergencyPhone">Emergency Phone</Label>
-                  <Input
-                    id="emergencyPhone"
-                    value={formData.emergencyPhone}
-                    onChange={(e) => handleInputChange("emergencyPhone", e.target.value)}
-                    placeholder="Enter emergency contact phone"
+                  <FormField
+                    control={form.control}
+                    name="emergencyContact"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Emergency Contact</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter emergency contact name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Textarea
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => handleInputChange("address", e.target.value)}
-                    placeholder="Enter address"
-                    rows={3}
+                  <FormField
+                    control={form.control}
+                    name="emergencyPhone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Emergency Phone</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="tel"
+                            placeholder="0412 345 678"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Professional Qualifications */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                  <Award className="h-4 w-4" />
-                  Professional Qualifications
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-0">
-                <div className="grid gap-2">
-                  <Label htmlFor="ahpraRegistration">AHPRA Registration</Label>
-                  <Input
-                    id="ahpraRegistration"
-                    value={formData.ahpraRegistration}
-                    onChange={(e) => handleInputChange("ahpraRegistration", e.target.value)}
-                    placeholder="Enter AHPRA registration number"
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Address</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Enter full address"
+                            rows={3}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="cert3IndividualSupport"
-                      checked={formData.cert3IndividualSupport}
-                      onCheckedChange={(checked) => handleInputChange("cert3IndividualSupport", checked)}
+              {/* Professional Qualifications */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                    <Award className="h-4 w-4" />
+                    Professional Qualifications
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-0">
+                  <FormField
+                    control={form.control}
+                    name="ahpraRegistration"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>AHPRA Registration</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter AHPRA registration number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="cert3IndividualSupport"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">
+                            CERT 3 Individual Support
+                          </FormLabel>
+                        </FormItem>
+                      )}
                     />
-                    <Label htmlFor="cert3IndividualSupport" className="text-sm">CERT 3</Label>
-                  </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="workingRights"
-                      checked={formData.workingRights}
-                      onCheckedChange={(checked) => handleInputChange("workingRights", checked)}
+                    <FormField
+                      control={form.control}
+                      name="workingRights"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">
+                            Work Rights
+                          </FormLabel>
+                        </FormItem>
+                      )}
                     />
-                    <Label htmlFor="workingRights" className="text-sm">Work Rights</Label>
-                  </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="covidVaccinations"
-                      checked={formData.covidVaccinations}
-                      onCheckedChange={(checked) => handleInputChange("covidVaccinations", checked)}
+                    <FormField
+                      control={form.control}
+                      name="covidVaccinations"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">
+                            COVID-19 Vaccine
+                          </FormLabel>
+                        </FormItem>
+                      )}
                     />
-                    <Label htmlFor="covidVaccinations" className="text-sm">COVID Vaccine</Label>
-                  </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="influenzaVaccination"
-                      checked={formData.influenzaVaccination}
-                      onCheckedChange={(checked) => handleInputChange("influenzaVaccination", checked)}
+                    <FormField
+                      control={form.control}
+                      name="influenzaVaccination"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">
+                            Influenza Vaccine
+                          </FormLabel>
+                        </FormItem>
+                      )}
                     />
-                    <Label htmlFor="influenzaVaccination" className="text-sm">Flu Vaccine</Label>
-                  </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="workingWithChildrenCheck"
-                      checked={formData.workingWithChildrenCheck}
-                      onCheckedChange={(checked) => handleInputChange("workingWithChildrenCheck", checked)}
+                    <FormField
+                      control={form.control}
+                      name="workingWithChildrenCheck"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">
+                            Working with Children Check
+                          </FormLabel>
+                        </FormItem>
+                      )}
                     />
-                    <Label htmlFor="workingWithChildrenCheck" className="text-sm">WWCC</Label>
-                  </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="ndisScreeningCheck"
-                      checked={formData.ndisScreeningCheck}
-                      onCheckedChange={(checked) => handleInputChange("ndisScreeningCheck", checked)}
+                    <FormField
+                      control={form.control}
+                      name="ndisScreeningCheck"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">
+                            NDIS Screening Check
+                          </FormLabel>
+                        </FormItem>
+                      )}
                     />
-                    <Label htmlFor="ndisScreeningCheck" className="text-sm">NDIS Check</Label>
-                  </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="policeCheck"
-                      checked={formData.policeCheck}
-                      onCheckedChange={(checked) => handleInputChange("policeCheck", checked)}
+                    <FormField
+                      control={form.control}
+                      name="policeCheck"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">
+                            Police Check
+                          </FormLabel>
+                        </FormItem>
+                      )}
                     />
-                    <Label htmlFor="policeCheck" className="text-sm">Police Check</Label>
-                  </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="firstAidCPR"
-                      checked={formData.firstAidCPR}
-                      onCheckedChange={(checked) => handleInputChange("firstAidCPR", checked)}
+                    <FormField
+                      control={form.control}
+                      name="firstAidCPR"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">
+                            First Aid & CPR
+                          </FormLabel>
+                        </FormItem>
+                      )}
                     />
-                    <Label htmlFor="firstAidCPR" className="text-sm">First Aid</Label>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* NDIS Modules */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                  <Shield className="h-4 w-4" />
-                  NDIS Modules
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-1 gap-2">
-                  {ndisModules.map((module) => (
-                    <div key={module} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id={module}
-                        checked={formData.ndisModules.includes(module)}
-                        onChange={() => toggleNdIsModule(module)}
-                        className="rounded border-gray-300"
-                      />
-                      <Label htmlFor={module} className="text-sm cursor-pointer">
-                        {module}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              {/* NDIS Modules */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                    <Shield className="h-4 w-4" />
+                    NDIS Modules
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <FormField
+                    control={form.control}
+                    name="ndisModules"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="grid grid-cols-1 gap-2">
+                          {NDIS_MODULES.map((module) => (
+                            <FormItem
+                              key={module}
+                              className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <input
+                                  type="checkbox"
+                                  checked={field.value?.includes(module)}
+                                  onChange={(e) => {
+                                    const currentModules = field.value || [];
+                                    return e.target.checked
+                                      ? field.onChange([
+                                          ...currentModules,
+                                          module,
+                                        ])
+                                      : field.onChange(
+                                          currentModules?.filter(
+                                            (value) => value !== module
+                                          )
+                                        );
+                                  }}
+                                  className="rounded border-gray-300"
+                                />
+                              </FormControl>
+                              <FormLabel className="text-sm font-normal cursor-pointer">
+                                {module}
+                              </FormLabel>
+                            </FormItem>
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+            </div>
 
-          <Separator />
+            <Separator />
 
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={updateStaffMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={updateStaffMutation.isPending}
-            >
-              {updateStaffMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                "Update Staff"
-              )}
-            </Button>
-          </div>
-        </form>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={updateStaffMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={
+                  updateStaffMutation.isPending || !form.formState.isValid
+                }
+              >
+                {updateStaffMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  "Update Staff"
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

@@ -13,7 +13,15 @@ import {
   updateStaff,
   deleteStaff,
   toggleStaffStatus,
+  UpdateStaffData,
 } from "@/app/(main)/admin/staff/actions";
+import {
+  createParticipant,
+  updateParticipant,
+  deleteParticipant,
+} from "@/app/(main)/admin/participants/actions";
+import { UpdateParticipantFormData } from "@/lib/validations/participant.schema";
+import { Participant } from "@/types/admin";
 
 // Delete contact message mutation with optimistic updates
 export function useDeleteContactMessage() {
@@ -182,7 +190,7 @@ export function useCreateStaff() {
     mutationFn: createStaff,
 
     // Optimistic update - add new staff immediately
-    onMutate: async (_newStaffData) => {
+    onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: adminQueryKeys.staff() });
 
       const staffQueries = queryClient.getQueriesData({
@@ -224,11 +232,16 @@ export function useUpdateStaff() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ staffId, data }: { staffId: string; data: any }) =>
-      updateStaff(staffId, data),
+    mutationFn: ({
+      staffId,
+      data,
+    }: {
+      staffId: string;
+      data: UpdateStaffData;
+    }) => updateStaff(staffId, data),
 
     // Optimistic update - update staff immediately
-    onMutate: async ({ staffId, data }) => {
+    onMutate: async ({ staffId }) => {
       await queryClient.cancelQueries({ queryKey: adminQueryKeys.staff() });
 
       const staffQueries = queryClient.getQueriesData({
@@ -405,6 +418,164 @@ export function useToggleStaffStatus() {
       }
 
       toast.error("Failed to update staff status. Please try again.");
+    },
+  });
+}
+
+// Participant mutations
+export function useCreateParticipant() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createParticipant,
+
+    // For create, we can't reliably add optimistic data without the generated ID
+    // The success handler will invalidate and refetch
+    onSuccess: () => {
+      toast.success("Participant created successfully");
+      queryClient.invalidateQueries({
+        queryKey: adminQueryKeys.participants(),
+      });
+    },
+
+    onError: (error) => {
+      console.error("Failed to create participant:", error);
+      toast.error("Failed to create participant. Please try again.");
+    },
+  });
+}
+
+export function useUpdateParticipant() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateParticipant,
+
+    // Optimistic update - update participant immediately
+    onMutate: async ({
+      id,
+      ...updateData
+    }: UpdateParticipantFormData & { id: string }) => {
+      await queryClient.cancelQueries({
+        queryKey: adminQueryKeys.participants(),
+      });
+
+      const participantQueries = queryClient.getQueriesData({
+        queryKey: adminQueryKeys.participants(),
+      });
+
+      const previousData = participantQueries.map(([queryKey, data]) => ({
+        queryKey,
+        data,
+      }));
+
+      // Optimistically update the participant in all queries
+      participantQueries.forEach(([queryKey, data]) => {
+        if (data && typeof data === "object" && "participants" in data) {
+          const participantsData = data as {
+            participants: Participant[];
+            total: number;
+          };
+          const updatedParticipants = participantsData.participants.map(
+            (participant) =>
+              participant.id === id
+                ? { ...participant, ...updateData }
+                : participant
+          );
+
+          queryClient.setQueryData(queryKey, {
+            ...participantsData,
+            participants: updatedParticipants,
+          });
+        }
+      });
+
+      return { previousData };
+    },
+
+    onSuccess: () => {
+      toast.success("Participant updated successfully");
+      queryClient.invalidateQueries({
+        queryKey: adminQueryKeys.participants(),
+      });
+    },
+
+    onError: (error, variables, context) => {
+      console.error("Failed to update participant:", error);
+
+      // Rollback optimistic updates
+      if (context?.previousData) {
+        context.previousData.forEach(({ queryKey, data }) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+
+      toast.error("Failed to update participant. Please try again.");
+    },
+  });
+}
+
+export function useDeleteParticipant() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteParticipant,
+
+    // Optimistic update - remove participant immediately
+    onMutate: async (participantId: string) => {
+      await queryClient.cancelQueries({
+        queryKey: adminQueryKeys.participants(),
+      });
+
+      const participantQueries = queryClient.getQueriesData({
+        queryKey: adminQueryKeys.participants(),
+      });
+
+      const previousData = participantQueries.map(([queryKey, data]) => ({
+        queryKey,
+        data,
+      }));
+
+      // Optimistically remove the participant from all queries
+      participantQueries.forEach(([queryKey, data]) => {
+        if (data && typeof data === "object" && "participants" in data) {
+          const participantsData = data as {
+            participants: Participant[];
+            total: number;
+          };
+          const updatedParticipants = participantsData.participants.filter(
+            (participant) => participant.id !== participantId
+          );
+
+          queryClient.setQueryData(queryKey, {
+            ...participantsData,
+            participants: updatedParticipants,
+            total: participantsData.total - 1,
+          });
+        }
+      });
+
+      return { previousData };
+    },
+
+    onSuccess: () => {
+      toast.success("Participant deleted successfully");
+      queryClient.invalidateQueries({
+        queryKey: adminQueryKeys.participants(),
+      });
+    },
+
+    onError: (error, participantId, context) => {
+      console.error("Failed to delete participant:", error);
+
+      // Rollback optimistic updates
+      if (context?.previousData) {
+        context.previousData.forEach(({ queryKey, data }) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+
+      toast.error("Failed to delete participant. Please try again.");
     },
   });
 }

@@ -4,16 +4,31 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SearchInput } from "@/components/ui/search-input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { X, Filter } from "lucide-react";
 import { ROLE_OPTIONS } from "../../constants";
+import dynamic from "next/dynamic";
+
+const Select = dynamic(
+  () => import("@/components/ui/select").then((mod) => mod.Select),
+  { ssr: false }
+);
+const SelectContent = dynamic(
+  () => import("@/components/ui/select").then((mod) => mod.SelectContent),
+  { ssr: false }
+);
+const SelectItem = dynamic(
+  () => import("@/components/ui/select").then((mod) => mod.SelectItem),
+  { ssr: false }
+);
+const SelectTrigger = dynamic(
+  () => import("@/components/ui/select").then((mod) => mod.SelectTrigger),
+  { ssr: false }
+);
+const SelectValue = dynamic(
+  () => import("@/components/ui/select").then((mod) => mod.SelectValue),
+  { ssr: false }
+);
 
 export default function CareersSearch() {
   const router = useRouter();

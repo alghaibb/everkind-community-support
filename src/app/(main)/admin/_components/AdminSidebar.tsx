@@ -18,18 +18,43 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Settings, ChevronUp, Shield } from "lucide-react";
 import { User } from "@/lib/auth";
 import LogoutButton from "@/components/logout-button";
 import { Separator } from "@/components/ui/separator";
 import { NAVIGATION_ITEMS } from "../constants";
+import dynamic from "next/dynamic";
+
+const DropdownMenu = dynamic(
+  () => import("@/components/ui/dropdown-menu").then((mod) => mod.DropdownMenu),
+  { ssr: false }
+);
+const DropdownMenuContent = dynamic(
+  () =>
+    import("@/components/ui/dropdown-menu").then(
+      (mod) => mod.DropdownMenuContent
+    ),
+  { ssr: false }
+);
+const DropdownMenuItem = dynamic(
+  () =>
+    import("@/components/ui/dropdown-menu").then((mod) => mod.DropdownMenuItem),
+  { ssr: false }
+);
+const DropdownMenuSeparator = dynamic(
+  () =>
+    import("@/components/ui/dropdown-menu").then(
+      (mod) => mod.DropdownMenuSeparator
+    ),
+  { ssr: false }
+);
+const DropdownMenuTrigger = dynamic(
+  () =>
+    import("@/components/ui/dropdown-menu").then(
+      (mod) => mod.DropdownMenuTrigger
+    ),
+  { ssr: false }
+);
 
 interface AdminSidebarProps {
   user: User;

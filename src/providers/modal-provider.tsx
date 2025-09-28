@@ -27,6 +27,24 @@ const DeleteCareerSubmissionDialog = lazy(
       "@/app/(main)/admin/careers/_components/DeleteCareerSubmissionDialog"
     )
 );
+const EditStaffModal = lazy(
+  () => import("@/app/(main)/admin/staff/_components/EditStaffModal")
+);
+const StaffDetailsModal = lazy(
+  () => import("@/app/(main)/admin/staff/_components/StaffDetailsModal")
+);
+const CreateParticipantModal = lazy(
+  () =>
+    import("@/app/(main)/admin/participants/_components/CreateParticipantModal")
+);
+const ViewParticipantModal = lazy(
+  () =>
+    import("@/app/(main)/admin/participants/_components/ViewParticipantModal")
+);
+const EditParticipantModal = lazy(
+  () =>
+    import("@/app/(main)/admin/participants/_components/EditParticipantModal")
+);
 
 export function ModalProvider() {
   return (
@@ -51,6 +69,21 @@ export function ModalProvider() {
       </Suspense>
       <Suspense fallback={null}>
         <DeleteCareerSubmissionDialog />
+      </Suspense>
+      <Suspense fallback={null}>
+        <EditStaffModal />
+      </Suspense>
+      <Suspense fallback={null}>
+        <StaffDetailsModal />
+      </Suspense>
+      <Suspense fallback={null}>
+        <CreateParticipantModal />
+      </Suspense>
+      <Suspense fallback={null}>
+        <ViewParticipantModal />
+      </Suspense>
+      <Suspense fallback={null}>
+        <EditParticipantModal />
       </Suspense>
     </>
   );

@@ -62,6 +62,7 @@ export async function GET(request: NextRequest) {
           ndisScreeningCheck: true,
           policeCheck: true,
           firstAidCPR: true,
+          availability: true,
           resume: true,
           wwccDocument: true,
           ndisDocument: true,
