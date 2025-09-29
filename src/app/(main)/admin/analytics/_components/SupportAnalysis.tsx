@@ -31,10 +31,12 @@ export default function SupportAnalysis({
       .map((item) => ({
         label:
           keyField === "disability"
-            ? (item as any).disability
-            : (item as any).support_need,
+            ? (item as { disability: string }).disability
+            : (item as { support_need: string }).support_need,
         count:
-          keyField === "disability" ? (item as any).count : (item as any).count,
+          keyField === "disability" 
+            ? (item as { count: number }).count 
+            : (item as { count: number }).count,
       }))
       .sort((a, b) => b.count - a.count);
 

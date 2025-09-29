@@ -73,8 +73,8 @@ export default function RecentActivity({ activity }: RecentActivityProps) {
   const renderActivitySection = (
     title: string,
     icon: React.ElementType,
-    items: any[],
-    renderItem: (item: any) => React.ReactNode
+    items: unknown[],
+    renderItem: (item: unknown, index: number) => React.ReactNode
   ) => {
     const Icon = icon;
 
@@ -117,113 +117,136 @@ export default function RecentActivity({ activity }: RecentActivityProps) {
           "New Participants",
           Users,
           activity.participants,
-          (participant, index) => (
-            <div
-              key={`participant-${index}`}
-              className="flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="text-xs">
-                    {getInitials(
-                      `${participant.firstName} ${participant.lastName}`
-                    )}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium">
-                    {participant.firstName} {participant.lastName}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">
-                      {formatDate(participant.createdAt)}
-                    </span>
+          (participant, index) => {
+            const p = participant as {
+              id: string;
+              firstName: string;
+              lastName: string;
+              createdAt: string;
+              status: string;
+            };
+            return (
+              <div
+                key={`participant-${index}`}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="text-xs">
+                      {getInitials(`${p.firstName} ${p.lastName}`)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">
+                      {p.firstName} {p.lastName}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">
+                        {formatDate(p.createdAt)}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <Badge
+                  variant="outline"
+                  className={`text-xs ${getStatusColor(p.status)}`}
+                >
+                  {formatLabel(p.status)}
+                </Badge>
               </div>
-              <Badge
-                variant="outline"
-                className={`text-xs ${getStatusColor(participant.status)}`}
-              >
-                {formatLabel(participant.status)}
-              </Badge>
-            </div>
-          )
+            );
+          }
         )}
 
         {renderActivitySection(
           "New Staff",
           UserCheck,
           activity.staff,
-          (staff, index) => (
-            <div
-              key={`staff-${index}`}
-              className="flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="text-xs">
-                    {getInitials(staff.user.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium">{staff.user.name}</p>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">
-                      {formatDate(staff.createdAt)}
-                    </span>
+          (staff, index) => {
+            const s = staff as {
+              id: string;
+              staffRole: string;
+              createdAt: string;
+              user: { name: string };
+            };
+            return (
+              <div
+                key={`staff-${index}`}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="text-xs">
+                      {getInitials(s.user.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">{s.user.name}</p>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">
+                        {formatDate(s.createdAt)}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <Badge variant="outline" className="text-xs">
+                  {formatLabel(s.staffRole)}
+                </Badge>
               </div>
-              <Badge variant="outline" className="text-xs">
-                {formatLabel(staff.staffRole)}
-              </Badge>
-            </div>
-          )
+            );
+          }
         )}
 
         {renderActivitySection(
           "Applications",
           Briefcase,
           activity.applications,
-          (application, index) => (
-            <div
-              key={`application-${index}`}
-              className="flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="text-xs">
-                    {getInitials(
-                      `${application.firstName} ${application.lastName}`
-                    )}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium">
-                    {application.firstName} {application.lastName}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">
-                      {formatLabel(application.role)}
-                    </span>
-                    <span className="text-xs text-muted-foreground">•</span>
-                    <span className="text-xs text-muted-foreground">
-                      {formatDate(application.createdAt)}
-                    </span>
+          (application, index) => {
+            const a = application as {
+              id: string;
+              firstName: string;
+              lastName: string;
+              role: string;
+              createdAt: string;
+              status: string;
+            };
+            return (
+              <div
+                key={`application-${index}`}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="text-xs">
+                      {getInitials(`${a.firstName} ${a.lastName}`)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">
+                      {a.firstName} {a.lastName}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {formatLabel(a.role)}
+                      </span>
+                      <span className="text-xs text-muted-foreground">•</span>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDate(a.createdAt)}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <Badge
+                  variant="outline"
+                  className={`text-xs ${getStatusColor(a.status)}`}
+                >
+                  {formatLabel(a.status)}
+                </Badge>
               </div>
-              <Badge
-                variant="outline"
-                className={`text-xs ${getStatusColor(application.status)}`}
-              >
-                {formatLabel(application.status)}
-              </Badge>
-            </div>
-          )
+            );
+          }
         )}
       </div>
     </div>
