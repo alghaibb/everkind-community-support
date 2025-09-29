@@ -61,8 +61,8 @@ export default function StatusDistributions({
         <CardContent className="space-y-4">
           {data.map((item) => {
             const key =
-              keyField === "status" 
-                ? (item as { status: string }).status 
+              keyField === "status"
+                ? (item as { status: string }).status
                 : (item as { role: string }).role;
             const percentage =
               total > 0 ? Math.round((item.count / total) * 100) : 0;

@@ -34,8 +34,8 @@ export default function SupportAnalysis({
             ? (item as { disability: string }).disability
             : (item as { support_need: string }).support_need,
         count:
-          keyField === "disability" 
-            ? (item as { count: number }).count 
+          keyField === "disability"
+            ? (item as { count: number }).count
             : (item as { count: number }).count,
       }))
       .sort((a, b) => b.count - a.count);
