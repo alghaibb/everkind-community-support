@@ -47,6 +47,7 @@ export const adminQueryKeys = {
     disability?: string;
     supportCoordinator?: string;
   }) => [...adminQueryKeys.participants(), "list", params] as const,
+  analytics: () => [...adminQueryKeys.all, "analytics"] as const,
 } as const;
 
 // Helper function to get base URL for fetch requests
@@ -267,5 +268,71 @@ export function useParticipantsList(params: {
     queryFn: () => fetchParticipants(params),
     staleTime: 2 * 60 * 1000,
     placeholderData: (previousData) => previousData,
+  });
+}
+
+// Analytics queries
+interface AnalyticsData {
+  overview: {
+    totalParticipants: number;
+    totalStaff: number;
+    totalCareerApplications: number;
+    totalContactMessages: number;
+    totalBudgetAllocated: number;
+    averageBudgetPerParticipant: number;
+  };
+  growth: {
+    participants: { current: number; previous: number; growth: number };
+    staff: { current: number; previous: number; growth: number };
+    applications: { current: number; previous: number; growth: number };
+    messages: { current: number; previous: number; growth: number };
+  };
+  distributions: {
+    participantsByStatus: { status: string; count: number }[];
+    staffByRole: { role: string; count: number }[];
+    applicationsByStatus: { status: string; count: number }[];
+    participantsByLocation: { location: string; count: number }[];
+    commonDisabilities: { disability: string; count: number }[];
+    supportNeedsDistribution: { support_need: string; count: number }[];
+  };
+  recentActivity: {
+    participants: Array<{
+      id: string;
+      firstName: string;
+      lastName: string;
+      createdAt: string;
+      status: string;
+    }>;
+    staff: Array<{
+      id: string;
+      staffRole: string;
+      createdAt: string;
+      user: { name: string };
+    }>;
+    applications: Array<{
+      id: string;
+      firstName: string;
+      lastName: string;
+      role: string;
+      createdAt: string;
+      status: string;
+    }>;
+  };
+}
+
+async function fetchAnalytics(): Promise<AnalyticsData> {
+  const response = await fetch(`${getBaseUrl()}/api/admin/analytics`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch analytics");
+  }
+  return response.json();
+}
+
+export function useAnalytics() {
+  return useQuery({
+    queryKey: adminQueryKeys.analytics(),
+    queryFn: fetchAnalytics,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
   });
 }

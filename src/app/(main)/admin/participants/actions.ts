@@ -9,6 +9,10 @@ import {
   UpdateParticipantFormData,
   updateParticipantSchema,
 } from "@/lib/validations/participant.schema";
+import {
+  handleParticipantError,
+  serializeParticipant,
+} from "@/utils/participant-utils";
 
 export async function createParticipant(data: CreateParticipantFormData) {
   try {
@@ -25,7 +29,7 @@ export async function createParticipant(data: CreateParticipantFormData) {
       data: {
         firstName: validatedData.firstName,
         lastName: validatedData.lastName,
-        preferredName: validatedData.preferredName || null,
+        preferredName: validatedData.preferredName || undefined,
         dateOfBirth: new Date(validatedData.dateOfBirth),
         gender: validatedData.gender || null,
         email: validatedData.email || null,
@@ -55,48 +59,14 @@ export async function createParticipant(data: CreateParticipantFormData) {
 
     revalidatePath("/admin/participants");
 
-    // Convert Decimal objects to plain numbers for client serialization
-    const serializedParticipant = {
-      ...participant,
-      planBudget: participant.planBudget
-        ? Number(participant.planBudget)
-        : null,
-    };
-
     return {
       success: true,
       message: "Participant created successfully",
-      participant: serializedParticipant,
+      participant: serializeParticipant(participant),
     };
-  } catch (error: unknown) {
+  } catch (error) {
     console.error("Error creating participant:", error);
-
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "P2002"
-    ) {
-      // Unique constraint violation
-      const field =
-        "meta" in error &&
-        error.meta &&
-        typeof error.meta === "object" &&
-        "target" in error.meta
-          ? (error.meta as { target?: string[] }).target?.[0]
-          : undefined;
-      if (field === "ndisNumber") {
-        return { error: "A participant with this NDIS number already exists" };
-      }
-      if (field === "email") {
-        return { error: "A participant with this email already exists" };
-      }
-      if (field === "phone") {
-        return { error: "A participant with this phone number already exists" };
-      }
-    }
-
-    return { error: "Failed to create participant. Please try again." };
+    return handleParticipantError(error, "create");
   }
 }
 
@@ -118,7 +88,7 @@ export async function updateParticipant(data: UpdateParticipantFormData) {
       data: {
         firstName: updateData.firstName,
         lastName: updateData.lastName,
-        preferredName: updateData.preferredName || null,
+        preferredName: updateData.preferredName || undefined,
         dateOfBirth: updateData.dateOfBirth
           ? new Date(updateData.dateOfBirth)
           : undefined,
@@ -153,57 +123,14 @@ export async function updateParticipant(data: UpdateParticipantFormData) {
 
     revalidatePath("/admin/participants");
 
-    // Convert Decimal objects to plain numbers for client serialization
-    const serializedParticipant = {
-      ...participant,
-      planBudget: participant.planBudget
-        ? Number(participant.planBudget)
-        : null,
-    };
-
     return {
       success: true,
       message: "Participant updated successfully",
-      participant: serializedParticipant,
+      participant: serializeParticipant(participant),
     };
-  } catch (error: unknown) {
+  } catch (error) {
     console.error("Error updating participant:", error);
-
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "P2002"
-    ) {
-      // Unique constraint violation
-      const field =
-        "meta" in error &&
-        error.meta &&
-        typeof error.meta === "object" &&
-        "target" in error.meta
-          ? (error.meta as { target?: string[] }).target?.[0]
-          : undefined;
-      if (field === "ndisNumber") {
-        return { error: "A participant with this NDIS number already exists" };
-      }
-      if (field === "email") {
-        return { error: "A participant with this email already exists" };
-      }
-      if (field === "phone") {
-        return { error: "A participant with this phone number already exists" };
-      }
-    }
-
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "P2025"
-    ) {
-      return { error: "Participant not found" };
-    }
-
-    return { error: "Failed to update participant. Please try again." };
+    return handleParticipantError(error, "update");
   }
 }
 
@@ -225,18 +152,8 @@ export async function deleteParticipant(id: string) {
       success: true,
       message: "Participant deleted successfully",
     };
-  } catch (error: unknown) {
+  } catch (error) {
     console.error("Error deleting participant:", error);
-
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "P2025"
-    ) {
-      return { error: "Participant not found" };
-    }
-
-    return { error: "Failed to delete participant. Please try again." };
+    return handleParticipantError(error, "delete");
   }
 }
