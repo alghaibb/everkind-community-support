@@ -1,4 +1,5 @@
 import { ApplicationStatus } from "@/generated/prisma";
+import { User, Session } from "@/lib/auth";
 
 export interface DashboardStats {
   applications: {
@@ -259,4 +260,47 @@ export interface ParticipantsStats {
   inactive: number;
   pending: number;
   discharged: number;
+}
+
+// Users Management Types - extending the auth User type
+export interface AdminUser extends Omit<User, "createdAt" | "updatedAt"> {
+  createdAt: string;
+  updatedAt: string;
+  lastActive: string | null;
+  isActive: boolean;
+  additionalInfo:
+    | {
+        type: "staff";
+        staffRole: string;
+        employeeId: string | null;
+        phone: string | null;
+        startDate: string | null;
+        endDate: string | null;
+      }
+    | {
+        type: "family";
+        relationship: string;
+        phone: string | null;
+        emergencyContact: boolean;
+      }
+    | null;
+}
+
+// Enhanced session type with admin plugin fields
+export interface AdminSession extends Session {
+  impersonatedBy?: string | null;
+}
+
+export interface UsersResponse {
+  users: AdminUser[];
+  stats: {
+    total: number;
+    active: number;
+    inactive: number;
+    admins: number;
+    staff: number;
+    internal: number;
+    family: number;
+  };
+  total: number;
 }

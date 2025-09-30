@@ -154,6 +154,11 @@ export const MODAL_TYPES = {
   EDIT_PARTICIPANT: "edit-participant",
   VIEW_PARTICIPANT: "view-participant",
   DELETE_PARTICIPANT: "delete-participant",
+  VIEW_USER: "view-user",
+  EDIT_USER: "edit-user",
+  DELETE_USER: "delete-user",
+  BAN_USER: "ban-user",
+  REVOKE_SESSIONS: "revoke-sessions",
 } as const;
 
 // Pagination defaults
@@ -224,6 +229,12 @@ export const NAVIGATION_ITEMS = [
         url: "/admin/messages",
         icon: MessageSquare,
         description: "Contact inquiries",
+      },
+      {
+        title: "Users",
+        url: "/admin/users",
+        icon: Users,
+        description: "All system users",
       },
     ],
   },

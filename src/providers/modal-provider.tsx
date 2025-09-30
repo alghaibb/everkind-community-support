@@ -45,6 +45,21 @@ const EditParticipantModal = lazy(
   () =>
     import("@/app/(main)/admin/participants/_components/EditParticipantModal")
 );
+const ViewUserModal = lazy(
+  () => import("@/app/(main)/admin/users/_components/ViewUserModal")
+);
+const EditUserModal = lazy(
+  () => import("@/app/(main)/admin/users/_components/EditUserModal")
+);
+const DeleteUserDialog = lazy(
+  () => import("@/app/(main)/admin/users/_components/DeleteUserDialog")
+);
+const BanUserDialog = lazy(
+  () => import("@/app/(main)/admin/users/_components/BanUserDialog")
+);
+const RevokeSessionsDialog = lazy(
+  () => import("@/app/(main)/admin/users/_components/RevokeSessionsDialog")
+);
 
 export function ModalProvider() {
   return (
@@ -84,6 +99,21 @@ export function ModalProvider() {
       </Suspense>
       <Suspense fallback={null}>
         <EditParticipantModal />
+      </Suspense>
+      <Suspense fallback={null}>
+        <ViewUserModal />
+      </Suspense>
+      <Suspense fallback={null}>
+        <EditUserModal />
+      </Suspense>
+      <Suspense fallback={null}>
+        <DeleteUserDialog />
+      </Suspense>
+      <Suspense fallback={null}>
+        <BanUserDialog />
+      </Suspense>
+      <Suspense fallback={null}>
+        <RevokeSessionsDialog />
       </Suspense>
     </>
   );

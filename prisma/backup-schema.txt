@@ -1,4 +1,3 @@
-
 generator client {
   provider      = "prisma-client-js"
   output        = "../src/generated/prisma"
@@ -42,7 +41,7 @@ model User {
   emailVerified Boolean   @default(false)
   image         String?
   userType      UserType  @default(INTERNAL)
-  role          Role? 
+  role          Role? // Only for INTERNAL users (STAFF/ADMIN)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
@@ -56,7 +55,6 @@ model User {
 }
 
 // Detailed staff information
-
 model Staff {
   id     String @id @default(cuid())
   userId String @unique
@@ -108,7 +106,6 @@ model Staff {
 }
 
 // Family members who can access participant information
-
 model FamilyMember {
   id     String @id @default(cuid())
   userId String @unique
@@ -135,7 +132,6 @@ model FamilyMember {
 }
 
 // NDIS Participants
-
 model Participant {
   id String @id @default(cuid())
 
@@ -158,7 +154,7 @@ model Participant {
   ndisNumber         String   @unique
   planStartDate      DateTime
   planEndDate        DateTime
-  planBudget         Decimal  @db.Decimal(10, 2) @default(0)
+  planBudget Decimal @db.Decimal(10, 2) @default(0)
   planManager        String?
   supportCoordinator String?
 
@@ -188,7 +184,6 @@ model Participant {
 }
 
 // Many-to-many relationship between Participants and Family Members
-
 model ParticipantFamily {
   id            String       @id @default(cuid())
   participantId String
@@ -208,7 +203,6 @@ model ParticipantFamily {
 }
 
 // Many-to-many relationship between Staff and Participants
-
 model ParticipantStaff {
   id            String      @id @default(cuid())
   participantId String
@@ -227,7 +221,6 @@ model ParticipantStaff {
 }
 
 // Service delivery records
-
 model ServiceRecord {
   id            String      @id @default(cuid())
   participantId String

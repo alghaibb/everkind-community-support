@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { getServerSession } from "@/lib/get-session";
-import { redirect } from "next/navigation";
+import { forbidden, unauthorized } from "next/navigation";
 import AnalyticsPageClient from "./_components/AnalyticsPageClient";
 
 export const metadata: Metadata = {
@@ -11,9 +11,14 @@ export const metadata: Metadata = {
 
 export default async function AnalyticsPage() {
   const session = await getServerSession();
+  const user = session?.user;
 
-  if (!session || session.user.role !== "ADMIN") {
-    redirect("/unauthorized");
+  if (!user) {
+    return unauthorized();
+  }
+
+  if (user.userType !== "INTERNAL" || user.role !== "ADMIN") {
+    return forbidden();
   }
 
   return (

@@ -16,6 +16,11 @@ type ModalType =
   | typeof MODAL_TYPES.EDIT_PARTICIPANT
   | typeof MODAL_TYPES.VIEW_PARTICIPANT
   | typeof MODAL_TYPES.DELETE_PARTICIPANT
+  | typeof MODAL_TYPES.VIEW_USER
+  | typeof MODAL_TYPES.EDIT_USER
+  | typeof MODAL_TYPES.DELETE_USER
+  | typeof MODAL_TYPES.BAN_USER
+  | typeof MODAL_TYPES.REVOKE_SESSIONS
   | null;
 
 interface ModalData {

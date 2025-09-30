@@ -7,6 +7,7 @@ import {
   ContactMessagesApiResponse,
   StaffResponse,
   ParticipantsResponse,
+  UsersResponse,
 } from "@/types/admin";
 import { ApplicationStatus } from "@/generated/prisma";
 import { env } from "@/lib/env";
@@ -48,6 +49,13 @@ export const adminQueryKeys = {
     supportCoordinator?: string;
   }) => [...adminQueryKeys.participants(), "list", params] as const,
   analytics: () => [...adminQueryKeys.all, "analytics"] as const,
+  users: () => [...adminQueryKeys.all, "users"] as const,
+  usersList: (params: {
+    search?: string;
+    role?: string;
+    userType?: string;
+    status?: string;
+  }) => [...adminQueryKeys.users(), "list", params] as const,
 } as const;
 
 // Helper function to get base URL for fetch requests
@@ -334,5 +342,44 @@ export function useAnalytics() {
     queryFn: fetchAnalytics,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
+  });
+}
+
+// Users queries
+async function fetchUsers(params: {
+  search?: string;
+  role?: string;
+  userType?: string;
+  status?: string;
+}): Promise<UsersResponse> {
+  const searchParams = new URLSearchParams();
+
+  if (params.search) searchParams.set("search", params.search);
+  if (params.role) searchParams.set("role", params.role);
+  if (params.userType) searchParams.set("userType", params.userType);
+  if (params.status) searchParams.set("status", params.status);
+
+  const response = await fetch(
+    `${getBaseUrl()}/api/admin/users?${searchParams.toString()}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch users");
+  }
+
+  return response.json();
+}
+
+export function useUsersList(params: {
+  search?: string;
+  role?: string;
+  userType?: string;
+  status?: string;
+}) {
+  return useQuery({
+    queryKey: adminQueryKeys.usersList(params),
+    queryFn: () => fetchUsers(params),
+    staleTime: 2 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
   });
 }

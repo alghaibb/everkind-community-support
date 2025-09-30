@@ -579,3 +579,140 @@ export function useDeleteParticipant() {
     },
   });
 }
+
+// Custom Email Verification Toggle (Not available in Better Auth)
+export function useToggleEmailVerification() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const { toggleEmailVerification } = await import(
+        "@/app/(main)/admin/users/actions"
+      );
+      const result = await toggleEmailVerification(userId);
+      if (!result.success) {
+        throw new Error(result.error || "Failed to toggle email verification");
+      }
+      return result;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({
+        queryKey: adminQueryKeys.usersList({}),
+      });
+    },
+    onError: (error) => {
+      console.error("Error toggling email verification:", error);
+      toast.error("Failed to toggle email verification");
+    },
+  });
+}
+
+// Custom User Management Mutations (Working versions)
+export function useUpdateUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: {
+      id: string;
+      name: string;
+      email: string;
+      emailVerified: boolean;
+      role?: "ADMIN" | "STAFF";
+    }) => {
+      const { updateUser } = await import("@/app/(main)/admin/users/actions");
+      const result = await updateUser(data);
+      if (!result.success) {
+        throw new Error(result.error || "Failed to update user");
+      }
+      return result.user;
+    },
+    onSuccess: () => {
+      toast.success("User updated successfully");
+      queryClient.invalidateQueries({
+        queryKey: adminQueryKeys.usersList({}),
+      });
+    },
+    onError: (error) => {
+      console.error("Error updating user:", error);
+      toast.error("Failed to update user");
+    },
+  });
+}
+
+export function useDeleteUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const { deleteUser } = await import("@/app/(main)/admin/users/actions");
+      const result = await deleteUser(userId);
+      if (!result.success) {
+        throw new Error(result.error || "Failed to delete user");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      toast.success("User deleted successfully");
+      queryClient.invalidateQueries({
+        queryKey: adminQueryKeys.usersList({}),
+      });
+    },
+    onError: (error) => {
+      console.error("Error deleting user:", error);
+      toast.error("Failed to delete user");
+    },
+  });
+}
+
+export function useBanUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { id: string; reason: string }) => {
+      const { banUser } = await import("@/app/(main)/admin/users/actions");
+      const result = await banUser(data);
+      if (!result.success) {
+        throw new Error(result.error || "Failed to ban user");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      toast.success("User banned successfully");
+      queryClient.invalidateQueries({
+        queryKey: adminQueryKeys.usersList({}),
+      });
+    },
+    onError: (error) => {
+      console.error("Error banning user:", error);
+      toast.error("Failed to ban user");
+    },
+  });
+}
+
+export function useRevokeUserSessions() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const { revokeUserSessions } = await import(
+        "@/app/(main)/admin/users/actions"
+      );
+      const result = await revokeUserSessions(userId);
+      if (!result.success) {
+        throw new Error(result.error || "Failed to revoke sessions");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      toast.success("User sessions revoked successfully");
+      queryClient.invalidateQueries({
+        queryKey: adminQueryKeys.usersList({}),
+      });
+    },
+    onError: (error) => {
+      console.error("Error revoking sessions:", error);
+      toast.error("Failed to revoke sessions");
+    },
+  });
+}
