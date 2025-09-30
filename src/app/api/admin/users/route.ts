@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Process users to add computed fields
-    const processedUsers: AdminUser[] = users.map((user) => {
+    const processedUsers = users.map((user) => {
       const lastSession = user.sessions[0];
       const isActive = lastSession
         ? lastSession.updatedAt > thirtyDaysAgo
