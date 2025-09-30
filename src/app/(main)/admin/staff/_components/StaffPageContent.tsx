@@ -49,9 +49,9 @@ export function StaffPageContent() {
       <StaffStats stats={data.stats} />
       <StaffSearch />
       <StaffTable
-        staff={data.staff}
-        totalPages={data.totalPages}
-        currentPage={data.currentPage}
+        staff={data.staff || []}
+        totalPages={data.totalPages || 1}
+        currentPage={data.currentPage || 1}
       />
     </div>
   );

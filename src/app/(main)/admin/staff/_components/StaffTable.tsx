@@ -94,9 +94,7 @@ export default function StaffTable({
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="space-y-1">
-                <div className="font-medium">
-                  {staffMember.user.name}
-                </div>
+                <div className="font-medium">{staffMember.user.name}</div>
                 <div className="flex flex-wrap gap-1">
                   <Badge
                     variant="secondary"
