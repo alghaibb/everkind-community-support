@@ -67,6 +67,8 @@ export async function GET(request: NextRequest) {
           address: true,
           hourlyRate: true,
           isActive: true,
+          ndisModules: true,
+          certificates: true,
           createdAt: true,
           updatedAt: true,
           user: {
