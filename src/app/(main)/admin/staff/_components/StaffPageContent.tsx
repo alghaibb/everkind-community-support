@@ -14,7 +14,7 @@ export function StaffPageContent() {
   const status = searchParams.get("status");
   const page = parseInt(searchParams.get("page") || "1");
 
-  const { data, isLoading } = useStaffList({
+  const { data, isLoading, error } = useStaffList({
     search: search || undefined,
     role: role || undefined,
     status: status || undefined,
@@ -23,6 +23,18 @@ export function StaffPageContent() {
 
   if (isLoading || !data || !data.staff || !data.stats) {
     return <StaffTableSkeleton />;
+  }
+
+  if (error) {
+    console.error("Staff list error:", error);
+    return (
+      <div className="text-center py-8">
+        <p className="text-destructive">Failed to load staff data</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          {error instanceof Error ? error.message : "Unknown error"}
+        </p>
+      </div>
+    );
   }
 
   return (

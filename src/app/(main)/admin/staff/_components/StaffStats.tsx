@@ -17,6 +17,9 @@ interface StaffStatsProps {
 }
 
 export default function StaffStats({ stats }: StaffStatsProps) {
+  // Ensure byRole exists and is an array
+  const byRole = Array.isArray(stats?.byRole) ? stats.byRole : [];
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {/* Total Staff */}
@@ -63,7 +66,7 @@ export default function StaffStats({ stats }: StaffStatsProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {stats.byRole?.map((roleData) => {
+            {byRole.map((roleData) => {
               const roleName =
                 roleData.role?.replace("_", " ") || "Unknown Role";
               return (
@@ -81,7 +84,7 @@ export default function StaffStats({ stats }: StaffStatsProps) {
                 </div>
               );
             })}
-            {(!stats.byRole || stats.byRole.length === 0) && (
+            {byRole.length === 0 && (
               <p className="text-xs text-muted-foreground">No staff yet</p>
             )}
           </div>
