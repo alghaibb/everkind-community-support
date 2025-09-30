@@ -55,7 +55,20 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: "desc" },
         skip,
         take: pageSize,
-        include: {
+        select: {
+          id: true,
+          staffRole: true,
+          employeeId: true,
+          startDate: true,
+          endDate: true,
+          phone: true,
+          emergencyContact: true,
+          emergencyPhone: true,
+          address: true,
+          hourlyRate: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
           user: {
             select: {
               name: true,

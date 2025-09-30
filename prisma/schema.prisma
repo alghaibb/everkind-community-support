@@ -52,6 +52,11 @@ model User {
   staffProfile  Staff?
   familyProfile FamilyMember?
 
+  @@index([email])
+  @@index([role])
+  @@index([userType])
+  @@index([createdAt(sort: Desc)])
+  @@index([role, userType])
   @@map("user")
 }
 
@@ -104,6 +109,10 @@ model Staff {
   assignedParticipants ParticipantStaff[]
   serviceRecords       ServiceRecord[]
 
+  @@index([staffRole])
+  @@index([isActive])
+  @@index([createdAt(sort: Desc)])
+  @@index([staffRole, isActive])
   @@map("staff")
 }
 
@@ -184,6 +193,10 @@ model Participant {
   familyMembers  ParticipantFamily[]
   serviceRecords ServiceRecord[]
 
+  @@index([status])
+  @@index([supportCoordinator])
+  @@index([createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
   @@map("participant")
 }
 

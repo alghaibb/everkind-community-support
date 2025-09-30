@@ -81,22 +81,12 @@ export async function GET(request: NextRequest) {
     });
 
     // Convert Decimal objects to plain numbers for client serialization
-    const serializedParticipants = participants.map((participant) => {
-      const serialized = {
-        ...participant,
-        planBudget: participant.planBudget
-          ? Number(participant.planBudget)
-          : null,
-      };
-      // Debug: Ensure planBudget is not a Decimal object
-      if (serialized.planBudget && typeof serialized.planBudget === "object") {
-        console.error(
-          "planBudget is still a Decimal object:",
-          serialized.planBudget
-        );
-      }
-      return serialized;
-    });
+    const serializedParticipants = participants.map((participant) => ({
+      ...participant,
+      planBudget: participant.planBudget
+        ? Number(participant.planBudget)
+        : null,
+    }));
 
     return NextResponse.json({
       participants: serializedParticipants,
