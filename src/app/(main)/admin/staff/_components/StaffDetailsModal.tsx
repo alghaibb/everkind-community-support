@@ -357,17 +357,17 @@ export default function StaffDetailsModal() {
           )}
 
           {/* NDIS Modules */}
-          {staff.ndisModules.length > 0 && (
+          {staff.ndisModules?.length > 0 && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                   <Award className="h-4 w-4" />
-                  NDIS Modules Completed ({staff.ndisModules.length})
+                  NDIS Modules Completed ({staff.ndisModules?.length || 0})
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="flex flex-wrap gap-1">
-                  {staff.ndisModules.map((module, index) => (
+                  {staff.ndisModules?.map((module, index) => (
                     <Badge key={index} variant="outline" className="text-xs">
                       {module}
                     </Badge>
@@ -378,17 +378,17 @@ export default function StaffDetailsModal() {
           )}
 
           {/* Documents */}
-          {staff.certificates.length > 0 && (
+          {staff.certificates?.length > 0 && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                   <FileText className="h-4 w-4" />
-                  Documents ({staff.certificates.length})
+                  Documents ({staff.certificates?.length || 0})
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-2">
-                  {staff.certificates.map((cert, index) => (
+                  {staff.certificates?.map((cert, index) => (
                     <div
                       key={index}
                       className="flex items-center gap-2 text-sm"
