@@ -21,7 +21,7 @@ export function StaffPageContent() {
     page,
   });
 
-  if (isLoading || !data) {
+  if (isLoading || !data || !data.staff || !data.stats) {
     return <StaffTableSkeleton />;
   }
 
