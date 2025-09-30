@@ -100,8 +100,10 @@ async function main() {
   console.log(`✅ Created ${contactMessages.length} sample contact messages`);
 
   // Create sample career submission
-  await prisma.careerSubmission.create({
-    data: {
+  await prisma.careerSubmission.upsert({
+    where: { email: "sarah.johnson.career@example.com" },
+    update: {},
+    create: {
       role: "Support Worker",
       firstName: "Sarah",
       lastName: "Johnson",
