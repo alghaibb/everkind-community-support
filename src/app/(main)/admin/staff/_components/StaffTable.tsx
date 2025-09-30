@@ -51,6 +51,9 @@ export default function StaffTable({
   const { onOpen } = useModal();
   const toggleStatusMutation = useToggleStaffStatus();
 
+  // Ensure staff is always an array
+  const safeStaff = Array.isArray(staff) ? staff : [];
+
   const handleViewDetails = (staffMember: StaffMember) => {
     onOpen(MODAL_TYPES.VIEW_STAFF, { staff: staffMember });
   };
@@ -67,7 +70,7 @@ export default function StaffTable({
     return role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
-  if (staff.length === 0) {
+  if (safeStaff.length === 0) {
     return (
       <div className="text-center py-8">
         <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -83,7 +86,7 @@ export default function StaffTable({
     <>
       {/* Mobile Card View */}
       <div className="block md:hidden space-y-4">
-        {staff.map((staffMember) => (
+        {safeStaff.map((staffMember) => (
           <div
             key={staffMember.id}
             className="rounded-lg border bg-card p-4 space-y-3"
@@ -211,7 +214,7 @@ export default function StaffTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {staff.map((staffMember) => (
+              {safeStaff.map((staffMember) => (
                 <TableRow key={staffMember.id}>
                   <TableCell>
                     <div className="space-y-1">
