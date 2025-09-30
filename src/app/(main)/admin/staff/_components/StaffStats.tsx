@@ -63,7 +63,7 @@ export default function StaffStats({ stats }: StaffStatsProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {stats.byRole.map((roleData) => {
+            {stats.byRole?.map((roleData) => {
               const roleName =
                 roleData.role?.replace("_", " ") || "Unknown Role";
               return (
@@ -81,7 +81,7 @@ export default function StaffStats({ stats }: StaffStatsProps) {
                 </div>
               );
             })}
-            {stats.byRole.length === 0 && (
+            {(!stats.byRole || stats.byRole.length === 0) && (
               <p className="text-xs text-muted-foreground">No staff yet</p>
             )}
           </div>
