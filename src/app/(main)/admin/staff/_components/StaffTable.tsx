@@ -190,7 +190,7 @@ export default function StaffTable({
                 })}
               </div>
               <div className="text-xs text-muted-foreground">
-                {staffMember.ndisModules.length} NDIS modules completed
+                {staffMember.ndisModules?.length || 0} NDIS modules completed
               </div>
             </div>
           </div>
