@@ -158,7 +158,7 @@ export function SchedulingCalendar() {
         <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Today's Appointments</CardTitle>
+              <CardTitle>Today&apos;s Appointments</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {isLoadingToday ? (

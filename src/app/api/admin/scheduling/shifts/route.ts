@@ -4,6 +4,25 @@ import { User } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { Prisma, ShiftStatus } from "@/generated/prisma";
 
+interface StaffShiftAccumulator {
+  id: string;
+  staffName: string;
+  role: string;
+  employeeId: string | null;
+  isActive: boolean;
+  shifts: Array<{
+    id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    duration: number;
+    durationHours: number;
+    status: string;
+    notes: string | null;
+  }>;
+  totalHours: number;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
@@ -110,7 +129,7 @@ export async function GET(request: NextRequest) {
 
     // Group shifts by staff member for easier display
     const staffShifts = shifts.reduce(
-      (acc, shift) => {
+      (acc: Record<string, StaffShiftAccumulator>, shift) => {
         const staffId = shift.staff.id;
 
         if (!acc[staffId]) {
@@ -146,7 +165,7 @@ export async function GET(request: NextRequest) {
 
         return acc;
       },
-      {} as Record<string, any>
+      {} as Record<string, StaffShiftAccumulator>
     );
 
     const staffShiftsArray = Object.values(staffShifts);

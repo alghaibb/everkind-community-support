@@ -17,9 +17,49 @@ import { SchedulingCalendar } from "./SchedulingCalendar";
 import { StaffRoster } from "./StaffRoster";
 import { AppointmentsTable } from "./AppointmentsTable";
 import { ServiceTracking } from "./ServiceTracking";
+import { SchedulingSkeleton } from "./SchedulingSkeleton";
+import {
+  useTodayAppointments,
+  useStaffShifts,
+  useServiceLogs,
+} from "@/lib/queries/admin-queries";
 
 export function SchedulingPageContent() {
   const [activeTab, setActiveTab] = useState("calendar");
+
+  // Get real data for stats
+  const { data: todayAppointments, isLoading: loadingToday } =
+    useTodayAppointments();
+  const { data: currentWeekStaff, isLoading: loadingStaff } = useStaffShifts(
+    "",
+    "current"
+  );
+  const { data: todayServices, isLoading: loadingServices } = useServiceLogs(
+    "",
+    "",
+    1
+  );
+
+  // Show skeleton while loading
+  const isLoading = loadingToday || loadingStaff || loadingServices;
+
+  // Calculate stats from real data
+  const todayStats = todayAppointments?.appointments || [];
+  const staffStats = currentWeekStaff?.stats;
+  const serviceStats = todayServices?.stats;
+
+  // Calculate today's service hours (from completed services today)
+  const todayServiceHours =
+    todayServices?.serviceLogs
+      .filter((log) => {
+        const today = new Date().toISOString().split("T")[0];
+        return log.serviceDate === today && log.status === "COMPLETED";
+      })
+      .reduce((total, log) => total + Number(log.actualHours), 0) || 0;
+
+  if (isLoading) {
+    return <SchedulingSkeleton />;
+  }
 
   return (
     <div className="space-y-6">
@@ -48,28 +88,33 @@ export function SchedulingPageContent() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Today's Appointments
+              Today&apos;s Appointments
             </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
+            <div className="text-2xl font-bold">{todayStats.length}</div>
             <p className="text-xs text-muted-foreground">
-              8 completed, 16 pending
+              {todayStats.filter((a) => a.status === "CONFIRMED").length}{" "}
+              confirmed,{" "}
+              {todayStats.filter((a) => a.status === "PENDING").length}{" "}
+              pending
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Active Staff Today
+              Active Staff This Week
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">
+              {staffStats?.totalStaff || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
-              6 on shift, 6 available
+              Staff scheduled this week
             </p>
           </CardContent>
         </Card>
@@ -81,8 +126,12 @@ export function SchedulingPageContent() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">156</div>
-            <p className="text-xs text-muted-foreground">+12% from yesterday</p>
+            <div className="text-2xl font-bold">
+              {todayServiceHours.toFixed(1)}h
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Completed services today
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -93,8 +142,12 @@ export function SchedulingPageContent() {
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18</div>
-            <p className="text-xs text-muted-foreground">75% completion rate</p>
+            <div className="text-2xl font-bold">
+              {serviceStats?.completed || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Services completed this week
+            </p>
           </CardContent>
         </Card>
       </div>
