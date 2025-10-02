@@ -87,31 +87,31 @@ export function SchedulingCalendar() {
   return (
     <div className="space-y-4">
       {/* Calendar Controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+        <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
           <div className="flex-1 max-w-md">
             <SearchInput placeholder="Search appointments..." />
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm">
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
               Today
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
               <ChevronRight className="h-4 w-4" />
             </Button>
-            <span className="font-semibold text-lg">
-              {date ? format(date, "MMMM yyyy") : "Select date"}
+            <span className="font-semibold text-sm sm:text-lg whitespace-nowrap">
+              {date ? format(date, "MMM yyyy") : "Select date"}
             </span>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
           <Select value={view} onValueChange={handleViewChange}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-24 sm:w-32">
               <Filter className="h-4 w-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
@@ -123,13 +123,18 @@ export function SchedulingCalendar() {
           </Select>
 
           {hasActiveFilters && (
-            <Button variant="outline" onClick={handleClearFilters} size="sm">
+            <Button
+              variant="outline"
+              onClick={handleClearFilters}
+              size="sm"
+              className="flex-shrink-0"
+            >
               <XIcon className="h-4 w-4 mr-2" />
               Clear
             </Button>
           )}
 
-          <Button>
+          <Button className="flex-1 sm:flex-none">
             <Plus className="h-4 w-4 mr-2" />
             New Appointment
           </Button>

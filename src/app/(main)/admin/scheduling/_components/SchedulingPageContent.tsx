@@ -63,20 +63,22 @@ export function SchedulingPageContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Scheduling</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Scheduling
+          </h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Manage staff schedules, participant appointments, and service
             delivery
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
             <Filter className="h-4 w-4 mr-2" />
             Filter
           </Button>
-          <Button size="sm">
+          <Button size="sm" className="flex-1 sm:flex-none">
             <Plus className="h-4 w-4 mr-2" />
             New Appointment
           </Button>
@@ -84,7 +86,7 @@ export function SchedulingPageContent() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -157,24 +159,42 @@ export function SchedulingPageContent() {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="calendar" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Calendar
-          </TabsTrigger>
-          <TabsTrigger value="roster" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Staff Roster
-          </TabsTrigger>
-          <TabsTrigger value="appointments" className="flex items-center gap-2">
-            <UserCheck className="h-4 w-4" />
-            Appointments
-          </TabsTrigger>
-          <TabsTrigger value="tracking" className="flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            Service Tracking
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex overflow-x-auto">
+          <TabsList className="inline-flex w-full min-w-max">
+            <TabsTrigger
+              value="calendar"
+              className="flex items-center gap-2 whitespace-nowrap"
+            >
+              <Calendar className="h-4 w-4" />
+              <span className="hidden sm:inline">Calendar</span>
+              <span className="sm:hidden">Calendar</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="roster"
+              className="flex items-center gap-2 whitespace-nowrap"
+            >
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">Staff Roster</span>
+              <span className="sm:hidden">Roster</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="appointments"
+              className="flex items-center gap-2 whitespace-nowrap"
+            >
+              <UserCheck className="h-4 w-4" />
+              <span className="hidden sm:inline">Appointments</span>
+              <span className="sm:hidden">Appts</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="tracking"
+              className="flex items-center gap-2 whitespace-nowrap"
+            >
+              <Activity className="h-4 w-4" />
+              <span className="hidden sm:inline">Service Tracking</span>
+              <span className="sm:hidden">Tracking</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="calendar" className="space-y-4">
           <SchedulingCalendar />
