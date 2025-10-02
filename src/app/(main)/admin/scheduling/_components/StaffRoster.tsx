@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SearchInput } from "@/components/ui/search-input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
@@ -27,63 +28,76 @@ import {
   Calendar,
   User,
   CheckCircle,
-  XCircle,
+  Filter,
+  X as XIcon,
 } from "lucide-react";
+import { useStaffShifts } from "@/lib/queries/admin-queries";
 
 export function StaffRoster() {
-  const [selectedWeek, setSelectedWeek] = useState("current");
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Mock data - replace with real data from API
-  const staffShifts = [
-    {
-      id: "1",
-      staffName: "Sarah Johnson",
-      role: "Support Worker",
-      avatar: "",
-      shifts: [
-        { day: "Mon", start: "09:00", end: "17:00", status: "scheduled" },
-        { day: "Tue", start: "09:00", end: "17:00", status: "scheduled" },
-        { day: "Wed", start: null, end: null, status: "off" },
-        { day: "Thu", start: "09:00", end: "17:00", status: "scheduled" },
-        { day: "Fri", start: "09:00", end: "15:00", status: "scheduled" },
-        { day: "Sat", start: null, end: null, status: "off" },
-        { day: "Sun", start: null, end: null, status: "off" },
-      ],
-      totalHours: 32,
-    },
-    {
-      id: "2",
-      staffName: "Mike Wilson",
-      role: "Coordinator",
-      avatar: "",
-      shifts: [
-        { day: "Mon", start: "08:00", end: "16:00", status: "scheduled" },
-        { day: "Tue", start: "08:00", end: "16:00", status: "scheduled" },
-        { day: "Wed", start: "08:00", end: "16:00", status: "scheduled" },
-        { day: "Thu", start: "08:00", end: "16:00", status: "scheduled" },
-        { day: "Fri", start: "08:00", end: "16:00", status: "scheduled" },
-        { day: "Sat", start: null, end: null, status: "off" },
-        { day: "Sun", start: null, end: null, status: "off" },
-      ],
-      totalHours: 40,
-    },
-    {
-      id: "3",
-      staffName: "Lisa Chen",
-      role: "Support Worker",
-      avatar: "",
-      shifts: [
-        { day: "Mon", start: null, end: null, status: "leave" },
-        { day: "Tue", start: null, end: null, status: "leave" },
-        { day: "Wed", start: "10:00", end: "18:00", status: "scheduled" },
-        { day: "Thu", start: "10:00", end: "18:00", status: "scheduled" },
-        { day: "Fri", start: "10:00", end: "18:00", status: "scheduled" },
-        { day: "Sat", start: "09:00", end: "17:00", status: "scheduled" },
-        { day: "Sun", start: "09:00", end: "17:00", status: "scheduled" },
-      ],
-      totalHours: 28,
-    },
-  ];
+  const selectedWeek = searchParams.get("week") || "current";
+  const searchTerm = searchParams.get("search") || "";
+
+  const handleWeekChange = (newWeek: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (newWeek && newWeek !== "current") {
+      params.set("week", newWeek);
+    } else {
+      params.delete("week");
+    }
+
+    router.push(`/admin/scheduling?${params.toString()}`, { scroll: false });
+  };
+
+  const handleClearFilters = () => {
+    router.push("/admin/scheduling", { scroll: false });
+  };
+
+  const hasActiveFilters =
+    searchParams.get("search") || (selectedWeek && selectedWeek !== "current");
+
+  // Use real data from API
+  const { data, isLoading, error } = useStaffShifts(searchTerm, selectedWeek);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex-1 max-w-md">
+            <div className="h-9 bg-muted animate-pulse rounded" />
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="h-9 w-32 bg-muted animate-pulse rounded" />
+          </div>
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-16 bg-muted animate-pulse rounded" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-destructive">Failed to load staff shifts</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          {error instanceof Error ? error.message : "Unknown error"}
+        </p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const { staffShifts, stats } = data;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -110,9 +124,13 @@ export function StaffRoster() {
     <div className="space-y-4">
       {/* Controls */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+        <div className="flex items-center space-x-4">
+          <div className="flex-1 max-w-md">
+            <SearchInput placeholder="Search staff..." />
+          </div>
+          <Select value={selectedWeek} onValueChange={handleWeekChange}>
             <SelectTrigger className="w-48">
+              <Filter className="h-4 w-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -121,6 +139,18 @@ export function StaffRoster() {
               <SelectItem value="next">Next Week</SelectItem>
             </SelectContent>
           </Select>
+
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              onClick={handleClearFilters}
+              className="flex-shrink-0"
+            >
+              <XIcon className="h-4 w-4 mr-2" />
+              Clear
+            </Button>
+          )}
+
           <Button variant="outline" size="sm">
             <Calendar className="h-4 w-4 mr-2" />
             Bulk Edit
@@ -142,7 +172,14 @@ export function StaffRoster() {
       {/* Roster Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Staff Roster - {selectedWeek === "current" ? "This Week" : selectedWeek === "previous" ? "Last Week" : "Next Week"}</CardTitle>
+          <CardTitle>
+            Staff Roster -{" "}
+            {selectedWeek === "current"
+              ? "This Week"
+              : selectedWeek === "previous"
+                ? "Last Week"
+                : "Next Week"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -167,8 +204,9 @@ export function StaffRoster() {
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={staff.avatar} />
-                        <AvatarFallback>{getInitials(staff.staffName)}</AvatarFallback>
+                        <AvatarFallback>
+                          {getInitials(staff.staffName)}
+                        </AvatarFallback>
                       </Avatar>
                       <span className="font-medium">{staff.staffName}</span>
                     </div>
@@ -176,9 +214,11 @@ export function StaffRoster() {
                   <TableCell>{staff.role}</TableCell>
                   {staff.shifts.map((shift, index) => (
                     <TableCell key={index}>
-                      {shift.start && shift.end ? (
+                      {shift.startTime && shift.endTime ? (
                         <div className="text-xs">
-                          <div>{shift.start} - {shift.end}</div>
+                          <div>
+                            {shift.startTime} - {shift.endTime}
+                          </div>
                           <Badge
                             variant="secondary"
                             className={getStatusColor(shift.status)}
@@ -215,32 +255,38 @@ export function StaffRoster() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Staff Hours</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Staff Hours
+            </CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">100</div>
+            <div className="text-2xl font-bold">{stats.totalHours}</div>
             <p className="text-xs text-muted-foreground">This week</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Staff Coverage</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Staff Coverage
+            </CardTitle>
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">95%</div>
-            <p className="text-xs text-muted-foreground">All shifts covered</p>
+            <div className="text-2xl font-bold">{stats.totalStaff}</div>
+            <p className="text-xs text-muted-foreground">Active staff</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Leave Requests</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Leave Requests
+            </CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">Pending approval</p>
+            <div className="text-2xl font-bold">{stats.scheduledShifts}</div>
+            <p className="text-xs text-muted-foreground">Scheduled shifts</p>
           </CardContent>
         </Card>
       </div>

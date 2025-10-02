@@ -27,7 +27,8 @@ export function SchedulingPageContent() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Scheduling</h1>
           <p className="text-muted-foreground">
-            Manage staff schedules, participant appointments, and service delivery
+            Manage staff schedules, participant appointments, and service
+            delivery
           </p>
         </div>
         <div className="flex items-center space-x-2">
@@ -46,27 +47,37 @@ export function SchedulingPageContent() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Today's Appointments</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Today's Appointments
+            </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">8 completed, 16 pending</p>
+            <p className="text-xs text-muted-foreground">
+              8 completed, 16 pending
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Staff Today</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Staff Today
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">6 on shift, 6 available</p>
+            <p className="text-xs text-muted-foreground">
+              6 on shift, 6 available
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Service Hours Today</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Service Hours Today
+            </CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -76,7 +87,9 @@ export function SchedulingPageContent() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed Services</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Completed Services
+            </CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -87,7 +100,11 @@ export function SchedulingPageContent() {
       </div>
 
       {/* Main Scheduling Interface */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-4"
+      >
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="calendar" className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />

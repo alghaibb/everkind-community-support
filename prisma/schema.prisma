@@ -108,6 +108,9 @@ model Staff {
   // Relations
   assignedParticipants ParticipantStaff[]
   serviceRecords       ServiceRecord[]
+  staffShifts          StaffShift[]
+  appointments         Appointment[]
+  serviceLogs          ServiceLog[]
 
   @@index([staffRole])
   @@index([isActive])
@@ -192,6 +195,8 @@ model Participant {
   assignedStaff  ParticipantStaff[]
   familyMembers  ParticipantFamily[]
   serviceRecords ServiceRecord[]
+  appointments   Appointment[]
+  serviceLogs    ServiceLog[]
 
   @@index([status])
   @@index([supportCoordinator])
@@ -371,4 +376,131 @@ model CareerSubmission {
   @@index([email])
   @@index([status, createdAt(sort: Desc)])
   @@map("career_submission")
+}
+
+// SCHEDULING MODELS
+
+enum ShiftStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentStatus {
+  CONFIRMED
+  PENDING
+  CANCELLED
+  COMPLETED
+}
+
+enum ServiceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model StaffShift {
+  id        String @id @default(cuid())
+  staffId   String
+  staff     Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  // Shift Details
+  shiftDate DateTime
+  startTime String // HH:mm format
+  endTime   String // HH:mm format
+  duration  Int // Minutes
+
+  // Status
+  status ShiftStatus @default(SCHEDULED)
+  notes  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([staffId])
+  @@index([shiftDate])
+  @@index([status])
+  @@index([shiftDate, staffId])
+  @@map("staff_shift")
+}
+
+model Appointment {
+  id            String @id @default(cuid())
+  participantId String
+  staffId       String?
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  staff         Staff?      @relation(fields: [staffId], references: [id], onDelete: SetNull)
+
+  // Appointment Details
+  appointmentDate DateTime
+  startTime       String // HH:mm format
+  endTime         String // HH:mm format
+  duration        Int // Minutes
+
+  // Service Information
+  serviceType String // e.g., "Personal Care Support", "Community Access", etc.
+  location    String // Where the service will be provided
+  notes       String? // Additional notes
+
+  // Status
+  status AppointmentStatus @default(PENDING)
+
+  // NDIS Compliance
+  ndisApproved Boolean @default(true) // Whether this service is NDIS approved
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  serviceLogs ServiceLog[]
+
+  @@index([participantId])
+  @@index([staffId])
+  @@index([appointmentDate])
+  @@index([status])
+  @@index([appointmentDate, participantId])
+  @@index([appointmentDate, staffId])
+  @@map("appointment")
+}
+
+model ServiceLog {
+  id            String @id @default(cuid())
+  appointmentId String
+  participantId String
+  staffId       String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  staff         Staff       @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  // Service Delivery Details
+  serviceDate DateTime
+  startTime   String? // HH:mm format
+  endTime     String? // HH:mm format
+  actualHours Decimal @db.Decimal(4, 2) // Actual hours delivered
+
+  // Service Information
+  serviceType String // Type of service delivered
+  description String // Detailed description of what was done
+  location    String // Where service was provided
+
+  // Status & Notes
+  status ServiceStatus @default(PENDING)
+  notes  String? // Additional notes about the service delivery
+
+  // NDIS Compliance
+  ndisApproved Boolean @default(true) // Whether service was NDIS approved
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([appointmentId])
+  @@index([participantId])
+  @@index([staffId])
+  @@index([serviceDate])
+  @@index([status])
+  @@index([serviceDate, participantId])
+  @@index([serviceDate, staffId])
+  @@map("service_log")
 }

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/ui/search-input";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -31,63 +33,88 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Search,
   Clock,
   CheckCircle,
   PlayCircle,
-  PauseCircle,
   FileText,
   User,
-  Calendar,
+  X as XIcon,
+  Filter,
 } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { useServiceLogs } from "@/lib/queries/admin-queries";
 
 export function ServiceTracking() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
 
-  // Mock data - replace with real data from API
-  const serviceLogs = [
-    {
-      id: "1",
-      participant: "John Smith",
-      service: "Personal Care Support",
-      staff: "Sarah Johnson",
-      date: "2025-10-02",
-      startTime: "09:00",
-      endTime: "11:00",
-      actualHours: 2,
-      status: "completed",
-      notes: "Assisted with morning routine, bathing, and dressing. Participant was cooperative and engaged well.",
-      ndisApproved: true,
-    },
-    {
-      id: "2",
-      participant: "Emma Davis",
-      service: "Community Access",
-      staff: "Mike Wilson",
-      date: "2025-10-02",
-      startTime: "13:00",
-      endTime: null,
-      actualHours: null,
-      status: "in-progress",
-      notes: "",
-      ndisApproved: true,
-    },
-    {
-      id: "3",
-      participant: "David Brown",
-      service: "Home Modifications",
-      staff: "Lisa Chen",
-      date: "2025-10-03",
-      startTime: "10:00",
-      endTime: "12:00",
-      actualHours: 2,
-      status: "completed",
-      notes: "Completed assessment of bathroom modifications. Provided recommendations for grab bars and shower chair.",
-      ndisApproved: false,
-    },
-  ];
+  const statusFilter = searchParams.get("status") || "all";
+
+  const handleStatusChange = (newStatus: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (newStatus && newStatus !== "all") {
+      params.set("status", newStatus);
+    } else {
+      params.delete("status");
+    }
+
+    // Reset to page 1 when filtering
+    params.set("page", "1");
+
+    router.push(`/admin/scheduling?${params.toString()}`, { scroll: false });
+  };
+
+  const handleClearFilters = () => {
+    router.push("/admin/scheduling", { scroll: false });
+  };
+
+  // Get search from URL params
+  const searchTerm = searchParams.get("search") || "";
+
+  const hasActiveFilters =
+    searchParams.get("search") || (statusFilter && statusFilter !== "all");
+
+  // Use real data from API
+  const { data, isLoading, error } = useServiceLogs(searchTerm, statusFilter);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex-1 max-w-md">
+            <div className="h-9 bg-muted animate-pulse rounded" />
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="h-9 w-32 bg-muted animate-pulse rounded" />
+          </div>
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-16 bg-muted animate-pulse rounded" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-destructive">Failed to load service logs</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          {error instanceof Error ? error.message : "Unknown error"}
+        </p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const { serviceLogs, stats } = data;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -104,17 +131,6 @@ export function ServiceTracking() {
     }
   };
 
-  const filteredLogs = serviceLogs.filter((log) => {
-    const matchesSearch =
-      log.participant.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.staff.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus = statusFilter === "all" || log.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
-
   const handleStartService = (logId: string) => {
     // Implement start service logic
     console.log("Starting service:", logId);
@@ -130,17 +146,12 @@ export function ServiceTracking() {
       {/* Controls */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search service logs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 w-64"
-            />
+          <div className="flex-1 max-w-md">
+            <SearchInput placeholder="Search service logs..." />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <Select value={statusFilter} onValueChange={handleStatusChange}>
             <SelectTrigger className="w-32">
+              <Filter className="h-4 w-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -151,6 +162,17 @@ export function ServiceTracking() {
               <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
+
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              onClick={handleClearFilters}
+              className="flex-shrink-0"
+            >
+              <XIcon className="h-4 w-4 mr-2" />
+              Clear
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center space-x-2">
@@ -169,14 +191,15 @@ export function ServiceTracking() {
               <DialogHeader>
                 <DialogTitle>Log Service Delivery</DialogTitle>
                 <DialogDescription>
-                  Record details of completed service delivery for NDIS compliance.
+                  Record details of completed service delivery for NDIS
+                  compliance.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="participant" className="text-right">
+                  <Label htmlFor="participant" className="text-right">
                     Participant
-                  </label>
+                  </Label>
                   <Select>
                     <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Select participant" />
@@ -189,24 +212,30 @@ export function ServiceTracking() {
                   </Select>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="service" className="text-right">
+                  <Label htmlFor="service" className="text-right">
                     Service
-                  </label>
+                  </Label>
                   <Select>
                     <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Select service" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="personal-care">Personal Care Support</SelectItem>
-                      <SelectItem value="community-access">Community Access</SelectItem>
-                      <SelectItem value="home-mod">Home Modifications</SelectItem>
+                      <SelectItem value="personal-care">
+                        Personal Care Support
+                      </SelectItem>
+                      <SelectItem value="community-access">
+                        Community Access
+                      </SelectItem>
+                      <SelectItem value="home-mod">
+                        Home Modifications
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="hours" className="text-right">
+                  <Label htmlFor="hours" className="text-right">
                     Hours
-                  </label>
+                  </Label>
                   <Input
                     id="hours"
                     type="number"
@@ -216,9 +245,9 @@ export function ServiceTracking() {
                   />
                 </div>
                 <div className="grid grid-cols-4 items-start gap-4">
-                  <label htmlFor="notes" className="text-right pt-2">
+                  <Label htmlFor="notes" className="text-right pt-2">
                     Notes
-                  </label>
+                  </Label>
                   <Textarea
                     id="notes"
                     placeholder="Describe the service delivered..."
@@ -257,18 +286,22 @@ export function ServiceTracking() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredLogs.map((log) => (
+              {serviceLogs.map((log) => (
                 <TableRow key={log.id}>
                   <TableCell>
-                    <div className="font-medium">{log.participant}</div>
+                    <div className="font-medium">{log.participant.name}</div>
                   </TableCell>
-                  <TableCell>{log.service}</TableCell>
-                  <TableCell>{log.staff}</TableCell>
-                  <TableCell>{log.date}</TableCell>
+                  <TableCell>{log.serviceType}</TableCell>
+                  <TableCell>{log.staff.name}</TableCell>
+                  <TableCell>{log.serviceDate}</TableCell>
                   <TableCell>
                     <div className="text-sm">
                       <div>{log.startTime}</div>
-                      {log.endTime && <div className="text-muted-foreground">to {log.endTime}</div>}
+                      {log.endTime && (
+                        <div className="text-muted-foreground">
+                          to {log.endTime}
+                        </div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -325,12 +358,14 @@ export function ServiceTracking() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Services</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Services
+            </CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{filteredLogs.length}</div>
-            <p className="text-xs text-muted-foreground">This week</p>
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground">Total services</p>
           </CardContent>
         </Card>
         <Card>
@@ -339,9 +374,7 @@ export function ServiceTracking() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {filteredLogs.filter((log) => log.status === "completed").length}
-            </div>
+            <div className="text-2xl font-bold">{stats.completed}</div>
             <p className="text-xs text-muted-foreground">Services delivered</p>
           </CardContent>
         </Card>
@@ -351,12 +384,7 @@ export function ServiceTracking() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {filteredLogs
-                .filter((log) => log.actualHours)
-                .reduce((total, log) => total + (log.actualHours || 0), 0)
-              }h
-            </div>
+            <div className="text-2xl font-bold">{stats.totalHours}h</div>
             <p className="text-xs text-muted-foreground">Delivered this week</p>
           </CardContent>
         </Card>
@@ -366,9 +394,7 @@ export function ServiceTracking() {
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {filteredLogs.filter((log) => log.ndisApproved).length}
-            </div>
+            <div className="text-2xl font-bold">{stats.ndisApproved}</div>
             <p className="text-xs text-muted-foreground">Approved services</p>
           </CardContent>
         </Card>

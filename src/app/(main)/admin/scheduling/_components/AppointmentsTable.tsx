@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/ui/search-input";
 import {
   Table,
   TableBody,
@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Plus,
-  Search,
   MoreHorizontal,
   Edit,
   Eye,
@@ -37,71 +36,81 @@ import {
   Clock,
   MapPin,
   User,
+  X as XIcon,
+  Filter,
 } from "lucide-react";
+import { useAppointments } from "@/lib/queries/admin-queries";
 
 export function AppointmentsTable() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Mock data - replace with real data from API
-  const appointments = [
-    {
-      id: "1",
-      participant: "John Smith",
-      service: "Personal Care Support",
-      staff: "Sarah Johnson",
-      date: "2025-10-02",
-      startTime: "09:00",
-      endTime: "11:00",
-      duration: "2h",
-      status: "confirmed",
-      type: "personal-care",
-      location: "Client Home",
-      notes: "Assistance with morning routine",
-    },
-    {
-      id: "2",
-      participant: "Emma Davis",
-      service: "Community Access",
-      staff: "Mike Wilson",
-      date: "2025-10-02",
-      startTime: "13:00",
-      endTime: "15:00",
-      duration: "2h",
-      status: "pending",
-      type: "community",
-      location: "Shopping Center",
-      notes: "Grocery shopping assistance",
-    },
-    {
-      id: "3",
-      participant: "David Brown",
-      service: "Home Modifications",
-      staff: "Lisa Chen",
-      date: "2025-10-03",
-      startTime: "10:00",
-      endTime: "12:00",
-      duration: "2h",
-      status: "confirmed",
-      type: "home-mod",
-      location: "Client Home",
-      notes: "Bathroom modifications assessment",
-    },
-    {
-      id: "4",
-      participant: "Maria Garcia",
-      service: "Daily Living Skills",
-      staff: "Sarah Johnson",
-      date: "2025-10-03",
-      startTime: "14:00",
-      endTime: "16:00",
-      duration: "2h",
-      status: "cancelled",
-      type: "daily-living",
-      location: "Client Home",
-      notes: "Cooking skills training",
-    },
-  ];
+  const statusFilter = searchParams.get("status") || "all";
+
+  const handleStatusChange = (newStatus: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (newStatus && newStatus !== "all") {
+      params.set("status", newStatus);
+    } else {
+      params.delete("status");
+    }
+
+    // Reset to page 1 when filtering
+    params.set("page", "1");
+
+    router.push(`/admin/scheduling?${params.toString()}`, { scroll: false });
+  };
+
+  const handleClearFilters = () => {
+    router.push("/admin/scheduling", { scroll: false });
+  };
+
+  const hasActiveFilters =
+    searchParams.get("search") || (statusFilter && statusFilter !== "all");
+
+  // Get search from URL params
+  const searchTerm = searchParams.get("search") || "";
+
+  // Use real data from API
+  const { data, isLoading, error } = useAppointments(searchTerm, statusFilter);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex-1 max-w-md">
+            <div className="h-9 bg-muted animate-pulse rounded" />
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="h-9 w-32 bg-muted animate-pulse rounded" />
+          </div>
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-16 bg-muted animate-pulse rounded" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-destructive">Failed to load appointments</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          {error instanceof Error ? error.message : "Unknown error"}
+        </p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const { appointments, stats } = data;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -133,33 +142,17 @@ export function AppointmentsTable() {
     }
   };
 
-  const filteredAppointments = appointments.filter((appointment) => {
-    const matchesSearch =
-      appointment.participant.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.staff.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
-
   return (
     <div className="space-y-4">
       {/* Controls */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search appointments..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 w-64"
-            />
+          <div className="flex-1 max-w-md">
+            <SearchInput placeholder="Search appointments..." />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <Select value={statusFilter} onValueChange={handleStatusChange}>
             <SelectTrigger className="w-32">
+              <Filter className="h-4 w-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -170,6 +163,17 @@ export function AppointmentsTable() {
               <SelectItem value="completed">Completed</SelectItem>
             </SelectContent>
           </Select>
+
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              onClick={handleClearFilters}
+              className="flex-shrink-0"
+            >
+              <XIcon className="h-4 w-4 mr-2" />
+              Clear
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center space-x-2">
@@ -204,29 +208,37 @@ export function AppointmentsTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredAppointments.map((appointment) => (
+              {appointments.map((appointment) => (
                 <TableRow key={appointment.id}>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <div
                         className={`w-3 h-3 rounded-full ${getServiceColor(
-                          appointment.type
+                          appointment.serviceType
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")
                         )}`}
                       />
-                      <span className="font-medium">{appointment.participant}</span>
+                      <span className="font-medium">
+                        {appointment.participant.name}
+                      </span>
                     </div>
                   </TableCell>
-                  <TableCell>{appointment.service}</TableCell>
-                  <TableCell>{appointment.staff}</TableCell>
+                  <TableCell>{appointment.serviceType}</TableCell>
+                  <TableCell>
+                    {appointment.staff?.name || "Unassigned"}
+                  </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      <div className="font-medium">{appointment.date}</div>
+                      <div className="font-medium">
+                        {appointment.appointmentDate}
+                      </div>
                       <div className="text-muted-foreground">
                         {appointment.startTime} - {appointment.endTime}
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>{appointment.duration}</TableCell>
+                  <TableCell>{appointment.duration}min</TableCell>
                   <TableCell>
                     <Badge
                       variant="secondary"
@@ -275,12 +287,14 @@ export function AppointmentsTable() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Appointments</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Appointments
+            </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{filteredAppointments.length}</div>
-            <p className="text-xs text-muted-foreground">This week</p>
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground">Total appointments</p>
           </CardContent>
         </Card>
         <Card>
@@ -289,9 +303,7 @@ export function AppointmentsTable() {
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {filteredAppointments.filter((a) => a.status === "confirmed").length}
-            </div>
+            <div className="text-2xl font-bold">{stats.confirmed}</div>
             <p className="text-xs text-muted-foreground">Ready to deliver</p>
           </CardContent>
         </Card>
@@ -301,10 +313,10 @@ export function AppointmentsTable() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {filteredAppointments.filter((a) => a.status === "pending").length}
-            </div>
-            <p className="text-xs text-muted-foreground">Awaiting confirmation</p>
+            <div className="text-2xl font-bold">{stats.pending}</div>
+            <p className="text-xs text-muted-foreground">
+              Awaiting confirmation
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -313,12 +325,7 @@ export function AppointmentsTable() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {filteredAppointments.reduce((total, appointment) => {
-                const duration = parseInt(appointment.duration.replace('h', ''));
-                return total + duration;
-              }, 0)}h
-            </div>
+            <div className="text-2xl font-bold">{stats.totalHours}h</div>
             <p className="text-xs text-muted-foreground">Scheduled this week</p>
           </CardContent>
         </Card>
