@@ -24,9 +24,5 @@ export default async function SchedulingPage() {
     return forbidden();
   }
 
-  return (
-    <Suspense fallback={<SchedulingSkeleton />}>
-      <SchedulingPageContent />
-    </Suspense>
-  );
+  return <SchedulingPageContent />;
 }

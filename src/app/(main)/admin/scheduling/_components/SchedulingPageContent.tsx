@@ -97,8 +97,7 @@ export function SchedulingPageContent() {
             <p className="text-xs text-muted-foreground">
               {todayStats.filter((a) => a.status === "CONFIRMED").length}{" "}
               confirmed,{" "}
-              {todayStats.filter((a) => a.status === "PENDING").length}{" "}
-              pending
+              {todayStats.filter((a) => a.status === "PENDING").length} pending
             </p>
           </CardContent>
         </Card>
