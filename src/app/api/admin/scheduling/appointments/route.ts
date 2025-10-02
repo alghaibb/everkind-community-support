@@ -63,17 +63,49 @@ export async function GET(request: NextRequest) {
     // Get total count for pagination
     const total = await prisma.appointment.count({ where });
 
+    // Calculate OVERALL stats (without filters) for dashboard display
+    const overallWhere: Prisma.AppointmentWhereInput = {};
+
+    // Add search filter to overall stats if present
+    if (search) {
+      overallWhere.OR = [
+        {
+          participant: {
+            OR: [
+              { firstName: { contains: search, mode: "insensitive" } },
+              { lastName: { contains: search, mode: "insensitive" } },
+              { preferredName: { contains: search, mode: "insensitive" } },
+              { ndisNumber: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        },
+        {
+          staff: {
+            user: {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { email: { contains: search, mode: "insensitive" } },
+              ],
+            },
+          },
+        },
+        { serviceType: { contains: search, mode: "insensitive" } },
+        { location: { contains: search, mode: "insensitive" } },
+        { notes: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
     // Calculate stats using database aggregations (more efficient)
     const statsPromises = [
-      // Count by status
+      // Count by status (overall)
       prisma.appointment.groupBy({
         by: ["status"],
-        where,
+        where: overallWhere,
         _count: { id: true },
       }),
-      // Sum of duration (in minutes, convert to hours)
+      // Sum of duration (in minutes, convert to hours) (overall)
       prisma.appointment.aggregate({
-        where,
+        where: overallWhere,
         _sum: { duration: true },
       }),
     ];
@@ -84,9 +116,9 @@ export async function GET(request: NextRequest) {
     const statusCounts = statusCountsResult as Array<{ status: AppointmentStatus; _count: { id: number } }>;
     const durationSum = durationSumResult as { _sum: { duration: number | null } };
 
-    // Build stats object
+    // Build stats object (always shows overall stats)
     const stats = {
-      total,
+      total: await prisma.appointment.count({ where: overallWhere }),
       confirmed: statusCounts.find(s => s.status === "CONFIRMED")?._count.id || 0,
       pending: statusCounts.find(s => s.status === "PENDING")?._count.id || 0,
       cancelled: statusCounts.find(s => s.status === "CANCELLED")?._count.id || 0,

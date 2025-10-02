@@ -64,22 +64,55 @@ export async function GET(request: NextRequest) {
     // Get total count for pagination
     const total = await prisma.serviceLog.count({ where });
 
+    // Calculate OVERALL stats (without status filter) for dashboard display
+    const overallWhere: Prisma.ServiceLogWhereInput = {};
+
+    // Add search filter to overall stats if present
+    if (search) {
+      overallWhere.OR = [
+        {
+          participant: {
+            OR: [
+              { firstName: { contains: search, mode: "insensitive" } },
+              { lastName: { contains: search, mode: "insensitive" } },
+              { preferredName: { contains: search, mode: "insensitive" } },
+              { ndisNumber: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        },
+        {
+          staff: {
+            user: {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { email: { contains: search, mode: "insensitive" } },
+              ],
+            },
+          },
+        },
+        { serviceType: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+        { location: { contains: search, mode: "insensitive" } },
+        { notes: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
     // Calculate stats using database aggregations (more efficient)
     const statsPromises = [
-      // Count by status
+      // Count by status (overall)
       prisma.serviceLog.groupBy({
         by: ["status"],
-        where,
+        where: overallWhere,
         _count: { id: true },
       }),
-      // Sum of actual hours
+      // Sum of actual hours (overall)
       prisma.serviceLog.aggregate({
-        where,
+        where: overallWhere,
         _sum: { actualHours: true },
       }),
-      // Count NDIS approved
+      // Count NDIS approved (overall)
       prisma.serviceLog.count({
-        where: { ...where, ndisApproved: true },
+        where: { ...overallWhere, ndisApproved: true },
       }),
     ];
 
@@ -90,9 +123,9 @@ export async function GET(request: NextRequest) {
     const hoursSum = hoursSumResult as { _sum: { actualHours: number | null } };
     const ndisApprovedCount = ndisApprovedCountResult as number;
 
-    // Build stats object
+    // Build stats object (always shows overall stats)
     const stats = {
-      total,
+      total: await prisma.serviceLog.count({ where: overallWhere }),
       pending: statusCounts.find(s => s.status === "PENDING")?._count.id || 0,
       inProgress: statusCounts.find(s => s.status === "IN_PROGRESS")?._count.id || 0,
       completed: statusCounts.find(s => s.status === "COMPLETED")?._count.id || 0,

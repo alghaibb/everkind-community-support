@@ -124,10 +124,14 @@ export async function GET(request: NextRequest) {
       prisma.staffShift.count({ where }),
     ];
 
-    const [statusCountsResult, uniqueStaffResult, totalShiftsResult] = await Promise.all(statsPromises);
+    const [statusCountsResult, uniqueStaffResult, totalShiftsResult] =
+      await Promise.all(statsPromises);
 
     // Type-safe extraction of results
-    const statusCounts = statusCountsResult as Array<{ status: ShiftStatus; _count: { id: number } }>;
+    const statusCounts = statusCountsResult as Array<{
+      status: ShiftStatus;
+      _count: { id: number };
+    }>;
     const uniqueStaff = uniqueStaffResult as Array<{ staffId: string }>;
     const totalShifts = totalShiftsResult as number;
     const uniqueStaffCount = uniqueStaff.length;
@@ -144,10 +148,14 @@ export async function GET(request: NextRequest) {
     const stats = {
       totalStaff: uniqueStaffCount,
       totalShifts,
-      scheduledShifts: statusCounts.find(s => s.status === "SCHEDULED")?._count.id || 0,
-      completedShifts: statusCounts.find(s => s.status === "COMPLETED")?._count.id || 0,
-      cancelledShifts: statusCounts.find(s => s.status === "CANCELLED")?._count.id || 0,
-      noShowShifts: statusCounts.find(s => s.status === "NO_SHOW")?._count.id || 0,
+      scheduledShifts:
+        statusCounts.find((s) => s.status === "SCHEDULED")?._count.id || 0,
+      completedShifts:
+        statusCounts.find((s) => s.status === "COMPLETED")?._count.id || 0,
+      cancelledShifts:
+        statusCounts.find((s) => s.status === "CANCELLED")?._count.id || 0,
+      noShowShifts:
+        statusCounts.find((s) => s.status === "NO_SHOW")?._count.id || 0,
       totalHours,
     };
 
@@ -235,7 +243,10 @@ export async function GET(request: NextRequest) {
 
     // Check for specific database connection errors
     if (error instanceof Error) {
-      if (error.message.includes("connection") || error.message.includes("pool")) {
+      if (
+        error.message.includes("connection") ||
+        error.message.includes("pool")
+      ) {
         console.error("Database connection error detected:", error.message);
         return NextResponse.json(
           { error: "Database connection error. Please try again." },
