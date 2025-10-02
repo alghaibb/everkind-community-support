@@ -61,13 +61,64 @@ export async function GET(request: NextRequest) {
       where.status = status as ServiceStatus;
     }
 
-    // Get total count
+    // Get total count for pagination
     const total = await prisma.serviceLog.count({ where });
 
-    // Get service logs with relations
+    // Calculate stats using database aggregations (more efficient)
+    const statsPromises = [
+      // Count by status
+      prisma.serviceLog.groupBy({
+        by: ["status"],
+        where,
+        _count: { id: true },
+      }),
+      // Sum of actual hours
+      prisma.serviceLog.aggregate({
+        where,
+        _sum: { actualHours: true },
+      }),
+      // Count NDIS approved
+      prisma.serviceLog.count({
+        where: { ...where, ndisApproved: true },
+      }),
+    ];
+
+    const [statusCountsResult, hoursSumResult, ndisApprovedCountResult] = await Promise.all(statsPromises);
+
+    // Type-safe extraction of results
+    const statusCounts = statusCountsResult as Array<{ status: ServiceStatus; _count: { id: number } }>;
+    const hoursSum = hoursSumResult as { _sum: { actualHours: number | null } };
+    const ndisApprovedCount = ndisApprovedCountResult as number;
+
+    // Build stats object
+    const stats = {
+      total,
+      pending: statusCounts.find(s => s.status === "PENDING")?._count.id || 0,
+      inProgress: statusCounts.find(s => s.status === "IN_PROGRESS")?._count.id || 0,
+      completed: statusCounts.find(s => s.status === "COMPLETED")?._count.id || 0,
+      cancelled: statusCounts.find(s => s.status === "CANCELLED")?._count.id || 0,
+      totalHours: Number(hoursSum._sum.actualHours || 0),
+      ndisApproved: ndisApprovedCount,
+    };
+
+    // Get service logs with optimized includes
     const serviceLogs = await prisma.serviceLog.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        appointmentId: true,
+        serviceDate: true,
+        startTime: true,
+        endTime: true,
+        actualHours: true,
+        serviceType: true,
+        description: true,
+        location: true,
+        status: true,
+        notes: true,
+        ndisApproved: true,
+        createdAt: true,
+        updatedAt: true,
         participant: {
           select: {
             id: true,
@@ -82,6 +133,8 @@ export async function GET(request: NextRequest) {
         staff: {
           select: {
             id: true,
+            employeeId: true,
+            staffRole: true,
             user: {
               select: {
                 id: true,
@@ -89,8 +142,6 @@ export async function GET(request: NextRequest) {
                 email: true,
               },
             },
-            staffRole: true,
-            employeeId: true,
           },
         },
         appointment: {
@@ -140,21 +191,6 @@ export async function GET(request: NextRequest) {
       updatedAt: log.updatedAt.toISOString(),
     }));
 
-    // Calculate stats
-    const stats = {
-      total,
-      pending: serviceLogs.filter((log) => log.status === "PENDING").length,
-      inProgress: serviceLogs.filter((log) => log.status === "IN_PROGRESS")
-        .length,
-      completed: serviceLogs.filter((log) => log.status === "COMPLETED").length,
-      cancelled: serviceLogs.filter((log) => log.status === "CANCELLED").length,
-      totalHours: serviceLogs.reduce(
-        (sum, log) => sum + Number(log.actualHours),
-        0
-      ),
-      ndisApproved: serviceLogs.filter((log) => log.ndisApproved).length,
-    };
-
     return NextResponse.json({
       serviceLogs: formattedServiceLogs,
       stats,
@@ -167,6 +203,26 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Service logs API error:", error);
+
+    // Check for specific database connection errors
+    if (error instanceof Error) {
+      if (error.message.includes("connection") || error.message.includes("pool")) {
+        console.error("Database connection error detected:", error.message);
+        return NextResponse.json(
+          { error: "Database connection error. Please try again." },
+          { status: 503 }
+        );
+      }
+
+      if (error.message.includes("timeout")) {
+        console.error("Database timeout error:", error.message);
+        return NextResponse.json(
+          { error: "Database timeout. Please try again." },
+          { status: 504 }
+        );
+      }
+    }
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
