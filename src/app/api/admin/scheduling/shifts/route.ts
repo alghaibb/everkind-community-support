@@ -104,10 +104,64 @@ export async function GET(request: NextRequest) {
       where.status = status as ShiftStatus;
     }
 
-    // Get staff shifts with relations
+    // Calculate stats using database aggregations (more efficient)
+    const statsPromises = [
+      // Count by status
+      prisma.staffShift.groupBy({
+        by: ["status"],
+        where,
+        _count: { id: true },
+      }),
+      // Count unique staff members
+      prisma.staffShift.findMany({
+        where,
+        select: {
+          staffId: true,
+        },
+        distinct: ["staffId"],
+      }),
+      // Get total shifts count
+      prisma.staffShift.count({ where }),
+    ];
+
+    const [statusCountsResult, uniqueStaffResult, totalShiftsResult] = await Promise.all(statsPromises);
+
+    // Type-safe extraction of results
+    const statusCounts = statusCountsResult as Array<{ status: ShiftStatus; _count: { id: number } }>;
+    const uniqueStaff = uniqueStaffResult as Array<{ staffId: string }>;
+    const totalShifts = totalShiftsResult as number;
+    const uniqueStaffCount = uniqueStaff.length;
+
+    // Calculate total hours using stored duration field (in minutes, convert to hours)
+    const totalDurationResult = await prisma.staffShift.aggregate({
+      where,
+      _sum: { duration: true },
+    });
+
+    const totalHours = (totalDurationResult._sum.duration || 0) / 60; // Convert minutes to hours
+
+    // Build stats object
+    const stats = {
+      totalStaff: uniqueStaffCount,
+      totalShifts,
+      scheduledShifts: statusCounts.find(s => s.status === "SCHEDULED")?._count.id || 0,
+      completedShifts: statusCounts.find(s => s.status === "COMPLETED")?._count.id || 0,
+      cancelledShifts: statusCounts.find(s => s.status === "CANCELLED")?._count.id || 0,
+      noShowShifts: statusCounts.find(s => s.status === "NO_SHOW")?._count.id || 0,
+      totalHours,
+    };
+
+    // Get staff shifts with optimized select
     const shifts = await prisma.staffShift.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        shiftDate: true,
+        startTime: true,
+        endTime: true,
+        duration: true,
+        status: true,
+        notes: true,
         staff: {
           select: {
             id: true,
@@ -144,11 +198,8 @@ export async function GET(request: NextRequest) {
           };
         }
 
-        // Calculate duration in hours
-        const [startHour, startMin] = shift.startTime.split(":").map(Number);
-        const [endHour, endMin] = shift.endTime.split(":").map(Number);
-        const durationHours =
-          endHour + endMin / 60 - (startHour + startMin / 60);
+        // Use stored duration (in minutes) and convert to hours for display
+        const durationHours = shift.duration / 60;
 
         acc[staffId].shifts.push({
           id: shift.id,
@@ -170,23 +221,6 @@ export async function GET(request: NextRequest) {
 
     const staffShiftsArray = Object.values(staffShifts);
 
-    // Calculate stats
-    const stats = {
-      totalStaff: staffShiftsArray.length,
-      totalShifts: shifts.length,
-      scheduledShifts: shifts.filter((s) => s.status === "SCHEDULED").length,
-      completedShifts: shifts.filter((s) => s.status === "COMPLETED").length,
-      cancelledShifts: shifts.filter((s) => s.status === "CANCELLED").length,
-      noShowShifts: shifts.filter((s) => s.status === "NO_SHOW").length,
-      totalHours: shifts.reduce((sum, shift) => {
-        const [startHour, startMin] = shift.startTime.split(":").map(Number);
-        const [endHour, endMin] = shift.endTime.split(":").map(Number);
-        const durationHours =
-          endHour + endMin / 60 - (startHour + startMin / 60);
-        return sum + durationHours;
-      }, 0),
-    };
-
     return NextResponse.json({
       staffShifts: staffShiftsArray,
       stats,
@@ -198,6 +232,26 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Staff shifts API error:", error);
+
+    // Check for specific database connection errors
+    if (error instanceof Error) {
+      if (error.message.includes("connection") || error.message.includes("pool")) {
+        console.error("Database connection error detected:", error.message);
+        return NextResponse.json(
+          { error: "Database connection error. Please try again." },
+          { status: 503 }
+        );
+      }
+
+      if (error.message.includes("timeout")) {
+        console.error("Database timeout error:", error.message);
+        return NextResponse.json(
+          { error: "Database timeout. Please try again." },
+          { status: 504 }
+        );
+      }
+    }
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

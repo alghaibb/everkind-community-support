@@ -60,13 +60,56 @@ export async function GET(request: NextRequest) {
       where.status = status as AppointmentStatus;
     }
 
-    // Get total count
+    // Get total count for pagination
     const total = await prisma.appointment.count({ where });
 
-    // Get appointments with relations
+    // Calculate stats using database aggregations (more efficient)
+    const statsPromises = [
+      // Count by status
+      prisma.appointment.groupBy({
+        by: ["status"],
+        where,
+        _count: { id: true },
+      }),
+      // Sum of duration (in minutes, convert to hours)
+      prisma.appointment.aggregate({
+        where,
+        _sum: { duration: true },
+      }),
+    ];
+
+    const [statusCountsResult, durationSumResult] = await Promise.all(statsPromises);
+
+    // Type-safe extraction of results
+    const statusCounts = statusCountsResult as Array<{ status: AppointmentStatus; _count: { id: number } }>;
+    const durationSum = durationSumResult as { _sum: { duration: number | null } };
+
+    // Build stats object
+    const stats = {
+      total,
+      confirmed: statusCounts.find(s => s.status === "CONFIRMED")?._count.id || 0,
+      pending: statusCounts.find(s => s.status === "PENDING")?._count.id || 0,
+      cancelled: statusCounts.find(s => s.status === "CANCELLED")?._count.id || 0,
+      completed: statusCounts.find(s => s.status === "COMPLETED")?._count.id || 0,
+      totalHours: (durationSum._sum.duration || 0) / 60, // Convert minutes to hours
+    };
+
+    // Get appointments with optimized select
     const appointments = await prisma.appointment.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        appointmentDate: true,
+        startTime: true,
+        endTime: true,
+        duration: true,
+        serviceType: true,
+        location: true,
+        notes: true,
+        status: true,
+        ndisApproved: true,
+        createdAt: true,
+        updatedAt: true,
         participant: {
           select: {
             id: true,
@@ -76,11 +119,13 @@ export async function GET(request: NextRequest) {
             ndisNumber: true,
             email: true,
             phone: true,
+            },
           },
-        },
         staff: {
           select: {
             id: true,
+            employeeId: true,
+            staffRole: true,
             user: {
               select: {
                 id: true,
@@ -88,8 +133,6 @@ export async function GET(request: NextRequest) {
                 email: true,
               },
             },
-            staffRole: true,
-            employeeId: true,
           },
         },
         serviceLogs: {
@@ -142,16 +185,6 @@ export async function GET(request: NextRequest) {
       serviceLogs: appointment.serviceLogs,
     }));
 
-    // Calculate stats
-    const stats = {
-      total,
-      confirmed: appointments.filter((a) => a.status === "CONFIRMED").length,
-      pending: appointments.filter((a) => a.status === "PENDING").length,
-      cancelled: appointments.filter((a) => a.status === "CANCELLED").length,
-      completed: appointments.filter((a) => a.status === "COMPLETED").length,
-      totalHours: appointments.reduce((sum, a) => sum + a.duration, 0) / 60, // Convert to hours
-    };
-
     return NextResponse.json({
       appointments: formattedAppointments,
       stats,
@@ -164,6 +197,26 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Appointments API error:", error);
+
+    // Check for specific database connection errors
+    if (error instanceof Error) {
+      if (error.message.includes("connection") || error.message.includes("pool")) {
+        console.error("Database connection error detected:", error.message);
+        return NextResponse.json(
+          { error: "Database connection error. Please try again." },
+          { status: 503 }
+        );
+      }
+
+      if (error.message.includes("timeout")) {
+        console.error("Database timeout error:", error.message);
+        return NextResponse.json(
+          { error: "Database timeout. Please try again." },
+          { status: 504 }
+        );
+      }
+    }
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
