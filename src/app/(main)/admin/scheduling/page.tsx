@@ -12,7 +12,6 @@ export const metadata: Metadata = {
 };
 
 export default async function SchedulingPage() {
-
   const session = await getServerSession();
   const user = session?.user;
 
