@@ -187,71 +187,71 @@ export function StaffRoster() {
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Staff Member</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Mon</TableHead>
-                <TableHead>Tue</TableHead>
-                <TableHead>Wed</TableHead>
-                <TableHead>Thu</TableHead>
-                <TableHead>Fri</TableHead>
-                <TableHead>Sat</TableHead>
-                <TableHead>Sun</TableHead>
-                <TableHead>Total Hours</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {staffShifts.map((staff) => (
-                <TableRow key={staff.id}>
-                  <TableCell>
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>
-                          {getInitials(staff.staffName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="font-medium">{staff.staffName}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{staff.role}</TableCell>
-                  {staff.shifts.map((shift, index) => (
-                    <TableCell key={index}>
-                      {shift.startTime && shift.endTime ? (
-                        <div className="text-xs">
-                          <div>
-                            {shift.startTime} - {shift.endTime}
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Staff Member</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Mon</TableHead>
+                  <TableHead>Tue</TableHead>
+                  <TableHead>Wed</TableHead>
+                  <TableHead>Thu</TableHead>
+                  <TableHead>Fri</TableHead>
+                  <TableHead>Sat</TableHead>
+                  <TableHead>Sun</TableHead>
+                  <TableHead>Total Hours</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {staffShifts.map((staff) => (
+                  <TableRow key={staff.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback>
+                            {getInitials(staff.staffName)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium">{staff.staffName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{staff.role}</TableCell>
+                    {staff.shifts.map((shift, index) => (
+                      <TableCell key={index}>
+                        {shift.startTime && shift.endTime ? (
+                          <div className="text-xs">
+                            <div>
+                              {shift.startTime} - {shift.endTime}
+                            </div>
+                            <Badge
+                              variant="secondary"
+                              className={getStatusColor(shift.status)}
+                            >
+                              {shift.status}
+                            </Badge>
                           </div>
+                        ) : (
                           <Badge
                             variant="secondary"
                             className={getStatusColor(shift.status)}
                           >
-                            {shift.status}
+                            {shift.status === "leave" ? "Leave" : "Off"}
                           </Badge>
-                        </div>
-                      ) : (
-                        <Badge
-                          variant="secondary"
-                          className={getStatusColor(shift.status)}
-                        >
-                          {shift.status === "leave" ? "Leave" : "Off"}
-                        </Badge>
-                      )}
+                        )}
+                      </TableCell>
+                    ))}
+                    <TableCell>
+                      <span className="font-medium">{staff.totalHours}h</span>
                     </TableCell>
-                  ))}
-                  <TableCell>
-                    <span className="font-medium">{staff.totalHours}h</span>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    <TableCell>
+                      <Button variant="ghost" size="sm">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>

@@ -341,85 +341,85 @@ export function ServiceTracking() {
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Participant</TableHead>
-                <TableHead>Service</TableHead>
-                <TableHead>Staff</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Hours</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>NDIS</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {serviceLogs.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell>
-                    <div className="font-medium">{log.participant.name}</div>
-                  </TableCell>
-                  <TableCell>{log.serviceType}</TableCell>
-                  <TableCell>{log.staff.name}</TableCell>
-                  <TableCell>{log.serviceDate}</TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      <div>{log.startTime}</div>
-                      {log.endTime && (
-                        <div className="text-muted-foreground">
-                          to {log.endTime}
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {log.actualHours ? `${log.actualHours}h` : "-"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="secondary"
-                      className={getStatusColor(log.status)}
-                    >
-                      {log.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {log.ndisApproved ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <div className="h-4 w-4 rounded-full border-2 border-gray-300" />
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      {log.status === "pending" && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleStartService(log.id)}
-                        >
-                          <PlayCircle className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {log.status === "in-progress" && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCompleteService(log.id)}
-                        >
-                          <CheckCircle className="h-4 w-4" />
-                        </Button>
-                      )}
-                      <Button variant="ghost" size="sm">
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Participant</TableHead>
+                  <TableHead>Service</TableHead>
+                  <TableHead>Staff</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Hours</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>NDIS</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {serviceLogs.map((log) => (
+                  <TableRow key={log.id}>
+                    <TableCell>
+                      <div className="font-medium">{log.participant.name}</div>
+                    </TableCell>
+                    <TableCell>{log.serviceType}</TableCell>
+                    <TableCell>{log.staff.name}</TableCell>
+                    <TableCell>{log.serviceDate}</TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div>{log.startTime}</div>
+                        {log.endTime && (
+                          <div className="text-muted-foreground">
+                            to {log.endTime}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {log.actualHours ? `${log.actualHours}h` : "-"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="secondary"
+                        className={getStatusColor(log.status)}
+                      >
+                        {log.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {log.ndisApproved ? (
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <div className="h-4 w-4 rounded-full border-2 border-gray-300" />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        {log.status === "pending" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleStartService(log.id)}
+                          >
+                            <PlayCircle className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {log.status === "in-progress" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCompleteService(log.id)}
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="sm">
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>

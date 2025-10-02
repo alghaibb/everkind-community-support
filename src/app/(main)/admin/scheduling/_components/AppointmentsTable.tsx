@@ -266,91 +266,91 @@ export function AppointmentsTable() {
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Participant</TableHead>
-                <TableHead>Service</TableHead>
-                <TableHead>Staff</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {appointments.map((appointment) => (
-                <TableRow key={appointment.id}>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <div
-                        className={`w-3 h-3 rounded-full ${getServiceColor(
-                          appointment.serviceType
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")
-                        )}`}
-                      />
-                      <span className="font-medium">
-                        {appointment.participant.name}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{appointment.serviceType}</TableCell>
-                  <TableCell>
-                    {appointment.staff?.name || "Unassigned"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      <div className="font-medium">
-                        {appointment.appointmentDate}
-                      </div>
-                      <div className="text-muted-foreground">
-                        {appointment.startTime} - {appointment.endTime}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{appointment.duration}min</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="secondary"
-                      className={getStatusColor(appointment.status)}
-                    >
-                      {appointment.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1">
-                      <MapPin className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-sm">{appointment.location}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit Appointment
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <X className="h-4 w-4 mr-2" />
-                          Cancel Appointment
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Participant</TableHead>
+                  <TableHead>Service</TableHead>
+                  <TableHead>Staff</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {appointments.map((appointment) => (
+                  <TableRow key={appointment.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <div
+                          className={`w-3 h-3 rounded-full ${getServiceColor(
+                            appointment.serviceType
+                              .toLowerCase()
+                              .replace(/\s+/g, "-")
+                          )}`}
+                        />
+                        <span className="font-medium">
+                          {appointment.participant.name}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{appointment.serviceType}</TableCell>
+                    <TableCell>
+                      {appointment.staff?.name || "Unassigned"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div className="font-medium">
+                          {appointment.appointmentDate}
+                        </div>
+                        <div className="text-muted-foreground">
+                          {appointment.startTime} - {appointment.endTime}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{appointment.duration}min</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="secondary"
+                        className={getStatusColor(appointment.status)}
+                      >
+                        {appointment.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-1">
+                        <MapPin className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-sm">{appointment.location}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit Appointment
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600">
+                            <X className="h-4 w-4 mr-2" />
+                            Cancel Appointment
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>
