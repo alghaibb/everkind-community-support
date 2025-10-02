@@ -110,19 +110,28 @@ export async function GET(request: NextRequest) {
       }),
     ];
 
-    const [statusCountsResult, durationSumResult] = await Promise.all(statsPromises);
+    const [statusCountsResult, durationSumResult] =
+      await Promise.all(statsPromises);
 
     // Type-safe extraction of results
-    const statusCounts = statusCountsResult as Array<{ status: AppointmentStatus; _count: { id: number } }>;
-    const durationSum = durationSumResult as { _sum: { duration: number | null } };
+    const statusCounts = statusCountsResult as Array<{
+      status: AppointmentStatus;
+      _count: { id: number };
+    }>;
+    const durationSum = durationSumResult as {
+      _sum: { duration: number | null };
+    };
 
     // Build stats object (always shows overall stats)
     const stats = {
       total: await prisma.appointment.count({ where: overallWhere }),
-      confirmed: statusCounts.find(s => s.status === "CONFIRMED")?._count.id || 0,
-      pending: statusCounts.find(s => s.status === "PENDING")?._count.id || 0,
-      cancelled: statusCounts.find(s => s.status === "CANCELLED")?._count.id || 0,
-      completed: statusCounts.find(s => s.status === "COMPLETED")?._count.id || 0,
+      confirmed:
+        statusCounts.find((s) => s.status === "CONFIRMED")?._count.id || 0,
+      pending: statusCounts.find((s) => s.status === "PENDING")?._count.id || 0,
+      cancelled:
+        statusCounts.find((s) => s.status === "CANCELLED")?._count.id || 0,
+      completed:
+        statusCounts.find((s) => s.status === "COMPLETED")?._count.id || 0,
       totalHours: (durationSum._sum.duration || 0) / 60, // Convert minutes to hours
     };
 
@@ -151,8 +160,8 @@ export async function GET(request: NextRequest) {
             ndisNumber: true,
             email: true,
             phone: true,
-            },
           },
+        },
         staff: {
           select: {
             id: true,
@@ -232,7 +241,10 @@ export async function GET(request: NextRequest) {
 
     // Check for specific database connection errors
     if (error instanceof Error) {
-      if (error.message.includes("connection") || error.message.includes("pool")) {
+      if (
+        error.message.includes("connection") ||
+        error.message.includes("pool")
+      ) {
         console.error("Database connection error detected:", error.message);
         return NextResponse.json(
           { error: "Database connection error. Please try again." },

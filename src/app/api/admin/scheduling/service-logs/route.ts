@@ -116,20 +116,27 @@ export async function GET(request: NextRequest) {
       }),
     ];
 
-    const [statusCountsResult, hoursSumResult, ndisApprovedCountResult] = await Promise.all(statsPromises);
+    const [statusCountsResult, hoursSumResult, ndisApprovedCountResult] =
+      await Promise.all(statsPromises);
 
     // Type-safe extraction of results
-    const statusCounts = statusCountsResult as Array<{ status: ServiceStatus; _count: { id: number } }>;
+    const statusCounts = statusCountsResult as Array<{
+      status: ServiceStatus;
+      _count: { id: number };
+    }>;
     const hoursSum = hoursSumResult as { _sum: { actualHours: number | null } };
     const ndisApprovedCount = ndisApprovedCountResult as number;
 
     // Build stats object (always shows overall stats)
     const stats = {
       total: await prisma.serviceLog.count({ where: overallWhere }),
-      pending: statusCounts.find(s => s.status === "PENDING")?._count.id || 0,
-      inProgress: statusCounts.find(s => s.status === "IN_PROGRESS")?._count.id || 0,
-      completed: statusCounts.find(s => s.status === "COMPLETED")?._count.id || 0,
-      cancelled: statusCounts.find(s => s.status === "CANCELLED")?._count.id || 0,
+      pending: statusCounts.find((s) => s.status === "PENDING")?._count.id || 0,
+      inProgress:
+        statusCounts.find((s) => s.status === "IN_PROGRESS")?._count.id || 0,
+      completed:
+        statusCounts.find((s) => s.status === "COMPLETED")?._count.id || 0,
+      cancelled:
+        statusCounts.find((s) => s.status === "CANCELLED")?._count.id || 0,
       totalHours: Number(hoursSum._sum.actualHours || 0),
       ndisApproved: ndisApprovedCount,
     };
@@ -239,7 +246,10 @@ export async function GET(request: NextRequest) {
 
     // Check for specific database connection errors
     if (error instanceof Error) {
-      if (error.message.includes("connection") || error.message.includes("pool")) {
+      if (
+        error.message.includes("connection") ||
+        error.message.includes("pool")
+      ) {
         console.error("Database connection error detected:", error.message);
         return NextResponse.json(
           { error: "Database connection error. Please try again." },

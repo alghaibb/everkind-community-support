@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -72,8 +73,74 @@ export function AppointmentsTable() {
   // Get search from URL params
   const searchTerm = searchParams.get("search") || "";
 
-  // Use real data from API
-  const { data, isLoading, error } = useAppointments(searchTerm, statusFilter);
+  // Load ALL appointments data once (no filters for initial load)
+  const { data: allData, isLoading, error } = useAppointments("", "all");
+
+  // Client-side filtering and pagination
+  const filteredAndPaginatedData = useMemo(() => {
+    if (!allData?.appointments)
+      return {
+        appointments: [],
+        pagination: { page: 1, pageSize: 10, totalPages: 1, total: 0 },
+      };
+
+    let filtered = allData.appointments;
+
+    // Apply status filter
+    if (statusFilter && statusFilter !== "all") {
+      filtered = filtered.filter(
+        (appointment) => appointment.status === statusFilter
+      );
+    }
+
+    // Apply search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (appointment) =>
+          appointment.participant.name.toLowerCase().includes(searchLower) ||
+          appointment.participant.ndisNumber
+            .toLowerCase()
+            .includes(searchLower) ||
+          appointment.serviceType.toLowerCase().includes(searchLower) ||
+          appointment.location.toLowerCase().includes(searchLower) ||
+          (appointment.staff?.name || "").toLowerCase().includes(searchLower) ||
+          (appointment.notes || "").toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Calculate pagination
+    const page = parseInt(searchParams.get("page") || "1");
+    const pageSize = 10;
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedAppointments = filtered.slice(startIndex, endIndex);
+
+    return {
+      appointments: paginatedAppointments,
+      pagination: {
+        page,
+        pageSize,
+        totalPages: Math.ceil(filtered.length / pageSize),
+        total: filtered.length,
+      },
+    };
+  }, [allData, statusFilter, searchTerm, searchParams]);
+
+  // Use filtered data
+  const data = {
+    ...allData,
+    appointments: filteredAndPaginatedData.appointments,
+    pagination: filteredAndPaginatedData.pagination,
+    stats: allData?.stats || {
+      total: 0,
+      confirmed: 0,
+      pending: 0,
+      cancelled: 0,
+      completed: 0,
+      totalHours: 0,
+    },
+  };
 
   if (isLoading) {
     return (

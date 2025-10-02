@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -76,8 +77,72 @@ export function ServiceTracking() {
   const hasActiveFilters =
     searchParams.get("search") || (statusFilter && statusFilter !== "all");
 
-  // Use real data from API
-  const { data, isLoading, error } = useServiceLogs(searchTerm, statusFilter);
+  // Load ALL service logs data once (no filters for initial load)
+  const { data: allData, isLoading, error } = useServiceLogs("", "all");
+
+  // Client-side filtering and pagination
+  const filteredAndPaginatedData = useMemo(() => {
+    if (!allData?.serviceLogs)
+      return {
+        serviceLogs: [],
+        pagination: { page: 1, pageSize: 10, totalPages: 1, total: 0 },
+      };
+
+    let filtered = allData.serviceLogs;
+
+    // Apply status filter
+    if (statusFilter && statusFilter !== "all") {
+      filtered = filtered.filter((log) => log.status === statusFilter);
+    }
+
+    // Apply search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (log) =>
+          log.participant.name.toLowerCase().includes(searchLower) ||
+          log.participant.ndisNumber.toLowerCase().includes(searchLower) ||
+          log.serviceType.toLowerCase().includes(searchLower) ||
+          log.location.toLowerCase().includes(searchLower) ||
+          (log.staff.name || "").toLowerCase().includes(searchLower) ||
+          (log.description || "").toLowerCase().includes(searchLower) ||
+          (log.notes || "").toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Calculate pagination
+    const page = parseInt(searchParams.get("page") || "1");
+    const pageSize = 10;
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedServiceLogs = filtered.slice(startIndex, endIndex);
+
+    return {
+      serviceLogs: paginatedServiceLogs,
+      pagination: {
+        page,
+        pageSize,
+        totalPages: Math.ceil(filtered.length / pageSize),
+        total: filtered.length,
+      },
+    };
+  }, [allData, statusFilter, searchTerm, searchParams]);
+
+  // Use filtered data
+  const data = {
+    ...allData,
+    serviceLogs: filteredAndPaginatedData.serviceLogs,
+    pagination: filteredAndPaginatedData.pagination,
+    stats: allData?.stats || {
+      total: 0,
+      pending: 0,
+      inProgress: 0,
+      completed: 0,
+      cancelled: 0,
+      totalHours: 0,
+      ndisApproved: 0,
+    },
+  };
 
   if (isLoading) {
     return (
