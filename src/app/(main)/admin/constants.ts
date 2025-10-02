@@ -245,7 +245,7 @@ export const NAVIGATION_ITEMS = [
         title: "Scheduling",
         url: "/admin/scheduling",
         icon: Calendar,
-        description: "Staff schedules",
+        description: "Staff schedules, appointments & service tracking",
       },
       {
         title: "Reports",
