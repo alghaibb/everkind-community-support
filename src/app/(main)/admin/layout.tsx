@@ -1,6 +1,5 @@
-import { redirect, unauthorized, forbidden } from "next/navigation";
+import { unauthorized, forbidden } from "next/navigation";
 import { getServerSession } from "@/lib/get-session";
-import { User } from "@/lib/auth";
 import AdminSidebar from "./_components/AdminSidebar";
 import AdminHeader from "./_components/AdminHeader";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -12,19 +11,14 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession();
+  const user = session?.user;
 
-  if (!session?.user) {
-    redirect("/admin-login");
+  if (!user) {
+    return unauthorized();
   }
 
-  const user = session.user as User;
-
-  if (user.userType !== "INTERNAL") {
-    unauthorized();
-  }
-
-  if (user.role !== "ADMIN") {
-    forbidden();
+  if (user.userType !== "INTERNAL" || user.role !== "ADMIN") {
+    return forbidden();
   }
 
   return (

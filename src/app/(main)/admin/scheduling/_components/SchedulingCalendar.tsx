@@ -17,9 +17,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
-  Clock,
-  MapPin,
-  User,
   Filter,
   X as XIcon,
 } from "lucide-react";
@@ -44,9 +41,12 @@ export function SchedulingCalendar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [clickedDate, setClickedDate] = useState<Date | null>(null);
 
   const view =
     (searchParams.get("view") as "month" | "week" | "day") || "month";
+
+  const currentDateFilter = searchParams.get("date");
 
   const handleViewChange = (newView: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -110,6 +110,8 @@ export function SchedulingCalendar() {
   }, [todayAppointmentsData]);
 
   const handleDayClick = (day: Date) => {
+    // Set clicked date immediately for visual feedback
+    setClickedDate(day);
     // Navigate to appointments tab with date filter
     const dateString = format(day, "yyyy-MM-dd");
     router.push(`/admin/scheduling?tab=appointments&date=${dateString}`, {
@@ -268,23 +270,27 @@ export function SchedulingCalendar() {
                     const dayKey = format(day, "yyyy-MM-dd");
                     const dayAppointments = appointmentsByDate[dayKey] || [];
                     const isCurrentMonth = isSameMonth(day, currentMonth);
-                    const isSelectedDay = false; // Will be implemented when date selection is added
                     const isTodayDate = isToday(day);
+                    const isActiveDate = currentDateFilter === dayKey;
+                    const isClickedDate = clickedDate
+                      ? format(day, "yyyy-MM-dd") ===
+                        format(clickedDate, "yyyy-MM-dd")
+                      : false;
 
                     return (
                       <div
                         key={index}
                         className={`
-                          min-h-[100px] p-2 border rounded-lg cursor-pointer transition-colors hover:bg-muted/50 relative
+                          min-h-[100px] p-2 border rounded-lg cursor-pointer transition-colors relative
                           ${isCurrentMonth ? "bg-background" : "bg-muted/20 text-muted-foreground"}
-                          ${isSelectedDay ? "ring-2 ring-primary" : ""}
-                          ${isTodayDate ? "bg-primary/5 border-primary/20" : ""}
+                          ${isClickedDate || isActiveDate ? "bg-primary text-primary-foreground" : ""}
+                          ${isTodayDate && !isClickedDate && !isActiveDate ? "bg-primary/10 border-primary/30" : ""}
                         `}
                         onClick={() => handleDayClick(day)}
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span
-                            className={`text-sm font-medium ${isTodayDate ? "text-primary" : ""}`}
+                            className={`text-sm font-medium ${isClickedDate || isActiveDate ? "text-primary-foreground" : isTodayDate ? "text-primary" : ""}`}
                           >
                             {format(day, "d")}
                           </span>
@@ -312,12 +318,12 @@ export function SchedulingCalendar() {
                             .map((appointment, idx) => (
                               <div
                                 key={appointment.id}
-                                className={`text-xs p-1 rounded truncate ${getAppointmentColor(
+                                className={`text-xs p-1 rounded truncate border-l-2 ${getAppointmentColor(
                                   appointment.serviceType
                                     .toLowerCase()
                                     .replace(/\s+/g, "-")
-                                )} text-white`}
-                                title={`${appointment.serviceType} - ${appointment.participant.name}`}
+                                )} text-white ${getStatusColor(appointment.status.toLowerCase())}`}
+                                title={`${appointment.serviceType} - ${appointment.participant.name} (${appointment.status})`}
                               >
                                 {appointment.startTime}{" "}
                                 {appointment.participant.name.split(" ")[0]}
