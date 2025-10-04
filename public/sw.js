@@ -1,15 +1,13 @@
 // EverKind Community Support Service Worker
-const CACHE_NAME = 'ekcs-v1.1';
+const CACHE_NAME = 'ekcs-v1.2';
 const STATIC_CACHE_URLS = [
-  '/',
-  '/about-us',
-  '/services',
-  '/contact-us',
-  '/careers',
   '/manifest.json',
   '/web-app-manifest-192x192.png',
   '/web-app-manifest-512x512.png',
   '/apple-icon.png',
+  '/favicon.ico',
+  '/robots.txt',
+  '/sitemap.xml'
 ];
 
 // Install event - cache static assets
@@ -62,17 +60,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Skip JavaScript files and other dynamic assets from caching
-  if (event.request.url.includes('.js') ||
-    event.request.url.includes('.jsx') ||
-    event.request.url.includes('.ts') ||
-    event.request.url.includes('.tsx') ||
-    event.request.url.includes('.hot-update') ||
-    event.request.url.includes('/_next/static/chunks/') ||
-    event.request.url.includes('/admin') ||
-    event.request.url.includes('/api/auth') ||
-    event.request.url.includes('/api/')) {
-    console.log('[SW] Skipping cache for dynamic asset:', event.request.url);
+  // Skip Next.js dynamic routes and API calls - let Next.js handle routing
+  if (event.request.url.includes('/_next/') ||
+      event.request.url.includes('/api/') ||
+      event.request.url.includes('/admin/') ||
+      event.request.url.includes('?') || // Skip URLs with query parameters
+      event.request.url.includes('#')) { // Skip URLs with hash fragments
     return fetch(event.request);
   }
 
@@ -87,14 +80,18 @@ self.addEventListener('fetch', (event) => {
         console.log('[SW] Fetching from network:', event.request.url);
         return fetch(event.request)
           .then((response) => {
-            // Only cache static assets and images, not dynamic HTML or API responses
+            // Only cache successful static assets
             if (response.status === 200 &&
               (event.request.url.includes('.png') ||
                 event.request.url.includes('.jpg') ||
                 event.request.url.includes('.jpeg') ||
                 event.request.url.includes('.svg') ||
                 event.request.url.includes('.ico') ||
-                event.request.url.includes('/manifest.json'))) {
+                event.request.url.includes('.woff') ||
+                event.request.url.includes('.woff2') ||
+                event.request.url.includes('/manifest.json') ||
+                event.request.url.includes('/robots.txt') ||
+                event.request.url.includes('/sitemap.xml'))) {
               const responseClone = response.clone();
               caches.open(CACHE_NAME)
                 .then((cache) => {
@@ -108,11 +105,9 @@ self.addEventListener('fetch', (event) => {
           })
           .catch((error) => {
             console.error('[SW] Network request failed:', error);
-            // Return offline page or fallback
-            return new Response('Offline - Please check your connection', {
-              status: 503,
-              statusText: 'Service Unavailable'
-            });
+            // Don't return offline fallback for navigation requests
+            // Let the browser handle 404s and routing naturally
+            return new Response('', { status: 404 });
           });
       })
       .catch((error) => {
