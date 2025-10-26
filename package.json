@@ -14,7 +14,8 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:clean": "tsx src/scripts/clean-db.ts",
     "db:add-availability": "tsx src/scripts/add-staff-availability.ts",
-    "db:seed-participants": "tsx src/scripts/seed-participants.ts"
+    "db:seed-participants": "tsx src/scripts/seed-participants.ts",
+    "build:start": "pnpm build && pnpm start"
   },
   "dependencies": {
     "@better-fetch/fetch": "^1.1.18",

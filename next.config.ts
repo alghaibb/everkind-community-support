@@ -16,6 +16,22 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     authInterrupts: true,
+    optimizePackageImports: [
+      "@radix-ui/react-avatar",
+      "@radix-ui/react-badge",
+      "@radix-ui/react-button",
+      "@radix-ui/react-card",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-label",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-select",
+      "@radix-ui/react-separator",
+      "@radix-ui/react-sidebar",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-tooltip",
+      "lucide-react"
+    ],
   },
   devIndicators: false,
 };

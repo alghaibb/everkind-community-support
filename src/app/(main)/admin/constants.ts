@@ -8,8 +8,6 @@ import {
   UserPlus,
   Activity,
   MessageSquare,
-  Calendar,
-  FileText,
 } from "lucide-react";
 
 // Role definitions
@@ -235,29 +233,6 @@ export const NAVIGATION_ITEMS = [
         url: "/admin/users",
         icon: Users,
         description: "All system users",
-      },
-    ],
-  },
-  {
-    title: "Operations",
-    items: [
-      {
-        title: "Scheduling",
-        url: "/admin/scheduling",
-        icon: Calendar,
-        description: "Staff schedules, appointments & service tracking",
-      },
-      {
-        title: "Reports",
-        url: "/admin/reports",
-        icon: FileText,
-        description: "Generate reports",
-      },
-      {
-        title: "Services",
-        url: "/admin/services",
-        icon: Heart,
-        description: "Service management",
       },
     ],
   },

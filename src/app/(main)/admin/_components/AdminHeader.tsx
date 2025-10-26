@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { memo, useMemo } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -28,15 +29,15 @@ const routeLabels: Record<string, string> = {
   "/admin/profile": "Profile Settings",
 };
 
-export default function AdminHeader() {
+const AdminHeaderComponent = () => {
   const pathname = usePathname();
 
-  const getBreadcrumbs = () => {
+  const breadcrumbs = useMemo(() => {
     const segments = pathname.split("/").filter(Boolean);
-    const breadcrumbs = [];
+    const crumbs = [];
 
     // Always start with Admin
-    breadcrumbs.push({
+    crumbs.push({
       label: "Admin",
       href: "/admin",
       isActive: pathname === "/admin",
@@ -49,7 +50,7 @@ export default function AdminHeader() {
       const fullPath = `/admin${currentPath}`;
       const isLast = i === segments.length - 1;
 
-      breadcrumbs.push({
+      crumbs.push({
         label:
           routeLabels[fullPath] ||
           segments[i].charAt(0).toUpperCase() + segments[i].slice(1),
@@ -58,10 +59,8 @@ export default function AdminHeader() {
       });
     }
 
-    return breadcrumbs;
-  };
-
-  const breadcrumbs = getBreadcrumbs();
+    return crumbs;
+  }, [pathname]);
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
@@ -113,4 +112,6 @@ export default function AdminHeader() {
       </div>
     </header>
   );
-}
+};
+
+export default memo(AdminHeaderComponent);

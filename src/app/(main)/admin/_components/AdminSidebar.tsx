@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { memo, useMemo } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -60,17 +61,25 @@ interface AdminSidebarProps {
   user: User;
 }
 
-export default function AdminSidebar({ user }: AdminSidebarProps) {
+const AdminSidebarComponent = ({ user }: AdminSidebarProps) => {
   const pathname = usePathname();
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
+  const getInitials = useMemo(
+    () => (name: string) => {
+      return name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    },
+    []
+  );
+
+  const initials = useMemo(
+    () => getInitials(user.name),
+    [getInitials, user.name]
+  );
 
   return (
     <Sidebar variant="inset" className="border-r">
@@ -108,6 +117,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                         >
                           <Link
                             href={item.url}
+                            prefetch={true}
                             className="flex items-center gap-2 w-full"
                           >
                             <item.icon className="h-4 w-4 flex-shrink-0" />
@@ -143,7 +153,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                       alt={user.name}
                     />
                     <AvatarFallback className="rounded-lg">
-                      {getInitials(user.name)}
+                      {initials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
@@ -185,4 +195,6 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       <SidebarRail />
     </Sidebar>
   );
-}
+};
+
+export default memo(AdminSidebarComponent);
