@@ -49,8 +49,8 @@ export default function ParticipantsPageContent() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="max-w-full">
+      <div className="flex items-center justify-between">
+        <div>
           <h1 className="text-3xl font-bold tracking-tight">Participants</h1>
           <p className="text-muted-foreground">
             Manage NDIS participants and their support plans
@@ -58,7 +58,7 @@ export default function ParticipantsPageContent() {
         </div>
         <Button
           onClick={() => onOpen(MODAL_TYPES.CREATE_PARTICIPANT)}
-          className="gap-2 w-full sm:w-auto"
+          className="gap-2"
         >
           <Plus className="h-4 w-4" />
           Add Participant
@@ -66,32 +66,30 @@ export default function ParticipantsPageContent() {
       </div>
 
       {/* Stats Cards */}
-      <div className="w-full">
-        <ParticipantsStats participants={participantsData?.participants || []} />
-      </div>
+      <ParticipantsStats participants={participantsData?.participants || []} />
 
       {/* Search and Filters */}
-      <Card className="w-full">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search className="h-5 w-5" />
             Search & Filter
           </CardTitle>
         </CardHeader>
-        <CardContent className="w-full">
+        <CardContent>
           <ParticipantsSearch />
         </CardContent>
       </Card>
 
       {/* Participants Table */}
-      <Card className="w-full">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
             Participants ({participantsData?.total || 0})
           </CardTitle>
         </CardHeader>
-        <CardContent className="w-full overflow-x-auto">
+        <CardContent className="overflow-x-auto">
           {isLoading ? (
             <ParticipantsTableSkeleton />
           ) : (
