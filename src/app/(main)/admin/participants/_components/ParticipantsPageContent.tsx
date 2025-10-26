@@ -89,7 +89,7 @@ export default function ParticipantsPageContent() {
             Participants ({participantsData?.total || 0})
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           {isLoading ? (
             <ParticipantsTableSkeleton />
           ) : (

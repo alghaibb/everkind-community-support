@@ -10,17 +10,17 @@ import {
 
 export default function ParticipantsTableSkeleton() {
   return (
-    <div className="rounded-md border">
-      <Table>
+    <div className="rounded-md border overflow-x-auto">
+      <Table className="min-w-[1000px]">
         <TableHeader>
           <TableRow>
-            <TableHead>Participant</TableHead>
-            <TableHead>NDIS Number</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Primary Disability</TableHead>
-            <TableHead>Support Coordinator</TableHead>
-            <TableHead>Plan End Date</TableHead>
-            <TableHead>Created</TableHead>
+            <TableHead className="min-w-[200px]">Participant</TableHead>
+            <TableHead className="min-w-[120px]">NDIS Number</TableHead>
+            <TableHead className="min-w-[100px]">Status</TableHead>
+            <TableHead className="min-w-[150px]">Primary Disability</TableHead>
+            <TableHead className="min-w-[150px]">Support Coordinator</TableHead>
+            <TableHead className="min-w-[120px]">Plan End Date</TableHead>
+            <TableHead className="min-w-[100px]">Created</TableHead>
             <TableHead className="w-[70px]">Actions</TableHead>
           </TableRow>
         </TableHeader>

@@ -80,32 +80,32 @@ export default function ParticipantsTable({
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
+    <div className="rounded-md border overflow-x-auto">
+      <Table className="min-w-[1000px]">
         <TableHeader>
           <TableRow>
-            <TableHead>Participant</TableHead>
-            <TableHead>NDIS Number</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Primary Disability</TableHead>
-            <TableHead>Support Coordinator</TableHead>
-            <TableHead>Plan End Date</TableHead>
-            <TableHead>Created</TableHead>
+            <TableHead className="min-w-[200px]">Participant</TableHead>
+            <TableHead className="min-w-[120px]">NDIS Number</TableHead>
+            <TableHead className="min-w-[100px]">Status</TableHead>
+            <TableHead className="min-w-[150px]">Primary Disability</TableHead>
+            <TableHead className="min-w-[150px]">Support Coordinator</TableHead>
+            <TableHead className="min-w-[120px]">Plan End Date</TableHead>
+            <TableHead className="min-w-[100px]">Created</TableHead>
             <TableHead className="w-[70px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {participants.map((participant) => (
             <TableRow key={participant.id}>
-              <TableCell>
+              <TableCell className="max-w-[200px]">
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-8 w-8 flex-shrink-0">
                     <AvatarFallback className="text-xs">
                       {getInitials(participant.firstName, participant.lastName)}
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <div className="font-medium">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">
                       {getDisplayName(participant)}
                     </div>
                     <div className="text-sm text-muted-foreground">
@@ -129,9 +129,9 @@ export default function ParticipantsTable({
                   {participant.status}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell className="max-w-[150px]">
                 <div
-                  className="max-w-[200px] truncate"
+                  className="truncate"
                   title={participant.disabilities.join(", ")}
                 >
                   {participant.disabilities[0] || "Not specified"}
@@ -142,8 +142,10 @@ export default function ParticipantsTable({
                   )}
                 </div>
               </TableCell>
-              <TableCell>
-                {participant.supportCoordinator || "Not assigned"}
+              <TableCell className="max-w-[150px]">
+                <div className="truncate" title={participant.supportCoordinator || "Not assigned"}>
+                  {participant.supportCoordinator || "Not assigned"}
+                </div>
               </TableCell>
               <TableCell>{formatDate(participant.planEndDate)}</TableCell>
               <TableCell className="text-sm text-muted-foreground">

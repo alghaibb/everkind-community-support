@@ -84,9 +84,7 @@ const AdminHeaderComponent = () => {
                       <span className="truncate">{breadcrumb.label}</span>
                     </BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink
-                      asChild
-                    >
+                    <BreadcrumbLink asChild>
                       <Link
                         href={breadcrumb.href}
                         prefetch={true}
