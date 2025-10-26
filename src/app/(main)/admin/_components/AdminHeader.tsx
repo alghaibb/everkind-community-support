@@ -23,9 +23,7 @@ const routeLabels: Record<string, string> = {
   "/admin/participants": "Participants",
   "/admin/messages": "Messages",
   "/admin/analytics": "Analytics",
-  "/admin/scheduling": "Scheduling",
-  "/admin/reports": "Reports",
-  "/admin/services": "Services",
+  "/admin/users": "Users",
   "/admin/profile": "Profile Settings",
 };
 
@@ -87,13 +85,18 @@ const AdminHeaderComponent = () => {
                     </BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink
-                      href={breadcrumb.href}
-                      className="flex items-center gap-1 text-xs sm:text-sm truncate"
+                      asChild
                     >
-                      {index === 0 && (
-                        <Shield className="h-3 w-3 flex-shrink-0" />
-                      )}
-                      <span className="truncate">{breadcrumb.label}</span>
+                      <Link
+                        href={breadcrumb.href}
+                        prefetch={true}
+                        className="flex items-center gap-1 text-xs sm:text-sm truncate"
+                      >
+                        {index === 0 && (
+                          <Shield className="h-3 w-3 flex-shrink-0" />
+                        )}
+                        <span className="truncate">{breadcrumb.label}</span>
+                      </Link>
                     </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>

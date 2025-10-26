@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     "Admin dashboard for managing the EverKind community support program.",
 };
 
+
 export default async function AdminDashboard() {
   const session = await getServerSession();
   const user = session?.user as User;

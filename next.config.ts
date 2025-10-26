@@ -32,6 +32,22 @@ const nextConfig: NextConfig = {
       "@radix-ui/react-tooltip",
       "lucide-react"
     ],
+    optimizeCss: true,
+    scrollRestoration: true,
+  },
+  // Performance optimizations
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: false,
+  // Optimize images
+  images: {
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
+  },
+  // Enable prefetching for better navigation
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
   },
   devIndicators: false,
 };
