@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Settings, ChevronUp, Shield } from "lucide-react";
+import { Settings, ChevronUp, Shield, Calendar } from "lucide-react";
 import { User } from "@/lib/auth";
 import LogoutButton from "@/components/logout-button";
 import { Separator } from "@/components/ui/separator";

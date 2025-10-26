@@ -1,4 +1,4 @@
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   DashboardStats,
   CareerApplicationsResponse,
@@ -9,7 +9,7 @@ import {
   ParticipantsResponse,
   UsersResponse,
 } from "@/types/admin";
-import { ApplicationStatus } from "@/generated/prisma";
+import { ApplicationStatus, StaffRole } from "@/generated/prisma";
 import { env } from "@/lib/env";
 
 export const adminQueryKeys = {
@@ -276,6 +276,340 @@ export function useParticipantsList(params: {
     queryFn: () => fetchParticipants(params),
     staleTime: 2 * 60 * 1000,
     placeholderData: (previousData) => previousData,
+  });
+}
+
+// SCHEDULING QUERIES
+
+interface OptimisticShift {
+  id: string;
+  shiftDate: string;
+  startTime: string;
+  endTime: string;
+  duration: number;
+  status: string;
+  notes?: string;
+  staff: {
+    id: string;
+    user: { name: string };
+    staffRole: string;
+  };
+}
+
+export function useStaffShifts(search?: string, week?: string) {
+  return useQuery({
+    queryKey: ["admin", "scheduling", "staff-shifts", { search, week }],
+    queryFn: async () => {
+      const searchParams = new URLSearchParams();
+      if (search) searchParams.set("search", search);
+      if (week && week !== "current") searchParams.set("week", week);
+
+      const response = await fetch(`/api/admin/scheduling/shifts?${searchParams}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch staff shifts");
+      }
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+// Optimistic mutations for scheduling
+export function useCreateShift() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (shiftData: {
+      staffId: string;
+      shiftDate: string;
+      startTime: string;
+      endTime: string;
+      notes?: string;
+    }) => {
+      const formData = new FormData();
+      Object.entries(shiftData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
+      });
+
+      const response = await fetch("/api/admin/scheduling/shifts", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create shift");
+      }
+
+      return response.json();
+    },
+    onMutate: async (newShift) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: ["admin", "scheduling", "staff-shifts"]
+      });
+
+      // Snapshot previous value
+      const previousShifts = queryClient.getQueryData([
+        "admin", "scheduling", "staff-shifts", { search: undefined, week: "current" }
+      ]);
+
+      // Calculate duration
+      const start = new Date(`2000-01-01T${newShift.startTime}`);
+      const end = new Date(`2000-01-01T${newShift.endTime}`);
+      if (end < start) end.setDate(end.getDate() + 1);
+      const duration = Math.round((end.getTime() - start.getTime()) / (1000 * 60));
+
+      // Get staff data for optimistic update
+      const staffData = queryClient.getQueryData<StaffResponse>([
+        "admin", "staff", "list", { search: undefined, role: undefined, status: undefined, page: 1 }
+      ]);
+
+      let staffInfo: OptimisticShift['staff'] = {
+        id: newShift.staffId,
+        user: { name: "Loading..." },
+        staffRole: "SUPPORT_WORKER",
+      };
+
+      // Try to find staff info from existing data
+      if (staffData?.staff) {
+        const foundStaff = staffData.staff.find((s) => s.id === newShift.staffId);
+        if (foundStaff) {
+          staffInfo = {
+            id: foundStaff.id,
+            user: { name: foundStaff.user.name },
+            staffRole: foundStaff.staffRole,
+          };
+        }
+      }
+
+      // Optimistically update
+      queryClient.setQueryData(
+        ["admin", "scheduling", "staff-shifts", { search: undefined, week: "current" }],
+        (old: { shifts: OptimisticShift[]; stats: { totalShifts: number; scheduledShifts: number } } | undefined) => {
+          if (!old) return old;
+
+          const optimisticShift: OptimisticShift = {
+            id: `temp-${Date.now()}`,
+            shiftDate: newShift.shiftDate,
+            startTime: newShift.startTime,
+            endTime: newShift.endTime,
+            duration,
+            status: "SCHEDULED",
+            notes: newShift.notes,
+            staff: staffInfo,
+          };
+
+          return {
+            ...old,
+            shifts: [...old.shifts, optimisticShift],
+            stats: {
+              ...old.stats,
+              totalShifts: old.stats.totalShifts + 1,
+              scheduledShifts: old.stats.scheduledShifts + 1,
+            },
+          };
+        }
+      );
+
+      return { previousShifts };
+    },
+    onError: (err, newShift, context) => {
+      // Rollback on error
+      if (context?.previousShifts) {
+        queryClient.setQueryData(
+          ["admin", "scheduling", "staff-shifts", { search: undefined, week: "current" }],
+          context.previousShifts
+        );
+      }
+    },
+    onSettled: () => {
+      // Refetch after error or success
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "scheduling", "staff-shifts"]
+      });
+    },
+  });
+}
+
+export function useUpdateShift() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (shiftData: {
+      id: string;
+      staffId?: string;
+      shiftDate?: string;
+      startTime?: string;
+      endTime?: string;
+      status?: string;
+      notes?: string;
+    }) => {
+      const { id, ...updateData } = shiftData;
+      const formData = new FormData();
+      Object.entries(updateData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
+      });
+
+      const response = await fetch(`/api/admin/scheduling/shifts?id=${id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Update failed:", errorText);
+        throw new Error("Failed to update shift");
+      }
+
+      return response.json();
+    },
+    onMutate: async (updatedShift) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: ["admin", "scheduling", "staff-shifts"]
+      });
+
+      // Snapshot previous value
+      const previousShifts = queryClient.getQueryData([
+        "admin", "scheduling", "staff-shifts", { search: undefined, week: "current" }
+      ]);
+
+      // Optimistically update
+      queryClient.setQueryData(
+        ["admin", "scheduling", "staff-shifts", { search: undefined, week: "current" }],
+        (old: { shifts: OptimisticShift[] } | undefined) => {
+          if (!old) return old;
+
+          const updatedShifts = old.shifts.map((shift) => {
+            if (shift.id === updatedShift.id) {
+              const updatedShiftObj: OptimisticShift = { ...shift };
+
+              // Update individual fields that were provided
+              if (updatedShift.staffId) {
+                // For staff updates, we need to find the new staff info
+                // For now, we'll keep the existing staff info
+                // This could be improved by looking up staff data
+              }
+
+              if (updatedShift.shiftDate) {
+                updatedShiftObj.shiftDate = updatedShift.shiftDate;
+              }
+
+              if (updatedShift.startTime) {
+                updatedShiftObj.startTime = updatedShift.startTime;
+              }
+
+              if (updatedShift.endTime) {
+                updatedShiftObj.endTime = updatedShift.endTime;
+              }
+
+              if (updatedShift.status) {
+                updatedShiftObj.status = updatedShift.status;
+              }
+
+              if (updatedShift.notes !== undefined) {
+                updatedShiftObj.notes = updatedShift.notes;
+              }
+
+              return updatedShiftObj;
+            }
+            return shift;
+          });
+
+          return {
+            ...old,
+            shifts: updatedShifts,
+          };
+        }
+      );
+
+      return { previousShifts };
+    },
+    onError: (err, updatedShift, context) => {
+      // Rollback on error
+      if (context?.previousShifts) {
+        queryClient.setQueryData(
+          ["admin", "scheduling", "staff-shifts", { search: undefined, week: "current" }],
+          context.previousShifts
+        );
+      }
+    },
+    onSettled: () => {
+      // Refetch after error or success
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "scheduling", "staff-shifts"]
+      });
+    },
+  });
+}
+
+export function useDeleteShift() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (shiftId: string) => {
+      const response = await fetch(`/api/admin/scheduling/shifts?id=${shiftId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete shift");
+      }
+
+      return { success: true };
+    },
+    onMutate: async (shiftId) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: ["admin", "scheduling", "staff-shifts"]
+      });
+
+      // Snapshot previous value
+      const previousShifts = queryClient.getQueryData([
+        "admin", "scheduling", "staff-shifts", { search: undefined, week: "current" }
+      ]);
+
+      // Optimistically remove
+      queryClient.setQueryData(
+        ["admin", "scheduling", "staff-shifts", { search: undefined, week: "current" }],
+        (old: { shifts: OptimisticShift[]; stats: { totalShifts: number; scheduledShifts: number } } | undefined) => {
+          if (!old) return old;
+
+          const filteredShifts = old.shifts.filter((shift) => shift.id !== shiftId);
+
+          return {
+            ...old,
+            shifts: filteredShifts,
+            stats: {
+              ...old.stats,
+              totalShifts: old.stats.totalShifts - 1,
+              scheduledShifts: Math.max(0, old.stats.scheduledShifts - 1),
+            },
+          };
+        }
+      );
+
+      return { previousShifts };
+    },
+    onError: (err, shiftId, context) => {
+      // Rollback on error
+      if (context?.previousShifts) {
+        queryClient.setQueryData(
+          ["admin", "scheduling", "staff-shifts", { search: undefined, week: "current" }],
+          context.previousShifts
+        );
+      }
+    },
+    onSettled: () => {
+      // Refetch after error or success
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "scheduling", "staff-shifts"]
+      });
+    },
   });
 }
 
