@@ -143,7 +143,10 @@ export default function ParticipantsTable({
                 </div>
               </TableCell>
               <TableCell className="max-w-[150px]">
-                <div className="truncate" title={participant.supportCoordinator || "Not assigned"}>
+                <div
+                  className="truncate"
+                  title={participant.supportCoordinator || "Not assigned"}
+                >
                   {participant.supportCoordinator || "Not assigned"}
                 </div>
               </TableCell>

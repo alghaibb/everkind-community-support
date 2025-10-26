@@ -102,14 +102,14 @@ export default function ParticipantsSearch() {
     searchParams.get("search") || status || disability || supportCoordinator;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       {/* Search and Filter Controls */}
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="flex-1">
+      <div className="flex flex-col gap-4 sm:flex-row w-full">
+        <div className="flex-1 min-w-0">
           <SearchInput placeholder="Search by name or NDIS number..." />
         </div>
 
-        <div className="flex gap-2 sm:gap-4">
+        <div className="flex flex-wrap gap-2 sm:gap-4 w-full sm:w-auto">
           <Select value={status} onValueChange={handleRoleChange}>
             <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="All statuses" />
@@ -129,7 +129,7 @@ export default function ParticipantsSearch() {
             placeholder="Disability..."
             value={disability}
             onChange={(e) => handleDisabilityChange(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-48"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-48 min-w-0"
           />
 
           <input
@@ -137,14 +137,14 @@ export default function ParticipantsSearch() {
             placeholder="Coordinator..."
             value={supportCoordinator}
             onChange={(e) => handleCoordinatorChange(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-48"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-48 min-w-0"
           />
 
           {hasActiveFilters && (
             <Button
               variant="outline"
               onClick={handleClear}
-              className="shrink-0"
+              className="shrink-0 w-full sm:w-auto"
             >
               Clear
             </Button>
