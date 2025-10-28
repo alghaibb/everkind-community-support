@@ -33,7 +33,7 @@ export function SchedulingContent() {
   const [editingShift, setEditingShift] = useState<Shift>();
 
   // Fetch staff shifts data
-  const { data, isLoading, error } = useStaffShifts();
+  const { data, error } = useStaffShifts();
 
   const handleAddShift = (date: Date) => {
     setEditingShift(undefined);

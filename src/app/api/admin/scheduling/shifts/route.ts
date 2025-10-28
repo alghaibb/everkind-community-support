@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/get-session";
 import { User } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { ShiftStatus, Prisma } from "@/generated/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -136,31 +138,38 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const shiftData: any = {};
 
-    // Extract form data
-    for (const [key, value] of formData.entries()) {
-      shiftData[key] = value.toString();
-    }
+    // Extract and validate required fields
+    const staffId = formData.get("staffId")?.toString().trim();
+    const shiftDateStr = formData.get("shiftDate")?.toString();
+    const startTime = formData.get("startTime")?.toString();
+    const endTime = formData.get("endTime")?.toString();
 
-    // Validate required fields
-    if (!shiftData.staffId || !shiftData.shiftDate || !shiftData.startTime || !shiftData.endTime) {
+    if (!staffId || !shiftDateStr || !startTime || !endTime) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Validate and convert data types
-    const staffIdStr = String(shiftData.staffId).trim();
-    if (staffIdStr.length === 0) {
-      return NextResponse.json({ error: "Staff ID is required" }, { status: 400 });
-    }
-    shiftData.staffId = staffIdStr;
-    shiftData.shiftDate = new Date(shiftData.shiftDate);
+    // Convert and validate data types
+    const shiftDate = new Date(shiftDateStr);
 
     // Calculate duration
-    const start = new Date(`2000-01-01T${shiftData.startTime}`);
-    const end = new Date(`2000-01-01T${shiftData.endTime}`);
+    const start = new Date(`2000-01-01T${startTime}`);
+    const end = new Date(`2000-01-01T${endTime}`);
     if (end < start) end.setDate(end.getDate() + 1);
-    shiftData.duration = Math.round((end.getTime() - start.getTime()) / (1000 * 60));
+    const duration = Math.round((end.getTime() - start.getTime()) / (1000 * 60));
+
+    const statusStr = formData.get("status")?.toString() || "SCHEDULED";
+    const status = statusStr as ShiftStatus;
+
+    const shiftData = {
+      staffId,
+      shiftDate,
+      startTime,
+      endTime,
+      duration,
+      notes: formData.get("notes")?.toString(),
+      status,
+    };
 
     // Create the shift
     const newShift = await prisma.staffShift.create({
@@ -220,36 +229,59 @@ export async function PUT(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const updateData: any = {};
+    const updateData: Prisma.StaffShiftUncheckedUpdateInput = {};
 
     // Extract form data
-    for (const [key, value] of formData.entries()) {
-      if (key !== "id") {
-        updateData[key] = value.toString();
-      }
-    }
+    const staffId = formData.get("staffId")?.toString().trim();
+    const shiftDateStr = formData.get("shiftDate")?.toString();
+    const startTime = formData.get("startTime")?.toString();
+    const endTime = formData.get("endTime")?.toString();
+    const notes = formData.get("notes")?.toString();
+    const statusStr = formData.get("status")?.toString();
 
     // Validate and handle staffId (foreign key field)
-    if (updateData.staffId !== undefined) {
-      if (updateData.staffId === "" || updateData.staffId === null) {
+    if (staffId !== undefined) {
+      if (staffId === "" || staffId === null) {
         // Don't update staffId if it's empty/null
-        delete updateData.staffId;
         console.log("Skipped empty staffId update");
       } else {
         // staffId should be a valid string (CUID)
-        const staffIdStr = String(updateData.staffId).trim();
-        if (staffIdStr.length === 0) {
+        if (staffId.length === 0) {
           return NextResponse.json(
             { error: "Staff ID cannot be empty" },
             { status: 400 }
           );
         }
-        updateData.staffId = staffIdStr;
+        updateData.staffId = staffId;
       }
     }
 
-    if (updateData.shiftDate) {
-      updateData.shiftDate = new Date(updateData.shiftDate);
+    if (shiftDateStr) {
+      updateData.shiftDate = new Date(shiftDateStr);
+    }
+
+    if (startTime !== undefined) {
+      updateData.startTime = startTime;
+    }
+
+    if (endTime !== undefined) {
+      updateData.endTime = endTime;
+    }
+
+    if (notes !== undefined) {
+      updateData.notes = notes;
+    }
+
+    if (statusStr !== undefined) {
+      updateData.status = statusStr as ShiftStatus;
+    }
+
+    // Recalculate duration if start/end times changed
+    if (startTime && endTime) {
+      const start = new Date(`2000-01-01T${startTime}`);
+      const end = new Date(`2000-01-01T${endTime}`);
+      if (end < start) end.setDate(end.getDate() + 1);
+      updateData.duration = Math.round((end.getTime() - start.getTime()) / (1000 * 60));
     }
 
     // Check if shift exists first
@@ -290,40 +322,48 @@ export async function PUT(request: NextRequest) {
       });
 
       return NextResponse.json(updatedShift);
-    } catch (updateError: any) {
+    } catch (updateError: unknown) {
       console.error("Prisma update error:", updateError);
 
       // Handle specific Prisma errors
-      if (updateError.code === 'P2025') {
+      if (updateError instanceof PrismaClientKnownRequestError) {
+        if (updateError.code === 'P2025') {
+          return NextResponse.json(
+            { error: "Shift not found" },
+            { status: 404 }
+          );
+        }
+
+        if (updateError.code === 'P2003') {
+          return NextResponse.json(
+            { error: "Invalid staff member - staff does not exist" },
+            { status: 400 }
+          );
+        }
+
+        if (updateError.code === 'P2002') {
+          return NextResponse.json(
+            { error: "Duplicate entry" },
+            { status: 409 }
+          );
+        }
+
+        // Log the full error for debugging
+        console.error("Full update error:", {
+          code: updateError.code,
+          message: updateError.message,
+          meta: updateError.meta
+        });
+
         return NextResponse.json(
-          { error: "Shift not found" },
-          { status: 404 }
+          { error: `Database error: ${updateError.message || 'Unknown error'}` },
+          { status: 500 }
         );
       }
 
-      if (updateError.code === 'P2003') {
-        return NextResponse.json(
-          { error: "Invalid staff member - staff does not exist" },
-          { status: 400 }
-        );
-      }
-
-      if (updateError.code === 'P2002') {
-        return NextResponse.json(
-          { error: "Duplicate entry" },
-          { status: 409 }
-        );
-      }
-
-      // Log the full error for debugging
-      console.error("Full update error:", {
-        code: updateError.code,
-        message: updateError.message,
-        meta: updateError.meta
-      });
-
+      // For non-Prisma errors
       return NextResponse.json(
-        { error: `Database error: ${updateError.message || 'Unknown error'}` },
+        { error: "Database update failed" },
         { status: 500 }
       );
     }

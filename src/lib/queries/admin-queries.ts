@@ -9,7 +9,7 @@ import {
   ParticipantsResponse,
   UsersResponse,
 } from "@/types/admin";
-import { ApplicationStatus, StaffRole } from "@/generated/prisma";
+import { ApplicationStatus } from "@/generated/prisma";
 import { env } from "@/lib/env";
 
 export const adminQueryKeys = {

@@ -11,9 +11,10 @@ if (typeof window !== "undefined") {
   const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
       if (entry.entryType === "navigation") {
+        const navEntry = entry as PerformanceNavigationTiming;
         console.log("Navigation performance:", {
           duration: entry.duration,
-          type: (entry as any).type,
+          type: navEntry.type,
           name: entry.name,
         });
       }
