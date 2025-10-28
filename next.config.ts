@@ -32,7 +32,6 @@ const nextConfig: NextConfig = {
       "@radix-ui/react-tooltip",
       "lucide-react"
     ],
-    optimizeCss: true,
     scrollRestoration: true,
   },
   // Performance optimizations
