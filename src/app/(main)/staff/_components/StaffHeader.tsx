@@ -21,7 +21,7 @@ interface StaffHeaderProps {
   user: User;
 }
 
-export default function StaffHeader({ user }: StaffHeaderProps) {
+export default function StaffHeader({ user: _user }: StaffHeaderProps) {
   const pathname = usePathname();
 
   // Generate breadcrumb items based on pathname

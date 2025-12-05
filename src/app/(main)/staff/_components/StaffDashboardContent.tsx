@@ -11,7 +11,6 @@ import {
   ClipboardList,
   ArrowRight,
   CalendarPlus,
-  CheckCircle2,
   AlertCircle,
   TrendingUp,
 } from "lucide-react";

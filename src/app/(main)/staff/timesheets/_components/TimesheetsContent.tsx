@@ -12,7 +12,6 @@ import {
   Plus,
   AlertCircle,
   CheckCircle2,
-  XCircle,
   FileText,
   Calendar,
 } from "lucide-react";

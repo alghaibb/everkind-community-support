@@ -11,7 +11,7 @@ interface Shift {
   endTime: string;
   serviceType: string;
   location: string;
-  status: keyof typeof SHIFT_STATUS;
+  status: string;
   participant?: {
     firstName: string;
     lastName: string;
@@ -40,7 +40,7 @@ export function TodaySchedule({ shifts }: TodayScheduleProps) {
     <div className="space-y-4">
       {shifts.map((shift) => {
         const statusConfig =
-          SHIFT_STATUS[shift.status] || SHIFT_STATUS.SCHEDULED;
+          SHIFT_STATUS[shift.status as keyof typeof SHIFT_STATUS] || SHIFT_STATUS.SCHEDULED;
 
         return (
           <div
