@@ -95,15 +95,15 @@ export function exportParticipantsToCSV(participants: Array<{
   preferredName?: string;
   ndisNumber: string;
   status: string;
-  dateOfBirth: string;
+  dateOfBirth: Date | string;
   email?: string;
   phone?: string;
   disabilities: string[];
   supportCoordinator?: string;
-  planStartDate: string;
-  planEndDate: string;
+  planStartDate: Date | string;
+  planEndDate: Date | string;
   planBudget?: number | null;
-  createdAt: string;
+  createdAt: Date | string;
 }>): void {
   const headers = [
     { key: "firstName" as const, label: "First Name" },
@@ -135,7 +135,7 @@ export function exportStaffToCSV(staff: Array<{
   employeeId?: string;
   isActive: boolean;
   phone?: string;
-  startDate: string;
+  startDate: Date | string;
   ndisModules?: string[];
 }>): void {
   const headers = [
@@ -174,7 +174,7 @@ export function exportMessagesToCSV(messages: Array<{
   phone?: string;
   subject?: string;
   message: string;
-  createdAt: string;
+  createdAt: Date | string;
 }>): void {
   const headers = [
     { key: "firstName" as const, label: "First Name" },
