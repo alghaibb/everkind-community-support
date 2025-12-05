@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useModal } from "./use-modal";
 import { MODAL_TYPES } from "@/app/(main)/admin/constants";
 
@@ -49,7 +48,6 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[]) {
  * Hook for admin-specific keyboard shortcuts
  */
 export function useAdminKeyboardShortcuts() {
-  const router = useRouter();
   const { onOpen, onClose, isOpen } = useModal();
 
   useKeyboardShortcuts([

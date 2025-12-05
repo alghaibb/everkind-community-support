@@ -132,7 +132,7 @@ export default function Hero() {
                 { value: "500+", label: "Clients Served", delay: 0 },
                 { value: "9", label: "Services Offered", delay: 0.1 },
                 { value: "24/7", label: "Support Available", delay: 0.2 },
-              ].map((stat, index) => (
+              ].map((stat) => (
                 <motion.div
                   key={stat.label}
                   initial={{ scale: 0.8, opacity: 0 }}

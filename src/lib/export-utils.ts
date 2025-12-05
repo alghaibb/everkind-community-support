@@ -205,7 +205,7 @@ export function exportCareersToCSV(applications: Array<{
   ndisScreeningCheck?: string;
   policeCheck?: string;
   firstAidCPR?: string;
-  createdAt: string;
+  createdAt: Date | string;
 }>): void {
   const headers = [
     { key: "firstName" as const, label: "First Name" },

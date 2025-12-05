@@ -1,16 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Trash2, MoreVertical, CheckSquare, Square } from "lucide-react";
+import { Trash2, MoreVertical } from "lucide-react";
 
 interface BulkActionsProps<T extends { id: string }> {
   items: T[];
@@ -18,7 +16,6 @@ interface BulkActionsProps<T extends { id: string }> {
   onSelectAll: () => void;
   onDeselectAll: () => void;
   onBulkDelete?: (ids: string[]) => void;
-  onBulkAction?: (action: string, ids: string[]) => void;
   customActions?: Array<{
     label: string;
     icon?: React.ReactNode;
@@ -33,11 +30,9 @@ export function BulkActions<T extends { id: string }>({
   onSelectAll,
   onDeselectAll,
   onBulkDelete,
-  onBulkAction,
   customActions,
 }: BulkActionsProps<T>) {
   const allSelected = items.length > 0 && selectedItems.size === items.length;
-  const someSelected = selectedItems.size > 0 && selectedItems.size < items.length;
 
   const handleSelectAll = () => {
     if (allSelected) {

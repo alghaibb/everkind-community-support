@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
 import { Sparkles, Heart } from "lucide-react";
 
 export default function AboutHero() {

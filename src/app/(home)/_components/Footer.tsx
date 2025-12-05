@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   footerDescription,
@@ -11,7 +10,7 @@ import {
   copyrightText,
 } from "../constants";
 import { motion } from "framer-motion";
-import { Heart, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { Heart, Mail, Phone, ArrowRight } from "lucide-react";
 
 export default function Footer() {
   return (
