@@ -117,8 +117,7 @@ export const trainingExperienceSchema = z.object({
     .max(50, "Certification details are too long"),
   experience: z.string()
     .min(50, "Please provide a detailed description of your experience (minimum 50 characters)")
-    .max(2000, "Experience description is too long (maximum 2000 characters)")
-    .refine((val) => val.split(' ').length >= 10, "Please provide more detail about your experience"),
+    .max(2000, "Experience description is too long (maximum 2000 characters)"),
   availability: z.object(
     Object.fromEntries(DAYS.map(day => [day, dayAvailability]))
   ).default(

@@ -47,9 +47,15 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  // Password management
+  mustChangePassword Boolean @default(false) // True when using temporary password
+
   // Link to specific profiles based on user type
   staffProfile  Staff?
   familyProfile FamilyMember?
+
+  // Notifications
+  notifications Notification[]
 
   @@index([email])
   @@index([role])
@@ -110,6 +116,8 @@ model Staff {
   staffShifts          StaffShift[]
   appointments         Appointment[]
   serviceLogs          ServiceLog[]
+  shiftRequests        ShiftRequest[]
+  timesheetEntries     TimesheetEntry[]
 
   @@index([staffRole])
   @@index([isActive])
@@ -191,11 +199,13 @@ model Participant {
   updatedAt DateTime @updatedAt
 
   // Relations
-  assignedStaff  ParticipantStaff[]
-  familyMembers  ParticipantFamily[]
-  serviceRecords ServiceRecord[]
-  appointments   Appointment[]
-  serviceLogs    ServiceLog[]
+  assignedStaff    ParticipantStaff[]
+  familyMembers    ParticipantFamily[]
+  serviceRecords   ServiceRecord[]
+  appointments     Appointment[]
+  serviceLogs      ServiceLog[]
+  availableShifts  AvailableShift[]
+  timesheetEntries TimesheetEntry[]
 
   @@index([status])
   @@index([supportCoordinator])
@@ -502,4 +512,160 @@ model ServiceLog {
   @@index([serviceDate, participantId])
   @@index([serviceDate, staffId])
   @@map("service_log")
+}
+
+// STAFF DASHBOARD MODELS
+
+enum ShiftRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TimesheetStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum NotificationType {
+  SHIFT_ASSIGNED
+  SHIFT_CANCELLED
+  SHIFT_REQUEST_APPROVED
+  SHIFT_REQUEST_REJECTED
+  TIMESHEET_APPROVED
+  TIMESHEET_REJECTED
+  NEW_PARTICIPANT
+  SCHEDULE_CHANGE
+  GENERAL
+}
+
+// Available shifts that staff can request to pick up
+model AvailableShift {
+  id String @id @default(cuid())
+
+  // Shift Details
+  shiftDate   DateTime
+  startTime   String // HH:mm format
+  endTime     String // HH:mm format
+  duration    Int // Minutes
+  serviceType String // Type of service
+  location    String
+
+  // Requirements
+  requiredRole   StaffRole? // Optional: specific role required
+  requiredSkills String[] // Skills needed for this shift
+  participantId  String? // If assigned to specific participant
+  participant    Participant? @relation(fields: [participantId], references: [id], onDelete: SetNull)
+
+  // Status
+  isAssigned Boolean @default(false)
+  assignedTo String? // Staff ID if assigned
+  notes      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  shiftRequests ShiftRequest[]
+
+  @@index([shiftDate])
+  @@index([isAssigned])
+  @@index([requiredRole])
+  @@index([shiftDate, isAssigned])
+  @@map("available_shift")
+}
+
+// Staff requests to pick up available shifts
+model ShiftRequest {
+  id               String         @id @default(cuid())
+  staffId          String
+  availableShiftId String
+  staff            Staff          @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  availableShift   AvailableShift @relation(fields: [availableShiftId], references: [id], onDelete: Cascade)
+
+  // Request Details
+  status  ShiftRequestStatus @default(PENDING)
+  message String? // Optional message from staff
+
+  // Review
+  reviewedBy     String? // Admin who reviewed
+  reviewedAt     DateTime?
+  rejectionNotes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([staffId, availableShiftId])
+  @@index([staffId])
+  @@index([availableShiftId])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("shift_request")
+}
+
+// Timesheet entries for staff to log hours
+model TimesheetEntry {
+  id      String @id @default(cuid())
+  staffId String
+  staff   Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  // Time Details
+  workDate     DateTime
+  startTime    String // HH:mm format
+  endTime      String // HH:mm format
+  breakMinutes Int      @default(0)
+  totalHours   Decimal  @db.Decimal(4, 2)
+
+  // Service Details
+  participantId String?
+  participant   Participant? @relation(fields: [participantId], references: [id], onDelete: SetNull)
+  serviceType   String
+  location      String
+  description   String
+
+  // Status & Approval
+  status         TimesheetStatus @default(DRAFT)
+  submittedAt    DateTime?
+  approvedBy     String?
+  approvedAt     DateTime?
+  rejectedBy     String?
+  rejectedAt     DateTime?
+  rejectionNotes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([staffId])
+  @@index([workDate])
+  @@index([status])
+  @@index([staffId, workDate])
+  @@index([staffId, status])
+  @@map("timesheet_entry")
+}
+
+// In-app notifications for staff
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Notification Details
+  type    NotificationType
+  title   String
+  message String
+  link    String? // Optional link to related page
+
+  // Status
+  isRead Boolean   @default(false)
+  readAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([userId, isRead])
+  @@index([createdAt(sort: Desc)])
+  @@map("notification")
 }

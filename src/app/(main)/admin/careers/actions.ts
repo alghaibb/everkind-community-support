@@ -146,6 +146,7 @@ export async function createStaffFromCareer(
         userType: "INTERNAL",
         role: "STAFF",
         emailVerified: true,
+        mustChangePassword: true, // Staff must change temp password on first login
       },
     });
 

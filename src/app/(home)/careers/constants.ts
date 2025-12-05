@@ -97,7 +97,8 @@ export const CAREER_DOCUMENT_FIELDS = [
   {
     key: "qualificationCertificate",
     label: "Qualification Certificate",
-    description: "Upload your Cert III Individual Support or Nursing qualification",
+    description:
+      "Support Workers: Cert III Individual Support | Nurses: Diploma or Bachelor of Nursing",
     required: false,
     acceptedFormats: ".pdf,.jpg,.jpeg,.png",
     folder: "careers/qualifications",
