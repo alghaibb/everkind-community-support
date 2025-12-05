@@ -82,15 +82,18 @@ const AdminSidebarComponent = ({ user }: AdminSidebarProps) => {
   );
 
   return (
-    <Sidebar variant="inset" className="border-r">
-      <SidebarHeader>
-        <div className="flex items-center gap-2 px-4 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Shield className="h-4 w-4" />
+    <Sidebar
+      variant="inset"
+      className="border-r border-border/50 bg-sidebar/95 backdrop-blur-md"
+    >
+      <SidebarHeader className="border-b border-border/50">
+        <div className="flex items-center gap-3 px-4 py-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25">
+            <Shield className="h-5 w-5" />
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold">EverKind Admin</span>
-            <span className="text-xs text-muted-foreground">
+          <div className="flex flex-col min-w-0">
+            <span className="text-sm font-bold truncate">EverKind Admin</span>
+            <span className="text-xs text-muted-foreground truncate">
               Community Support
             </span>
           </div>
@@ -114,14 +117,17 @@ const AdminSidebarComponent = ({ user }: AdminSidebarProps) => {
                           asChild
                           isActive={isActive}
                           tooltip={item.description}
+                          className="transition-all duration-200 hover:scale-[1.02]"
                         >
                           <Link
                             href={item.url}
                             prefetch={true}
-                            className="flex items-center gap-2 w-full"
+                            className="flex items-center gap-3 w-full"
                           >
                             <item.icon className="h-4 w-4 flex-shrink-0" />
-                            <span className="truncate">{item.title}</span>
+                            <span className="truncate font-medium">
+                              {item.title}
+                            </span>
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -145,26 +151,25 @@ const AdminSidebarComponent = ({ user }: AdminSidebarProps) => {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent/50 transition-all duration-200"
                 >
-                  <Avatar className="h-8 w-8 rounded-lg">
+                  <Avatar className="h-9 w-9 rounded-xl border-2 border-primary/20">
                     <AvatarImage
                       src={user.image || undefined}
                       alt={user.name}
                     />
-                    <AvatarFallback className="rounded-lg">
+                    <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground font-bold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                  <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
+                    <span className="truncate font-bold">{user.name}</span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      {user.email}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Badge
-                      variant="secondary"
-                      className="h-5 bg-green-100 text-green-800"
-                    >
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Badge variant="success" className="h-5 text-[10px] px-2">
                       Admin
                     </Badge>
                     <ChevronUp className="ml-auto size-4" />

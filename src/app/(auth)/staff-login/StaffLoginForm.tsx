@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { User } from "@/lib/auth";
@@ -130,12 +129,6 @@ export default function StaffLoginForm() {
         >
           Sign In
         </Button>
-
-        <div className="text-center">
-          <Button asChild variant="link" size="sm">
-            <Link href="/forgot-password">Forgot your password?</Link>
-          </Button>
-        </div>
       </form>
     </Form>
   );

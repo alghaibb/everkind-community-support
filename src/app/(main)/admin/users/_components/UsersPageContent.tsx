@@ -78,72 +78,97 @@ export function UsersPageContent() {
   const stats = data?.stats;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 xs:space-y-7 sm:space-y-8 w-full min-w-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Users Management
-          </h1>
-          <p className="text-muted-foreground">
-            Manage all users including admins, staff, and family members
-          </p>
-        </div>
+      <div className="space-y-2">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+          Users Management
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Manage all users including admins, staff, and family members
+        </p>
       </div>
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+        <div className="grid gap-4 xs:gap-5 sm:gap-6 grid-cols-1 xs:grid-cols-2 xl:grid-cols-4">
+          <Card className="hover:scale-[1.02] transition-transform duration-300 animate-scale-in">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-xs xs:text-sm font-semibold truncate">
+                Total Users
+              </CardTitle>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 shrink-0">
+                <Users className="h-4 w-4 text-primary" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
+              <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+                {stats.total}
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+          <Card
+            className="hover:scale-[1.02] transition-transform duration-300 animate-scale-in"
+            style={{ animationDelay: "0.05s" }}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-xs xs:text-sm font-semibold truncate">
                 Active Users
               </CardTitle>
-              <UserCheck className="h-4 w-4 text-muted-foreground" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-green-500/10 to-green-500/5 shrink-0">
+                <UserCheck className="h-4 w-4 text-green-600" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.active}</div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+                {stats.active}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 truncate">
                 {stats.inactive} inactive
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+          <Card
+            className="hover:scale-[1.02] transition-transform duration-300 animate-scale-in"
+            style={{ animationDelay: "0.1s" }}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-xs xs:text-sm font-semibold truncate">
                 Admin & Staff
               </CardTitle>
-              <Shield className="h-4 w-4 text-muted-foreground" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-500/5 shrink-0">
+                <Shield className="h-4 w-4 text-amber-600" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
                 {stats.admins + stats.staff}
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-xs text-muted-foreground mt-1 truncate">
                 {stats.admins} admins, {stats.staff} staff
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">User Types</CardTitle>
-              <Building className="h-4 w-4 text-muted-foreground" />
+          <Card
+            className="hover:scale-[1.02] transition-transform duration-300 animate-scale-in"
+            style={{ animationDelay: "0.15s" }}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-xs xs:text-sm font-semibold truncate">
+                User Types
+              </CardTitle>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 shrink-0">
+                <Building className="h-4 w-4 text-blue-600" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.internal}</div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+                {stats.internal}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 truncate">
                 Internal: {stats.internal}, Family: {stats.family}
               </div>
             </CardContent>
@@ -152,15 +177,15 @@ export function UsersPageContent() {
       )}
 
       {/* Search and Filters */}
-      <Card>
+      <Card className="animate-slide-up">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
-            Search & Filter Users
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Search className="h-5 w-5 shrink-0" />
+            <span className="truncate">Search & Filter Users</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <Label className="text-sm font-medium">Search</Label>
               <SearchInput

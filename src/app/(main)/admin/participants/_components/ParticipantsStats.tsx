@@ -13,13 +13,15 @@ export default function ParticipantsStats({
   // Calculate stats
   const totalParticipants = participants.length;
   const activeParticipants = participants.filter(
-    (p) => p.status === "ACTIVE" as ParticipantStatus
+    (p) => p.status === ("ACTIVE" as ParticipantStatus)
   ).length;
   const pendingParticipants = participants.filter(
-    (p) => p.status === "PENDING" as ParticipantStatus
+    (p) => p.status === ("PENDING" as ParticipantStatus)
   ).length;
   const inactiveParticipants = participants.filter(
-    (p) => p.status === "INACTIVE" || p.status === "DISCHARGED" as ParticipantStatus
+    (p) =>
+      p.status === "INACTIVE" ||
+      p.status === ("DISCHARGED" as ParticipantStatus)
   ).length;
 
   const stats = [
@@ -50,16 +52,28 @@ export default function ParticipantsStats({
   ];
 
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full">
-      {stats.map((stat) => (
-        <Card key={stat.title} className="w-full">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-            <stat.icon className="h-4 w-4 text-muted-foreground" />
+    <div className="grid gap-4 xs:gap-5 sm:gap-6 grid-cols-1 xs:grid-cols-2 xl:grid-cols-4 w-full min-w-0">
+      {stats.map((stat, index) => (
+        <Card
+          key={stat.title}
+          className="w-full hover:scale-[1.02] transition-transform duration-300 animate-scale-in"
+          style={{ animationDelay: `${index * 0.05}s` }}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-xs xs:text-sm font-semibold truncate">
+              {stat.title}
+            </CardTitle>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 shrink-0">
+              <stat.icon className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
-            <p className="text-xs text-muted-foreground">{stat.description}</p>
+            <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+              {stat.value}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 truncate">
+              {stat.description}
+            </p>
           </CardContent>
         </Card>
       ))}

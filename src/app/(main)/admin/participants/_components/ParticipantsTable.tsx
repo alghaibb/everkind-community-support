@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -11,16 +12,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { BulkActions } from "@/components/ui/bulk-actions";
 import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import { useModal } from "@/hooks/use-modal";
 import { MODAL_TYPES } from "../../constants";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 interface Participant {
   id: string;
@@ -38,6 +42,7 @@ interface Participant {
 
 interface ParticipantsTableProps {
   participants: Participant[];
+  onBulkDelete?: (ids: string[]) => Promise<void>;
 }
 
 const STATUS_COLORS = {
@@ -49,8 +54,10 @@ const STATUS_COLORS = {
 
 export default function ParticipantsTable({
   participants,
+  onBulkDelete,
 }: ParticipantsTableProps) {
   const { onOpen } = useModal();
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
@@ -71,6 +78,41 @@ export default function ParticipantsTable({
     }
   };
 
+  const handleSelectAll = () => {
+    if (selectedItems.size === participants.length) {
+      setSelectedItems(new Set());
+    } else {
+      setSelectedItems(new Set(participants.map((p) => p.id)));
+    }
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedItems(new Set());
+  };
+
+  const handleToggleItem = (id: string) => {
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedItems(newSelected);
+  };
+
+  const handleBulkDelete = async (ids: string[]) => {
+    if (onBulkDelete) {
+      try {
+        await onBulkDelete(ids);
+        setSelectedItems(new Set());
+        toast.success(`Successfully deleted ${ids.length} participant(s)`);
+      } catch (error) {
+        console.error("Bulk delete error:", error);
+        toast.error("Failed to delete participants");
+      }
+    }
+  };
+
   if (participants.length === 0) {
     return (
       <div className="text-center py-8">
@@ -80,24 +122,50 @@ export default function ParticipantsTable({
   }
 
   return (
-    <div className="rounded-md border overflow-x-auto">
-      <Table className="min-w-[1000px]">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="min-w-[200px]">Participant</TableHead>
-            <TableHead className="min-w-[120px]">NDIS Number</TableHead>
-            <TableHead className="min-w-[100px]">Status</TableHead>
-            <TableHead className="min-w-[150px]">Primary Disability</TableHead>
-            <TableHead className="min-w-[150px]">Support Coordinator</TableHead>
-            <TableHead className="min-w-[120px]">Plan End Date</TableHead>
-            <TableHead className="min-w-[100px]">Created</TableHead>
-            <TableHead className="w-[70px]">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {participants.map((participant) => (
-            <TableRow key={participant.id}>
-              <TableCell className="max-w-[200px]">
+    <div className="space-y-4 w-full">
+      {selectedItems.size > 0 && (
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-4 bg-muted/50 rounded-md border w-full">
+          <BulkActions
+            items={participants}
+            selectedItems={selectedItems}
+            onSelectAll={handleSelectAll}
+            onDeselectAll={handleDeselectAll}
+            onBulkDelete={onBulkDelete ? handleBulkDelete : undefined}
+          />
+        </div>
+      )}
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="min-w-[1000px]">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={selectedItems.size === participants.length && participants.length > 0}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all participants"
+                />
+              </TableHead>
+              <TableHead className="min-w-[200px]">Participant</TableHead>
+              <TableHead className="min-w-[120px]">NDIS Number</TableHead>
+              <TableHead className="min-w-[100px]">Status</TableHead>
+              <TableHead className="min-w-[150px]">Primary Disability</TableHead>
+              <TableHead className="min-w-[150px]">Support Coordinator</TableHead>
+              <TableHead className="min-w-[120px]">Plan End Date</TableHead>
+              <TableHead className="min-w-[100px]">Created</TableHead>
+              <TableHead className="w-[70px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {participants.map((participant) => (
+              <TableRow key={participant.id}>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedItems.has(participant.id)}
+                    onCheckedChange={() => handleToggleItem(participant.id)}
+                    aria-label={`Select ${participant.firstName} ${participant.lastName}`}
+                  />
+                </TableCell>
+                <TableCell className="max-w-[200px]">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8 flex-shrink-0">
                     <AvatarFallback className="text-xs">
@@ -201,6 +269,7 @@ export default function ParticipantsTable({
           ))}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 }

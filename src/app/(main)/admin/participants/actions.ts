@@ -157,3 +157,36 @@ export async function deleteParticipant(id: string) {
     return handleParticipantError(error, "delete");
   }
 }
+
+export async function bulkDeleteParticipants(ids: string[]) {
+  try {
+    const session = await getServerSession();
+    if (!session || session.user.role !== "ADMIN") {
+      return { error: "Unauthorized" };
+    }
+
+    if (!ids || ids.length === 0) {
+      return { error: "No participants selected" };
+    }
+
+    // Delete multiple participants
+    const result = await prisma.participant.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    revalidatePath("/admin/participants");
+
+    return {
+      success: true,
+      message: `Successfully deleted ${result.count} participant(s)`,
+      count: result.count,
+    };
+  } catch (error) {
+    console.error("Error bulk deleting participants:", error);
+    return { error: "Failed to delete participants. Please try again." };
+  }
+}

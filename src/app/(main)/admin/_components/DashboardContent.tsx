@@ -44,71 +44,100 @@ export function DashboardContent({ userName }: { userName: string }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 xs:space-y-7 sm:space-y-8 w-full min-w-0">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">
+      <div className="space-y-2">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+          Dashboard
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
           Welcome back, {userName}. Here&apos;s what&apos;s happening at
           EverKind.
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Staff</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+      <div className="grid gap-4 xs:gap-5 sm:gap-6 grid-cols-1 xs:grid-cols-2 xl:grid-cols-4">
+        <Card className="hover:scale-[1.02] transition-transform duration-300 animate-scale-in">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-xs xs:text-sm font-semibold truncate">
+              Total Staff
+            </CardTitle>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 shrink-0">
+              <Users className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.staff.total}</div>
-            <p className="text-xs text-muted-foreground">Active team members</p>
+            <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+              {stats.staff.total}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 truncate">
+              Active team members
+            </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+        <Card
+          className="hover:scale-[1.02] transition-transform duration-300 animate-scale-in"
+          style={{ animationDelay: "0.05s" }}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-xs xs:text-sm font-semibold truncate">
               Total Applications
             </CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 shrink-0">
+              <FileText className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.applications.total}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+              {stats.applications.total}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 truncate">
               +{stats.applications.weekly} this week
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+        <Card
+          className="hover:scale-[1.02] transition-transform duration-300 animate-scale-in"
+          style={{ animationDelay: "0.1s" }}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-xs xs:text-sm font-semibold truncate">
               Contact Messages
             </CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-green-500/10 to-green-500/5 shrink-0">
+              <MessageSquare className="h-4 w-4 text-green-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.messages.total}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+              {stats.messages.total}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 truncate">
               +{stats.messages.weekly} this week
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+        <Card
+          className="hover:scale-[1.02] transition-transform duration-300 animate-scale-in"
+          style={{ animationDelay: "0.15s" }}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-xs xs:text-sm font-semibold truncate">
               Monthly Growth
             </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-500/5 shrink-0">
+              <Activity className="h-4 w-4 text-amber-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl xs:text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
               {stats.applications.monthly + stats.messages.monthly}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mt-1 truncate">
               Combined activity this month
             </p>
           </CardContent>
@@ -116,19 +145,21 @@ export function DashboardContent({ userName }: { userName: string }) {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
+      <div className="grid gap-4 xs:gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="hover-lift">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Briefcase className="h-5 w-5" />
-              Career Applications
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 shrink-0">
+                <Briefcase className="h-5 w-5 text-primary" />
+              </div>
+              <span className="truncate">Career Applications</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
               Review and manage job applications from potential staff members.
             </p>
-            <Button asChild>
+            <Button asChild className="w-full sm:w-auto">
               <Link href="/admin/careers">
                 <Eye className="mr-2 h-4 w-4" />
                 View Applications
@@ -137,18 +168,20 @@ export function DashboardContent({ userName }: { userName: string }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover-lift">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <MessageSquare className="h-5 w-5" />
-              Contact Messages
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-green-500/10 to-green-500/5 shrink-0">
+                <MessageSquare className="h-5 w-5 text-green-600" />
+              </div>
+              <span className="truncate">Contact Messages</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
               Respond to inquiries and support requests from families.
             </p>
-            <Button asChild>
+            <Button asChild className="w-full sm:w-auto">
               <Link href="/admin/messages">
                 <Eye className="mr-2 h-4 w-4" />
                 View Messages
@@ -157,18 +190,20 @@ export function DashboardContent({ userName }: { userName: string }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover-lift">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Users className="h-5 w-5" />
-              Staff Management
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 shrink-0">
+                <Users className="h-5 w-5 text-blue-600" />
+              </div>
+              <span className="truncate">Staff Management</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
               Manage team members, roles, and account settings.
             </p>
-            <Button asChild>
+            <Button asChild className="w-full sm:w-auto">
               <Link href="/admin/staff">
                 <Plus className="mr-2 h-4 w-4" />
                 Manage Staff
@@ -179,10 +214,12 @@ export function DashboardContent({ userName }: { userName: string }) {
       </div>
 
       {/* Recent Activity */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+      <div className="grid gap-4 xs:gap-5 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+        <Card className="animate-slide-up">
           <CardHeader>
-            <CardTitle>Recent Applications</CardTitle>
+            <CardTitle className="text-base sm:text-lg">
+              Recent Applications
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {stats.recent.applications.length > 0 ? (
@@ -223,9 +260,11 @@ export function DashboardContent({ userName }: { userName: string }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="animate-slide-up" style={{ animationDelay: "0.1s" }}>
           <CardHeader>
-            <CardTitle>Recent Messages</CardTitle>
+            <CardTitle className="text-base sm:text-lg">
+              Recent Messages
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {stats.recent.messages.length > 0 ? (

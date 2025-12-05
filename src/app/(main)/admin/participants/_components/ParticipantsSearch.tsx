@@ -102,14 +102,14 @@ export default function ParticipantsSearch() {
     searchParams.get("search") || status || disability || supportCoordinator;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full min-w-0">
       {/* Search and Filter Controls */}
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="flex-1">
+      <div className="flex flex-col gap-4 sm:flex-row w-full min-w-0">
+        <div className="flex-1 min-w-0">
           <SearchInput placeholder="Search by name or NDIS number..." />
         </div>
 
-        <div className="flex gap-2 sm:gap-4">
+        <div className="flex gap-2 sm:gap-4 min-w-0 flex-wrap">
           <Select value={status} onValueChange={handleRoleChange}>
             <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="All statuses" />
