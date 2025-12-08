@@ -197,11 +197,11 @@ export function StaffDashboardContent() {
       </div>
 
       {/* Pending Items Section */}
-      {(data?.pendingRequests?.length > 0 ||
-        data?.pendingTimesheets?.length > 0) && (
+      {((data?.pendingRequests?.length ?? 0) > 0 ||
+        (data?.pendingTimesheets?.length ?? 0) > 0) && (
         <div className="grid gap-6 md:grid-cols-2">
           {/* Pending Shift Requests */}
-          {data?.pendingRequests?.length > 0 && (
+          {(data?.pendingRequests?.length ?? 0) > 0 && (
             <Card className="border-border/50 shadow-soft-lg animate-slide-up">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -211,12 +211,14 @@ export function StaffDashboardContent() {
                       Pending Shift Requests
                     </CardTitle>
                   </div>
-                  <Badge variant="warning">{data.pendingRequests.length}</Badge>
+                  <Badge variant="warning">
+                    {data?.pendingRequests?.length ?? 0}
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {data.pendingRequests
+                  {(data?.pendingRequests ?? [])
                     .slice(0, 3)
                     .map(
                       (request: {
@@ -247,7 +249,7 @@ export function StaffDashboardContent() {
           )}
 
           {/* Pending Timesheets */}
-          {data?.pendingTimesheets?.length > 0 && (
+          {(data?.pendingTimesheets?.length ?? 0) > 0 && (
             <Card className="border-border/50 shadow-soft-lg animate-slide-up">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -258,13 +260,13 @@ export function StaffDashboardContent() {
                     </CardTitle>
                   </div>
                   <Badge variant="warning">
-                    {data.pendingTimesheets.length}
+                    {data?.pendingTimesheets?.length ?? 0}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {data.pendingTimesheets
+                  {(data?.pendingTimesheets ?? [])
                     .slice(0, 3)
                     .map(
                       (timesheet: {

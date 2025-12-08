@@ -63,7 +63,7 @@ export default async function StaffLayout({
     <SidebarProvider>
       <StaffSidebar user={session.user} staffRole={staffProfile.staffRole} />
       <SidebarInset className="overflow-x-hidden min-w-0 bg-background">
-        <StaffHeader user={session.user} />
+        <StaffHeader />
         <div className="flex flex-1 flex-col gap-4 xs:gap-5 sm:gap-6 p-3 xs:p-4 sm:p-5 md:p-6 lg:p-8 pt-0 overflow-x-hidden min-w-0 max-w-full container-fluid">
           <div className="max-w-[1600px] 3xl:max-w-[1800px] mx-auto w-full min-w-0">
             <div className="min-h-[calc(100vh-8rem)] min-w-0 max-w-full animate-fade-in">

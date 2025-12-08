@@ -14,14 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Bell } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { User } from "@/lib/auth";
 import Link from "next/link";
 
-interface StaffHeaderProps {
-  user: User;
-}
-
-export default function StaffHeader({ user: _user }: StaffHeaderProps) {
+export default function StaffHeader() {
   const pathname = usePathname();
 
   // Generate breadcrumb items based on pathname

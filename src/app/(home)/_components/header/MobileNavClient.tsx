@@ -20,6 +20,11 @@ import {
   MessageSquare,
   Shield,
   Heart,
+  Calendar,
+  CalendarPlus,
+  ClipboardList,
+  Bell,
+  UserCircle,
 } from "lucide-react";
 
 interface MobileNavClientProps {
@@ -35,6 +40,7 @@ export default function MobileNavClient({ user }: MobileNavClientProps) {
   const [open, setOpen] = useState(false);
   const [expandedServices, setExpandedServices] = useState(false);
   const isAdmin = user?.role === "ADMIN";
+  const isStaff = user?.role === "STAFF";
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -94,24 +100,100 @@ export default function MobileNavClient({ user }: MobileNavClientProps) {
 
           {user ? (
             <>
-              <div className="border-t border-border my-4" />
-              <Link
-                href="/profile"
-                className="flex items-center px-3 py-2 text-base font-medium hover:text-primary transition-colors"
-                onClick={() => setOpen(false)}
-              >
-                <User className="mr-3 h-4 w-4" />
-                Profile
-              </Link>
-              <Link
-                href="/settings"
-                className="flex items-center px-3 py-2 text-base font-medium hover:text-primary transition-colors"
-                onClick={() => setOpen(false)}
-              >
-                <Settings className="mr-3 h-4 w-4" />
-                Settings
-              </Link>
+              {/* Staff Portal Links */}
+              {isStaff && (
+                <>
+                  <div className="border-t border-border my-4" />
+                  <div className="px-3 py-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                      Staff Portal
+                    </p>
+                    <div className="space-y-1">
+                      <Link
+                        href="/staff"
+                        className="flex items-center px-3 py-2 text-sm font-medium hover:text-primary transition-colors"
+                        onClick={() => setOpen(false)}
+                      >
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/staff/schedule"
+                        className="flex items-center px-3 py-2 text-sm font-medium hover:text-primary transition-colors"
+                        onClick={() => setOpen(false)}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        My Schedule
+                      </Link>
+                      <Link
+                        href="/staff/available-shifts"
+                        className="flex items-center px-3 py-2 text-sm font-medium hover:text-primary transition-colors"
+                        onClick={() => setOpen(false)}
+                      >
+                        <CalendarPlus className="mr-2 h-4 w-4" />
+                        Available Shifts
+                      </Link>
+                      <Link
+                        href="/staff/participants"
+                        className="flex items-center px-3 py-2 text-sm font-medium hover:text-primary transition-colors"
+                        onClick={() => setOpen(false)}
+                      >
+                        <Users className="mr-2 h-4 w-4" />
+                        My Participants
+                      </Link>
+                      <Link
+                        href="/staff/timesheets"
+                        className="flex items-center px-3 py-2 text-sm font-medium hover:text-primary transition-colors"
+                        onClick={() => setOpen(false)}
+                      >
+                        <ClipboardList className="mr-2 h-4 w-4" />
+                        Timesheets
+                      </Link>
+                      <Link
+                        href="/staff/notifications"
+                        className="flex items-center px-3 py-2 text-sm font-medium hover:text-primary transition-colors"
+                        onClick={() => setOpen(false)}
+                      >
+                        <Bell className="mr-2 h-4 w-4" />
+                        Notifications
+                      </Link>
+                      <Link
+                        href="/staff/profile"
+                        className="flex items-center px-3 py-2 text-sm font-medium hover:text-primary transition-colors"
+                        onClick={() => setOpen(false)}
+                      >
+                        <UserCircle className="mr-2 h-4 w-4" />
+                        My Profile
+                      </Link>
+                    </div>
+                  </div>
+                </>
+              )}
 
+              {/* Generic user links (only show if not staff) */}
+              {!isStaff && (
+                <>
+                  <div className="border-t border-border my-4" />
+                  <Link
+                    href="/profile"
+                    className="flex items-center px-3 py-2 text-base font-medium hover:text-primary transition-colors"
+                    onClick={() => setOpen(false)}
+                  >
+                    <User className="mr-3 h-4 w-4" />
+                    Profile
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className="flex items-center px-3 py-2 text-base font-medium hover:text-primary transition-colors"
+                    onClick={() => setOpen(false)}
+                  >
+                    <Settings className="mr-3 h-4 w-4" />
+                    Settings
+                  </Link>
+                </>
+              )}
+
+              {/* Admin Panel Links */}
               {isAdmin && (
                 <>
                   <div className="border-t border-border my-4" />
@@ -196,7 +278,7 @@ export default function MobileNavClient({ user }: MobileNavClientProps) {
         </nav>
 
         {user && (
-          <div className="border-t border-border  ">
+          <div className="border-t border-border">
             <LogoutButton variant="ghost" />
           </div>
         )}

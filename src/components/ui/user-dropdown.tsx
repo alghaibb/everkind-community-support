@@ -19,6 +19,11 @@ import {
   Users,
   MessageSquare,
   Shield,
+  Calendar,
+  CalendarPlus,
+  ClipboardList,
+  Bell,
+  UserCircle,
 } from "lucide-react";
 import Link from "next/link";
 import LogoutButton from "@/components/logout-button";
@@ -38,6 +43,7 @@ export function UserDropdown({
   showAdminRoutes = true,
 }: UserDropdownProps) {
   const isAdmin = user.role === "ADMIN";
+  const isStaff = user.role === "STAFF";
 
   return (
     <DropdownMenu>
@@ -66,6 +72,12 @@ export function UserDropdown({
                   Admin
                 </Badge>
               )}
+              {isStaff && (
+                <Badge variant="outline" className="text-xs">
+                  <User className="mr-1 h-3 w-3" />
+                  Staff
+                </Badge>
+              )}
             </div>
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
@@ -75,21 +87,77 @@ export function UserDropdown({
 
         <DropdownMenuSeparator />
 
-        {/* User Routes */}
-        <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href="/profile" className="cursor-pointer">
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/settings" className="cursor-pointer">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+        {/* Staff Routes */}
+        {isStaff && (
+          <>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                Staff Portal
+              </DropdownMenuLabel>
+              <DropdownMenuItem asChild>
+                <Link href="/staff" className="cursor-pointer">
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/staff/schedule" className="cursor-pointer">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  <span>My Schedule</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/staff/available-shifts" className="cursor-pointer">
+                  <CalendarPlus className="mr-2 h-4 w-4" />
+                  <span>Available Shifts</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/staff/participants" className="cursor-pointer">
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>My Participants</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/staff/timesheets" className="cursor-pointer">
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  <span>Timesheets</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/staff/notifications" className="cursor-pointer">
+                  <Bell className="mr-2 h-4 w-4" />
+                  <span>Notifications</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/staff/profile" className="cursor-pointer">
+                  <UserCircle className="mr-2 h-4 w-4" />
+                  <span>My Profile</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
+        {/* Generic User Routes (only show if not staff) */}
+        {!isStaff && (
+          <DropdownMenuGroup>
+            <DropdownMenuItem asChild>
+              <Link href="/profile" className="cursor-pointer">
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings" className="cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        )}
 
         {/* Admin Routes */}
         {isAdmin && showAdminRoutes && (

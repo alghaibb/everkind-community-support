@@ -40,7 +40,8 @@ export function TodaySchedule({ shifts }: TodayScheduleProps) {
     <div className="space-y-4">
       {shifts.map((shift) => {
         const statusConfig =
-          SHIFT_STATUS[shift.status as keyof typeof SHIFT_STATUS] || SHIFT_STATUS.SCHEDULED;
+          SHIFT_STATUS[shift.status as keyof typeof SHIFT_STATUS] ||
+          SHIFT_STATUS.SCHEDULED;
 
         return (
           <div
