@@ -1,16 +1,33 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { CalendarPlus, Calendar, TrendingUp } from "lucide-react";
+import Link from "next/link";
 
 export function StaffDashboardSkeleton() {
   return (
     <div className="space-y-6 xs:space-y-7 sm:space-y-8 w-full min-w-0">
-      {/* Header Skeleton */}
+      {/* Header - Instant */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-4 w-48" />
+        <div className="min-w-0 flex-1 space-y-2">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+            Welcome back
+          </h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            Here&apos;s an overview of your schedule and tasks
+          </p>
         </div>
-        <Skeleton className="h-10 w-40" />
+        <Button
+          asChild
+          size="lg"
+          className="gap-2 shrink-0 w-full sm:w-auto shadow-glow hover:shadow-glow-lg"
+        >
+          <Link href="/staff/available-shifts">
+            <CalendarPlus className="h-4 w-4" />
+            <span className="hidden xs:inline">Browse Available Shifts</span>
+            <span className="xs:hidden">Available Shifts</span>
+          </Link>
+        </Button>
       </div>
 
       {/* Stats Cards Skeleton */}
@@ -32,9 +49,15 @@ export function StaffDashboardSkeleton() {
       {/* Main Content Grid Skeleton */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <Card className="border-border/50">
-            <CardHeader>
-              <Skeleton className="h-6 w-40" />
+          <Card className="border-border/50 shadow-soft-lg">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                <CardTitle className="text-base sm:text-lg">
+                  Today&apos;s Schedule
+                </CardTitle>
+              </div>
+              <Skeleton className="h-8 w-20" />
             </CardHeader>
             <CardContent className="space-y-4">
               {Array.from({ length: 3 }).map((_, i) => (
@@ -55,9 +78,14 @@ export function StaffDashboardSkeleton() {
         </div>
 
         <div className="lg:col-span-1">
-          <Card className="border-border/50">
+          <Card className="border-border/50 shadow-soft-lg">
             <CardHeader>
-              <Skeleton className="h-6 w-32" />
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                <CardTitle className="text-base sm:text-lg">
+                  Quick Actions
+                </CardTitle>
+              </div>
             </CardHeader>
             <CardContent className="space-y-3">
               {Array.from({ length: 4 }).map((_, i) => (

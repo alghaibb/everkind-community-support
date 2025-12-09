@@ -4,10 +4,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function ParticipantsSkeleton() {
   return (
     <div className="space-y-6 xs:space-y-7 sm:space-y-8 w-full min-w-0">
-      {/* Header */}
-      <div className="space-y-2">
-        <Skeleton className="h-10 w-48" />
-        <Skeleton className="h-4 w-64" />
+      {/* Header - Instant */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1 space-y-2">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/70">
+            My Participants
+          </h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            View participants currently assigned to you
+          </p>
+        </div>
       </div>
 
       {/* Grid */}
