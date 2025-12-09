@@ -61,7 +61,8 @@ export default withBundleAnalyzer(
     dest: "public",
     register: true,
     skipWaiting: true,
-    disable: process.env.NODE_ENV === "development",
+    // Disable PWA during local dev and bundle analysis to avoid noisy errors
+    disable: process.env.NODE_ENV === "development" || process.env.ANALYZE === "true",
     buildExcludes: [/middleware-manifest\.json$/],
   })(nextConfig)
 );
