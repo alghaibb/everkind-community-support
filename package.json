@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "prisma generate && next dev --turbopack",
     "build": "prisma generate && next build --turbopack",
+    "analyze": "ANALYZE=true TURBOPACK=0 next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
@@ -70,6 +71,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@next/bundle-analyzer": "^16.0.8",
     "@tailwindcss/postcss": "^4",
     "@tanstack/eslint-plugin-query": "^5.90.1",
     "@types/node": "^20",

@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
+import bundleAnalyzer from "@next/bundle-analyzer";
 import withPWA from "next-pwa";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   turbopack: {
@@ -51,10 +56,12 @@ const nextConfig: NextConfig = {
   devIndicators: false,
 };
 
-export default withPWA({
-  dest: "public",
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === "development",
-  buildExcludes: [/middleware-manifest\.json$/],
-})(nextConfig);
+export default withBundleAnalyzer(
+  withPWA({
+    dest: "public",
+    register: true,
+    skipWaiting: true,
+    disable: process.env.NODE_ENV === "development",
+    buildExcludes: [/middleware-manifest\.json$/],
+  })(nextConfig)
+);
