@@ -3,6 +3,7 @@ import { getServerSession } from "@/lib/get-session";
 import { User } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getDateRanges } from "@/lib/date-utils";
+import { cachedJson, CACHE_TIMES } from "@/lib/performance";
 
 export async function GET() {
   try {
@@ -102,7 +103,8 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({
+    // Cache admin dashboard for 1 minute
+    return cachedJson({
       applications: {
         total: result.totalApplications,
         weekly: result.weeklyApplications,
@@ -120,7 +122,7 @@ export async function GET() {
         applications: result.recentApplications,
         messages: result.recentMessages,
       },
-    });
+    }, CACHE_TIMES.DYNAMIC);
   } catch (error) {
     console.error("Dashboard API error:", error);
     return NextResponse.json(

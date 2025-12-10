@@ -6,6 +6,7 @@ import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import StaffSidebar from "./_components/StaffSidebar";
 import StaffHeader from "./_components/StaffHeader";
+import { PrefetchStaffRoutes } from "@/components/prefetch-routes";
 
 export default async function StaffLayout({
   children,
@@ -71,6 +72,8 @@ export default async function StaffLayout({
             </div>
           </div>
           <ModalProvider />
+          {/* Prefetch common staff routes for instant navigation */}
+          <PrefetchStaffRoutes />
         </div>
       </SidebarInset>
     </SidebarProvider>

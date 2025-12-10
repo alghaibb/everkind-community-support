@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { STALE_TIMES } from "@/lib/performance";
 
 // Staff Dashboard Data
 interface StaffDashboardData {
@@ -58,8 +59,7 @@ export function useStaffDashboard() {
   return useQuery({
     queryKey: ["staff", "dashboard"],
     queryFn: fetchStaffDashboard,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
+    staleTime: STALE_TIMES.DYNAMIC, // 1 minute
   });
 }
 
@@ -104,7 +104,7 @@ export function useStaffSchedule(startDate?: string, endDate?: string) {
   return useQuery({
     queryKey: ["staff", "schedule", startDate, endDate],
     queryFn: () => fetchStaffSchedule(startDate, endDate),
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIMES.DYNAMIC, // 1 minute
   });
 }
 
@@ -157,7 +157,7 @@ export function useAvailableShifts(
   return useQuery({
     queryKey: ["staff", "available-shifts", page, serviceType, date],
     queryFn: () => fetchAvailableShifts(page, serviceType, date),
-    staleTime: 1000 * 60 * 1, // 1 minute - more frequent updates
+    staleTime: STALE_TIMES.DYNAMIC, // 1 minute
   });
 }
 
@@ -191,7 +191,7 @@ export function useStaffParticipants() {
   return useQuery({
     queryKey: ["staff", "participants"],
     queryFn: fetchStaffParticipants,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: STALE_TIMES.SEMI_STATIC, // 15 minutes - rarely changes
   });
 }
 
@@ -252,7 +252,7 @@ export function useTimesheets(
   return useQuery({
     queryKey: ["staff", "timesheets", status, startDate, endDate],
     queryFn: () => fetchTimesheets(status, startDate, endDate),
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIMES.DYNAMIC, // 1 minute
   });
 }
 
@@ -308,7 +308,7 @@ export function useStaffAppointments(
   return useQuery({
     queryKey: ["staff", "appointments", status, startDate, endDate],
     queryFn: () => fetchAppointments(status, startDate, endDate),
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIMES.DYNAMIC, // 1 minute
   });
 }
 
@@ -340,8 +340,7 @@ export function useNotifications() {
   return useQuery({
     queryKey: ["staff", "notifications"],
     queryFn: fetchNotifications,
-    staleTime: 1000 * 30, // 30 seconds - frequent updates
-    refetchInterval: 1000 * 60 * 2, // Refetch every 2 minutes
+    staleTime: STALE_TIMES.REALTIME, // 10 seconds - near real-time
   });
 }
 
@@ -386,6 +385,6 @@ export function useStaffProfile() {
   return useQuery({
     queryKey: ["staff", "profile"],
     queryFn: fetchStaffProfile,
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: STALE_TIMES.SEMI_STATIC, // 15 minutes - rarely changes
   });
 }

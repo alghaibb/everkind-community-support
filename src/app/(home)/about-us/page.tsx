@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   ],
 };
 
+// Revalidate about page every 1 hour
+export const revalidate = 3600;
+
 /**
  * About Us Page
  * Showcases company mission, values, team, and statistics

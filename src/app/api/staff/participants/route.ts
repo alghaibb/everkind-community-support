@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
+import { cachedJson, CACHE_TIMES } from "@/lib/performance";
 
 export async function GET() {
   try {
@@ -40,7 +41,8 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json({
+    // Cache participants for 15 minutes (semi-static)
+    return cachedJson({
       participants: assignments.map((a) => ({
         id: a.participant.id,
         firstName: a.participant.firstName,
@@ -53,7 +55,7 @@ export async function GET() {
         isPrimary: a.isPrimary,
       })),
       total: assignments.length,
-    });
+    }, CACHE_TIMES.SEMI_STATIC);
   } catch (error) {
     console.error("Staff participants error:", error);
     return NextResponse.json(

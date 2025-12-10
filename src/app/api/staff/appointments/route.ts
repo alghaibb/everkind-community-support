@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek } from "date-fns";
+import { cachedJson, CACHE_TIMES } from "@/lib/performance";
 
 export async function GET(request: NextRequest) {
   try {
@@ -48,46 +49,51 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Get appointments
-    const appointments = await prisma.appointment.findMany({
-      where: whereClause,
-      include: {
-        participant: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            phone: true,
-            address: true,
-          },
-        },
-      },
-      orderBy: [{ appointmentDate: "asc" }, { startTime: "asc" }],
-    });
-
-    // Count today's and this week's appointments
+    // Calculate stats efficiently using count queries (parallel execution)
     const todayStart = startOfDay(today);
     const todayEnd = endOfDay(today);
     const weekStart = startOfWeek(today, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
 
-    const allUpcoming = await prisma.appointment.findMany({
-      where: {
-        staffId: staff.id,
-        appointmentDate: { gte: todayStart },
-        status: { not: "CANCELLED" },
-      },
-    });
+    // Fetch appointments and counts in parallel for better performance
+    const [appointments, todayCount, weekCount] = await Promise.all([
+      // Get appointments with lean includes
+      prisma.appointment.findMany({
+        where: whereClause,
+        include: {
+          participant: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              phone: true,
+              address: true,
+            },
+          },
+        },
+        orderBy: [{ appointmentDate: "asc" }, { startTime: "asc" }],
+        take: 100, // Limit for performance
+      }),
+      // Today's count
+      prisma.appointment.count({
+        where: {
+          staffId: staff.id,
+          appointmentDate: { gte: todayStart, lte: todayEnd },
+          status: { not: "CANCELLED" },
+        },
+      }),
+      // Week's count
+      prisma.appointment.count({
+        where: {
+          staffId: staff.id,
+          appointmentDate: { gte: weekStart, lte: weekEnd },
+          status: { not: "CANCELLED" },
+        },
+      }),
+    ]);
 
-    const todayCount = allUpcoming.filter(
-      (a) => a.appointmentDate >= todayStart && a.appointmentDate <= todayEnd
-    ).length;
-
-    const weekCount = allUpcoming.filter(
-      (a) => a.appointmentDate >= weekStart && a.appointmentDate <= weekEnd
-    ).length;
-
-    return NextResponse.json({
+    // Cache appointments for 1 minute
+    return cachedJson({
       appointments: appointments.map((a) => ({
         id: a.id,
         appointmentDate: a.appointmentDate.toISOString(),
@@ -109,7 +115,7 @@ export async function GET(request: NextRequest) {
       total: appointments.length,
       todayCount,
       weekCount,
-    });
+    }, CACHE_TIMES.DYNAMIC);
   } catch (error) {
     console.error("Staff appointments error:", error);
     return NextResponse.json(

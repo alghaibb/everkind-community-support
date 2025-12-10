@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   ],
 };
 
+// Revalidate services page every 1 hour
+export const revalidate = 3600;
+
 export default function ServicesPage() {
   return (
     <ErrorBoundary>

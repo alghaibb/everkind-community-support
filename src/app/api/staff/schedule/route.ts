@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import { cachedJson, CACHE_TIMES } from "@/lib/performance";
 
 export async function GET(request: NextRequest) {
   try {
@@ -63,7 +64,8 @@ export async function GET(request: NextRequest) {
     });
     const monthlyHours = monthTimesheets.reduce((acc, t) => acc + Number(t.totalHours), 0);
 
-    return NextResponse.json({
+    // Cache schedule for 1 minute
+    return cachedJson({
       shifts: shifts.map((shift) => ({
         id: shift.id,
         shiftDate: shift.shiftDate.toISOString(),
@@ -74,7 +76,7 @@ export async function GET(request: NextRequest) {
       })),
       weeklyHours: Math.round(weeklyHours * 10) / 10,
       monthlyHours: Math.round(monthlyHours * 10) / 10,
-    });
+    }, CACHE_TIMES.DYNAMIC);
   } catch (error) {
     console.error("Staff schedule error:", error);
     return NextResponse.json(

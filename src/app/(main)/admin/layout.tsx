@@ -5,46 +5,7 @@ import AdminHeader from "./_components/AdminHeader";
 import { AdminKeyboardShortcuts } from "./_components/AdminKeyboardShortcuts";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ModalProvider } from "@/providers/modal-provider";
-
-// Performance monitoring for navigation
-if (typeof window !== "undefined") {
-  // Monitor route changes for performance
-  const observer = new PerformanceObserver((list) => {
-    for (const entry of list.getEntries()) {
-      if (entry.entryType === "navigation") {
-        const navEntry = entry as PerformanceNavigationTiming;
-        console.log("Navigation performance:", {
-          duration: entry.duration,
-          type: navEntry.type,
-          name: entry.name,
-        });
-      }
-    }
-  });
-
-  observer.observe({ entryTypes: ["navigation"] });
-
-  // Preload admin routes on mount for instant navigation
-  const adminRoutes = [
-    "/admin/staff",
-    "/admin/careers",
-    "/admin/participants",
-    "/admin/messages",
-    "/admin/users",
-    "/admin/analytics",
-  ];
-
-  // Prefetch routes after a short delay to not block initial load
-  setTimeout(() => {
-    adminRoutes.forEach((route) => {
-      const link = document.createElement("link");
-      link.rel = "prefetch";
-      link.href = route;
-      link.as = "document";
-      document.head.appendChild(link);
-    });
-  }, 1000);
-}
+import { PrefetchAdminRoutes } from "@/components/prefetch-routes";
 
 export default async function AdminLayout({
   children,
@@ -76,6 +37,8 @@ export default async function AdminLayout({
             </div>
           </div>
           <ModalProvider />
+          {/* Prefetch common admin routes for instant navigation */}
+          <PrefetchAdminRoutes />
         </div>
       </SidebarInset>
     </SidebarProvider>

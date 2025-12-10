@@ -35,24 +35,32 @@ const nextConfig: NextConfig = {
       "@radix-ui/react-sidebar",
       "@radix-ui/react-tabs",
       "@radix-ui/react-tooltip",
-      "lucide-react"
+      "lucide-react",
+      "framer-motion",
+      "date-fns",
     ],
     scrollRestoration: true,
+    // Optimize CSS for faster loading
+    optimizeCss: true,
+    // Enable partial prerendering for instant navigation
+    ppr: false, // Will be stable in future Next.js versions
   },
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
-  generateEtags: false,
+  generateEtags: true, // Enable for better caching
   // Optimize images
   images: {
-    formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60,
+    formats: ["image/avif", "image/webp"], // AVIF first (smaller)
+    minimumCacheTTL: 3600, // 1 hour cache
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  // Enable prefetching for better navigation
-  onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
-  },
+  // Optimize bundling
+  productionBrowserSourceMaps: false,
   devIndicators: false,
 };
 

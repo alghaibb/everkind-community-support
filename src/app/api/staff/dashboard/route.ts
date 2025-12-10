@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek } from "date-fns";
+import { cachedJson, CACHE_TIMES } from "@/lib/performance";
 
 export async function GET() {
   try {
@@ -100,7 +101,8 @@ export async function GET() {
       take: 5,
     });
 
-    return NextResponse.json({
+    // Cache dashboard data for 1 minute (dynamic data)
+    return cachedJson({
       staffName: staff.user.name,
       staffRole: staff.staffRole,
       stats: {
@@ -137,7 +139,7 @@ export async function GET() {
         isRead: n.isRead,
         createdAt: n.createdAt.toISOString(),
       })),
-    });
+    }, CACHE_TIMES.DYNAMIC);
   } catch (error) {
     console.error("Staff dashboard error:", error);
     return NextResponse.json(

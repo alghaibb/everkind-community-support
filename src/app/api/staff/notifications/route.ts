@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
+import { cachedJson, CACHE_TIMES } from "@/lib/performance";
 
 export async function GET() {
   try {
@@ -19,7 +20,8 @@ export async function GET() {
 
     const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-    return NextResponse.json({
+    // Cache notifications for 10 seconds (real-time)
+    return cachedJson({
       notifications: notifications.map((n) => ({
         id: n.id,
         type: n.type,
@@ -30,7 +32,7 @@ export async function GET() {
         createdAt: n.createdAt.toISOString(),
       })),
       unreadCount,
-    });
+    }, CACHE_TIMES.REALTIME);
   } catch (error) {
     console.error("Staff notifications error:", error);
     return NextResponse.json(

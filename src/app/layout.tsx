@@ -12,6 +12,8 @@ const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-poppins",
   weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap", // Faster font loading
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -67,6 +69,11 @@ export default function RootLayout({
       <head>
         <meta name="apple-mobile-web-app-title" content="EKCS" />
         <link rel="manifest" href="/manifest.json" />
+        {/* Preconnect to external domains for faster loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* DNS prefetch for faster lookups */}
+        <link rel="dns-prefetch" href="https://vercel.live" />
       </head>
       <body className={`${poppins.variable} antialiased`}>
         <ThemeProvider

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/get-session";
 import prisma from "@/lib/prisma";
 import { addDays, startOfDay } from "date-fns";
+import { cachedJson, CACHE_TIMES } from "@/lib/performance";
 
 export async function GET(request: NextRequest) {
   try {
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
       { requiredRole: staff.staffRole },
     ];
 
-    // Get available shifts
+    // Get available shifts with pagination for performance
     const shifts = await prisma.availableShift.findMany({
       where: {
         ...whereClause,
@@ -66,9 +67,11 @@ export async function GET(request: NextRequest) {
         },
       },
       orderBy: [{ shiftDate: "asc" }, { startTime: "asc" }],
+      take: 50, // Limit to 50 shifts for performance
     });
 
-    return NextResponse.json({
+    // Cache available shifts for 1 minute
+    return cachedJson({
       shifts: shifts.map((shift) => ({
         id: shift.id,
         shiftDate: shift.shiftDate.toISOString(),
@@ -83,7 +86,7 @@ export async function GET(request: NextRequest) {
         hasRequested: shift.shiftRequests.length > 0,
       })),
       total: shifts.length,
-    });
+    }, CACHE_TIMES.DYNAMIC);
   } catch (error) {
     console.error("Available shifts error:", error);
     return NextResponse.json(
