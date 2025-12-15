@@ -15,6 +15,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Home, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { NotificationDropdown } from "@/components/notification-dropdown";
 
 const routeLabels: Record<string, string> = {
   "/admin": "Dashboard",
@@ -25,6 +26,8 @@ const routeLabels: Record<string, string> = {
   "/admin/analytics": "Analytics",
   "/admin/users": "Users",
   "/admin/profile": "Profile Settings",
+  "/admin/shift-requests": "Shift Requests",
+  "/admin/available-shifts": "Available Shifts",
 };
 
 const AdminHeaderComponent = () => {
@@ -103,10 +106,13 @@ const AdminHeaderComponent = () => {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="ml-auto flex-shrink-0">
+        <div className="ml-auto flex items-center gap-1 sm:gap-2 flex-shrink-0">
+          {/* Notifications Dropdown */}
+          <NotificationDropdown apiEndpoint="/api/admin/notifications" />
+          
           <Button asChild variant="ghost" size="icon">
             <Link href="/">
-              <Home className="h-3 w-3" />
+              <Home className="h-4 w-4" />
             </Link>
           </Button>
         </div>

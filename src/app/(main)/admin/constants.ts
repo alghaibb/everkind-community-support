@@ -9,6 +9,8 @@ import {
   Activity,
   MessageSquare,
   Calendar,
+  CalendarPlus,
+  ClipboardCheck,
 } from "lucide-react";
 
 // Role definitions
@@ -238,13 +240,25 @@ export const NAVIGATION_ITEMS = [
     ],
   },
   {
-    title: "Operations",
+    title: "Scheduling",
     items: [
       {
-        title: "Scheduling",
+        title: "Staff Schedule",
         url: "/admin/scheduling",
         icon: Calendar,
         description: "Staff schedules and shifts",
+      },
+      {
+        title: "Available Shifts",
+        url: "/admin/available-shifts",
+        icon: CalendarPlus,
+        description: "Create shifts for pickup",
+      },
+      {
+        title: "Shift Requests",
+        url: "/admin/shift-requests",
+        icon: ClipboardCheck,
+        description: "Approve shift pickups",
       },
     ],
   },

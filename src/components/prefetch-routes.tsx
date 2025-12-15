@@ -39,8 +39,8 @@ export function PrefetchStaffRoutes() {
       routes={[
         "/staff",
         "/staff/schedule",
+        "/staff/available-shifts",
         "/staff/timesheets",
-        "/staff/notifications",
       ]}
     />
   );
@@ -58,6 +58,8 @@ export function PrefetchAdminRoutes() {
         "/admin/participants",
         "/admin/careers",
         "/admin/messages",
+        "/admin/shift-requests",
+        "/admin/available-shifts",
       ]}
     />
   );

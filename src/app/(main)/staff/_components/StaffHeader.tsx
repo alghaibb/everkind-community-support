@@ -10,11 +10,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Bell } from "lucide-react";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { NotificationDropdown } from "@/components/notification-dropdown";
 
 export default function StaffHeader() {
   const pathname = usePathname();
@@ -96,20 +93,8 @@ export default function StaffHeader() {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Notifications button */}
-        <Button variant="ghost" size="icon" className="relative" asChild>
-          <Link href="/staff/notifications">
-            <Bell className="h-5 w-5" />
-            {/* Notification badge - you can make this dynamic */}
-            <Badge
-              variant="destructive"
-              className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]"
-            >
-              3
-            </Badge>
-            <span className="sr-only">Notifications</span>
-          </Link>
-        </Button>
+        {/* Notifications Dropdown */}
+        <NotificationDropdown apiEndpoint="/api/staff/notifications" />
       </div>
     </header>
   );

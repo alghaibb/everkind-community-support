@@ -172,24 +172,24 @@ export default function MobileNavClient({ user }: MobileNavClientProps) {
 
               {/* Generic user links (only show if not staff) */}
               {!isStaff && (
-                <>
-                  <div className="border-t border-border my-4" />
-                  <Link
-                    href="/profile"
-                    className="flex items-center px-3 py-2 text-base font-medium hover:text-primary transition-colors"
-                    onClick={() => setOpen(false)}
-                  >
-                    <User className="mr-3 h-4 w-4" />
-                    Profile
-                  </Link>
-                  <Link
-                    href="/settings"
-                    className="flex items-center px-3 py-2 text-base font-medium hover:text-primary transition-colors"
-                    onClick={() => setOpen(false)}
-                  >
-                    <Settings className="mr-3 h-4 w-4" />
-                    Settings
-                  </Link>
+            <>
+              <div className="border-t border-border my-4" />
+              <Link
+                href="/profile"
+                className="flex items-center px-3 py-2 text-base font-medium hover:text-primary transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                <User className="mr-3 h-4 w-4" />
+                Profile
+              </Link>
+              <Link
+                href="/settings"
+                className="flex items-center px-3 py-2 text-base font-medium hover:text-primary transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                <Settings className="mr-3 h-4 w-4" />
+                Settings
+              </Link>
                 </>
               )}
 
